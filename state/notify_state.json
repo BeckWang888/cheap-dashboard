@@ -61,12 +61,12 @@
    }
   },
   "TSLA": {
-   "state": "觀察中",
+   "state": "重點觀察",
    "heat": "",
-   "trough": "",
+   "trough": "形成中",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    }
   },
@@ -101,7 +101,7 @@
    }
   },
   "GGLL": {
-   "state": "轉折初現",
+   "state": "轉折確認",
    "heat": "",
    "trough": "",
    "armed": {
@@ -111,6 +111,9 @@
    }
   }
  },
- "sent": {},
+ "sent": {
+  "TSLA|trough形成中": "2026-10-03",
+  "GGLL|confirm": "2026-10-03"
+ },
  "groups": {}
 }
