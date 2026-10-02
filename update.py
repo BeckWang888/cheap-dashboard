@@ -46,7 +46,7 @@ def analyze(item: dict) -> dict:
     out = {k: item.get(k) for k in ("symbol", "name", "market", "type", "group")}
     out["base"] = base
     out["intraday"] = not closed_today
-    out["price"] = num(close.iloc[-1], 4)
+    out["quote"] = quote(close)
     out["v"] = {}
     tail = close.index[-CHART_DAYS:]
     out["chart"] = {"d": [d.strftime("%Y-%m-%d") for d in tail], "p": [num(v, 4) for v in close.loc[tail]]}
@@ -60,8 +60,17 @@ def analyze(item: dict) -> dict:
     if lev:
         real = data.load(item["symbol"], refresh=True)["Close"]
         out["lev"] = lev_info(real, close, item["x"], base)
-        out["price"] = num(real.iloc[-1], 4)
+        out["quote"] = quote(real)
+    out["price"] = out["quote"]["price"]
     return out
+
+
+def quote(s: pd.Series) -> dict:
+    """最新價、日期、前一日收盤與漲跌幅。"""
+    s = s.dropna()
+    prev = s.iloc[-2] if len(s) > 1 else None
+    return {"price": num(s.iloc[-1], 4), "date": s.index[-1].strftime("%Y-%m-%d"),
+            "prev": num(prev, 4), "chg": num(s.iloc[-1] / prev - 1, 5) if prev else None}
 
 
 def read_json(path: Path, default):

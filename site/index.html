@@ -71,6 +71,8 @@ button:focus-visible,label.t:focus-within,.row:focus-visible{outline:2px solid v
 .hot{display:inline-block;font-size:11px;font-weight:700;padding:0 6px;border-radius:8px;margin-left:6px;vertical-align:2px;color:#fff;background:var(--warm)}
 .hot.vh{background:var(--hot)}
 .live{display:inline-block;font-size:11px;padding:0 6px;border-radius:8px;margin-left:6px;vertical-align:2px;background:var(--chip);color:var(--sub)}
+.px{font-size:13px;color:var(--sub);margin-top:2px;font-variant-numeric:tabular-nums}
+.px b{color:var(--ink);font-weight:600;margin-right:6px}
 .sec{padding:10px 16px;font-size:13px;background:var(--chip);color:var(--sub);border-top:1px solid var(--line)}
 table{border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums;width:100%}
 td,th{padding:4px 6px;text-align:right;white-space:nowrap;border-top:1px solid var(--line)}
@@ -142,6 +144,7 @@ function render(){
   var heat=c.heat?'<span class="hot'+(c.heat==="嚴重過熱"?" vh":"")+'">'+c.heat+'</span>':'';
   h+='<div class="row'+(s[1]==="go"?" go":s[1]==="boss"?" boss":"")+(st.open===r.symbol?" open":"")+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
    +'<div class="id"><b>'+esc(r.symbol.replace(".TW",""))+'</b>'+heat+(r.intraday?'<span class="live">盤中</span>':'')+'<span class="nm">'+esc(r.name)+'</span>'
+   +pxLine(r)
    +(L?'<div class="lv">'+L.x+' 倍・對應 '+esc(L.underlying)+'</div>':'')+(r.thin?'<div class="lv warn">資料不足，分數僅供參考</div>':'')
    +'<div class="sig"><span>'+dots+'</span><em class="'+s[1]+'">'+s[0]+'</em></div></div>'
    +'<div class="sc"><b>'+(c.score==null?'—':c.score.toFixed(0))+'</b><span style="color:var('+(l?l[2]:'--sub')+')">'+(l?l[1]:'')+'</span></div>'
@@ -151,9 +154,12 @@ function render(){
  document.getElementById("list").innerHTML=h||'<div class="empty">沒有符合條件的標的。</div>';
  if(st.open){var el=document.querySelector('.row.open .mini');if(el)hover(el,D.items.filter(function(r){return r.symbol===st.open})[0])}
 }
+function fmtPx(v){return v==null?'—':v>=1000?v.toLocaleString("en-US",{maximumFractionDigits:1}):v.toFixed(2)}
+function pxLine(r){var q=r.quote;if(!q)return'';var d=q.date.slice(5).replace("-","/");
+ return '<div class="px"><b>'+fmtPx(q.price)+'</b>'+(q.chg==null?'':pc(q.chg,2))+'<span class="dim">　'+d+(r.intraday?' 盤中':' 收盤')+'</span></div>'}
 function detail(r){
  var c=C(r),L=r.lev,b=r.v[st.v].bt,pf=L?"標的 ":"",SN=D.signal_names;
- var h='<div class="det"><div class="kv"><div>'+pf+'距 52 週高點<b>'+pc(c.dd52)+'</b></div><div>'+pf+'距歷史高點<b>'+pc(c.dd_ath)+'</b></div><div>'+pf+'日線 RSI<b>'+(c.rsi==null?'—':c.rsi.toFixed(0))+'</b></div><div>'+pf+'相對 MA200<b>'+pc(c.ma_dev)+'</b></div><div>價格<b>'+(r.price==null?'—':r.price)+'</b></div></div>';
+ var h='<div class="det"><div class="kv"><div>'+pf+'距 52 週高點<b>'+pc(c.dd52)+'</b></div><div>'+pf+'距歷史高點<b>'+pc(c.dd_ath)+'</b></div><div>'+pf+'日線 RSI<b>'+(c.rsi==null?'—':c.rsi.toFixed(0))+'</b></div><div>'+pf+'相對 MA200<b>'+pc(c.ma_dev)+'</b></div><div>'+(r.intraday?'盤中價':'最新收盤')+'<b>'+fmtPx(r.price)+'</b></div><div>前一日收盤<b>'+fmtPx(r.quote&&r.quote.prev)+'</b></div></div>';
  if(L)h+='<h4>槓桿 ETF 本身</h4><div class="kv"><div>離高點<b>'+pc(L.dd_ath)+'</b></div><div>回本所需漲幅<b>'+pc(L.recover,0)+'</b></div><div>近一年實際 − 標的×'+L.x+'<b>'+(L.gap_1y==null?'不足 1 年':pc(L.gap_1y))+'</b></div></div>';
  var chips='<span class="fl bsf'+(c.trough?" on":"")+(c.trough_forming&&!c.trough?" half":"")+'">月線 MACD 谷底'+(c.trough?"（已確認）":c.trough_forming?"（形成中）":"")+'</span>';
  SN.forEach(function(n,k){chips+='<span class="fl'+(c.sigs[k]?" on":"")+(k===1&&!c.sigs[1]&&c.s2_forming?" half":"")+'">'+n+(k===1&&!c.sigs[1]&&c.s2_forming?"（形成中）":"")+'</span>'});
