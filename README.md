@@ -7,6 +7,11 @@
 - 每次執行 `update.py`：抓資料 → 算分數與訊號 → 產生 `site/data.json` → 發布到 GitHub Pages → 有新事件就用 ntfy 推播。
 - `state/` 由 Actions 自動提交：通知狀態（避免重複通知）與每日訊號紀錄 `signal_log.csv`（日後檢驗用）。
 
+## 持倉分頁
+- 網頁上方切到「持倉」。資料存在 `holdings.json`（公開），價格由排程抓到 `site/prices.json`。
+- 新增修改要先在頁面的「存檔設定」貼上 GitHub fine-grained token（只給這個 repo 的 Contents 讀寫），存在該裝置瀏覽器。
+- 用手機鍵盤語音輸入一連串持倉 → 「整理成表格」（`site/parser.js`，固定句型解析）→ 確認存入。存檔後 workflow 會自動跑一次，約 2 分鐘後新代碼有價格。
+
 ## 常改的地方
 - `watchlist.json`：標的清單。`type` 為 `etf` / `stock` / `leveraged`；槓桿型要填 `underlying` 和 `x`（倍數）；`group` 用來提醒同族群同時便宜。台股代碼加 `.TW`。
 - `config.json`：通知門檻 `thresholds`、各類通知開關 `notify`、冷卻天數 `cooldown_days`、族群提醒門檻 `group_alert_min`。

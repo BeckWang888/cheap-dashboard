@@ -1,0 +1,44 @@
+{
+ "accounts": [
+  {
+   "id": "hn-tw",
+   "name": "華南金 台股",
+   "market": "TW",
+   "ccy": "TWD"
+  },
+  {
+   "id": "hn-us",
+   "name": "華南金 美股",
+   "market": "US",
+   "ccy": "USD"
+  },
+  {
+   "id": "fb-tw",
+   "name": "第一金 台股",
+   "market": "TW",
+   "ccy": "TWD"
+  },
+  {
+   "id": "fb-us",
+   "name": "第一金 美股",
+   "market": "US",
+   "ccy": "USD"
+  },
+  {
+   "id": "moomoo",
+   "name": "Moomoo",
+   "market": "US",
+   "ccy": "USD"
+  },
+  {
+   "id": "etoro",
+   "name": "eToro",
+   "market": "US",
+   "ccy": "USD"
+  }
+ ],
+ "lots": [],
+ "cash": {},
+ "names": {},
+ "updated": ""
+}

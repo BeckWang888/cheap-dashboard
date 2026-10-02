@@ -80,6 +80,26 @@ def read_json(path: Path, default):
         return default
 
 
+def holdings_prices(now_tw) -> dict:
+    """持倉頁要的現價與匯率。持股不在觀察清單裡也會抓。"""
+    h = read_json(ROOT / "holdings.json", {})
+    syms = sorted({l["sym"] for l in h.get("lots", []) if l.get("sym")})
+    out = {"generated": now_tw.strftime("%Y-%m-%d %H:%M"), "q": {}, "missing": []}
+    for sym in syms:
+        try:
+            ys, s = data.recent_close(sym)
+        except Exception as e:
+            print(f"[警告] 持股 {sym} 報價失敗：{e}")
+            ys, s = "", pd.Series(dtype=float)
+        if s.empty:
+            out["missing"].append(sym)
+            continue
+        out["q"][sym] = dict(quote(s), ys=ys, ccy="TWD" if ys.endswith((".TW", ".TWO")) else "USD")
+    _, fx = data.recent_close("TWD=X")
+    out["fx"] = quote(fx) if not fx.empty else None
+    return out
+
+
 def log_signals(results: list, today: str):
     """每天記一筆，日後用來檢驗「當時說便宜的，後來怎麼樣」。同一天重跑會覆蓋。"""
     path = STATE / "signal_log.csv"
@@ -121,6 +141,8 @@ def main():
                "groups": groups, "failed": failed, "items": results}
     (SITE / "data.json").write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     log_signals(results, now_tw.strftime("%Y-%m-%d"))
+    prices = holdings_prices(now_tw)
+    (SITE / "prices.json").write_text(json.dumps(prices, ensure_ascii=False), encoding="utf-8")
 
     prev = read_json(STATE / "notify_state.json", None)
     cur = [{"symbol": r["symbol"], "current": r["v"]["full"]["current"]} for r in results]

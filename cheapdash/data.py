@@ -69,11 +69,11 @@ def _load_yahoo(symbol: str) -> pd.DataFrame:
     return df
 
 
-def _load_yahoo_recent(symbol: str) -> pd.DataFrame:
+def _load_yahoo_recent(symbol: str, period: str = "5d") -> pd.DataFrame:
     try:
         _fix_ca_bundle()
         import yfinance as yf
-        df = yf.Ticker(symbol).history(period="5d", auto_adjust=False)
+        df = yf.Ticker(symbol).history(period=period, auto_adjust=False)
     except Exception as e:
         print(f"[警告] {symbol} 盤中報價抓取失敗：{e}")
         return pd.DataFrame()
@@ -116,3 +116,14 @@ def load(symbol: str, refresh: bool = False) -> pd.DataFrame:
         print(f"[注意] {symbol} {d.date()} 單日變動 {j:.0%}，請確認是否為未還原的分割")
     df.to_csv(path)
     return df
+
+
+def recent_close(symbol: str) -> tuple[str, pd.Series]:
+    """持倉用：最近幾天的收盤價（不還原，就是券商 App 看到的價格）。
+    台股代碼（純數字開頭）先試上市 .TW，再試上櫃 .TWO。回傳 (Yahoo 代碼, 收盤價序列)。"""
+    cands = [symbol + ".TW", symbol + ".TWO"] if symbol[:1].isdigit() else [symbol]
+    for ys in cands:
+        df = _load_yahoo_recent(ys, "1mo")
+        if not df.empty:
+            return ys, df["Close"].dropna()
+    return "", pd.Series(dtype=float)

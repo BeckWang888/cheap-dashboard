@@ -10,6 +10,9 @@ on:
     - cron: "20 16 * * 1-5"  # 美股盤中
     - cron: "30 21 * * 1-5"  # 美股收盤後
   workflow_dispatch: {}      # 也可以在 Actions 頁面手動按「Run workflow」
+  push:                      # 改了持倉、清單或設定就馬上更新（持倉頁存檔後約 2 分鐘出現新價格）
+    branches: [main]
+    paths: [holdings.json, watchlist.json, config.json]
 
 permissions:
   contents: write
