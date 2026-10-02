@@ -37,8 +37,107 @@
    "ccy": "USD"
   }
  ],
- "lots": [],
+ "lots": [
+  {
+   "id": "lmuqebx3dqmt3",
+   "acct": "fb-tw",
+   "sym": "9901",
+   "date": "2026-06-06",
+   "qty": 13,
+   "px": 236309
+  },
+  {
+   "id": "lmuqebx3dnn3o",
+   "acct": "fb-tw",
+   "sym": "0050",
+   "date": "2026-06-06",
+   "qty": 1000,
+   "px": 75908
+  },
+  {
+   "id": "lmuqebx3d4fec",
+   "acct": "fb-tw",
+   "sym": "0052",
+   "date": "2026-06-06",
+   "qty": 7000,
+   "px": 322465
+  },
+  {
+   "id": "lmuqebx3dxeem",
+   "acct": "fb-tw",
+   "sym": "00662",
+   "date": "2026-06-06",
+   "qty": 3000,
+   "px": 311491
+  },
+  {
+   "id": "lmuqebx3djw39",
+   "acct": "fb-tw",
+   "sym": "00757",
+   "date": "2026-06-06",
+   "qty": 2000,
+   "px": 216557
+  },
+  {
+   "id": "lmuqebx3dhtsc",
+   "acct": "fb-tw",
+   "sym": "00830",
+   "date": "2026-06-06",
+   "qty": 3000,
+   "px": 273600
+  },
+  {
+   "id": "lmuqebx3dybii",
+   "acct": "fb-tw",
+   "sym": "00892",
+   "date": "2026-06-06",
+   "qty": 5000,
+   "px": 153356
+  },
+  {
+   "id": "lmuqebx3djq60",
+   "acct": "fb-tw",
+   "sym": "00941",
+   "date": "2026-06-06",
+   "qty": 4000,
+   "px": 91138
+  },
+  {
+   "id": "lmuqebx3dg96f",
+   "acct": "fb-tw",
+   "sym": "00990A",
+   "date": "2026-06-06",
+   "qty": 10000,
+   "px": 162310
+  },
+  {
+   "id": "lmuqebx3dct1a",
+   "acct": "fb-tw",
+   "sym": "6940",
+   "date": "2026-06-06",
+   "qty": 2000,
+   "px": 53676
+  },
+  {
+   "id": "lmuqebx3d8jij",
+   "acct": "fb-tw",
+   "sym": "009800",
+   "date": "2026-06-06",
+   "qty": 5000,
+   "px": 52825
+  },
+  {
+   "id": "lmuqebx3d5wue",
+   "acct": "fb-tw",
+   "sym": "009816",
+   "date": "2026-06-06",
+   "qty": 12000,
+   "px": 136362
+  }
+ ],
  "cash": {},
- "names": {},
- "updated": ""
+ "names": {
+  "0050": "元大台灣50"
+ },
+ "updated": "2026-10-02T03:21:11.500Z"
 }
