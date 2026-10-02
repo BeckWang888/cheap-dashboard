@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>便宜度 Dashboard</title>
+<meta name="theme-color" content="#12805f">
+<style>
+:root{
+  --bg:#eef1f4;--panel:#fff;--ink:#1b2430;--sub:#5d6978;--line:#d9dfe6;
+  --hot:#c2452d;--warm:#e0a24a;--mid:#c9d0d8;--cool:#6fb79c;--cheap:#12805f;
+  --accent:#12805f;--chip:#e3e8ee;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#10161d;--panel:#18202a;--ink:#e6ebf1;--sub:#93a0af;--line:#2a3441;--hot:#e0644a;--warm:#d9a04c;--mid:#3a4553;--cool:#4fa88a;--cheap:#3ec9a0;--accent:#3ec9a0;--chip:#232d3a}
+}
+:root[data-theme="dark"]{--bg:#10161d;--panel:#18202a;--ink:#e6ebf1;--sub:#93a0af;--line:#2a3441;--hot:#e0644a;--warm:#d9a04c;--mid:#3a4553;--cool:#4fa88a;--cheap:#3ec9a0;--accent:#3ec9a0;--chip:#232d3a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;line-height:1.5;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+.wrap{max-width:900px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:22px;margin:0 0 2px;font-weight:700}
+.note{font-size:13px;color:var(--sub);margin:0 0 14px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.sum{display:flex;gap:20px;flex-wrap:wrap;margin:6px 0 16px}
+.sum b{font-size:28px;font-variant-numeric:tabular-nums;display:block;line-height:1.1}
+.sum span{font-size:13px;color:var(--sub)}
+.bar{display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.tabs{display:inline-flex;background:var(--chip);border-radius:8px;padding:3px}
+.tabs button{border:0;background:none;color:var(--sub);font:inherit;font-size:14px;padding:6px 12px;border-radius:6px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--panel);color:var(--ink);font-weight:600}
+label.t{font-size:14px;color:var(--sub);display:flex;gap:6px;align-items:center;cursor:pointer}
+button:focus-visible,label.t:focus-within,.row:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.alert{border-radius:10px;padding:10px 14px;margin:0 0 12px;font-size:14px;background:var(--chip);border-left:4px solid var(--warm)}
+.alert.err{border-left-color:var(--hot)}
+.legend{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin:12px 0 4px}
+.legend.d{display:none}
+@media(min-width:640px){.legend.d{display:grid;grid-template-columns:200px 1fr 120px;gap:16px;padding:0 16px}.legend.d span:nth-child(2){display:flex;justify-content:space-between}.legend.m{display:none}}
+.list{background:var(--panel);border-radius:12px;border:1px solid var(--line);overflow:hidden}
+.row{display:grid;grid-template-columns:1fr auto;gap:8px 16px;padding:14px 16px;border-top:1px solid var(--line);cursor:pointer}
+.row:first-child{border-top:0}
+.id b{font-size:17px}.id .nm{font-size:13px;color:var(--sub);margin-left:8px}
+.sc{text-align:right;font-variant-numeric:tabular-nums}
+.sc b{font-size:22px}.sc span{display:block;font-size:12px;font-weight:600}
+.th{grid-column:1/-1;position:relative;height:10px;border-radius:5px;margin:6px 0 2px;background:linear-gradient(90deg,var(--hot),var(--warm) 25%,var(--mid) 50%,var(--cool) 75%,var(--cheap))}
+.th i{position:absolute;top:-4px;bottom:-4px;width:1px;background:var(--panel);opacity:.9}
+.th u{position:absolute;top:-6px;width:6px;height:22px;margin-left:-3px;border-radius:3px;background:var(--ink);border:2px solid var(--panel);box-sizing:content-box;transform:translateX(-2px)}
+.det{grid-column:1/-1;display:none;padding-top:8px;cursor:default}
+.row.open .det{display:block}
+.kv{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--sub)}
+.kv b{display:block;color:var(--ink);font-size:15px;font-variant-numeric:tabular-nums}
+.det h4{font-size:13px;color:var(--sub);margin:14px 0 6px;font-weight:600}
+.fl{display:inline-block;padding:1px 8px;border-radius:10px;background:var(--chip);margin:0 4px 4px 0;font-size:12px}
+.fl.on{background:var(--accent);color:var(--bg);font-weight:600}
+.fl.bsf.on{background:var(--warm);color:#1b2430}
+.fl.half{outline:1.5px dashed var(--warm);outline-offset:-1.5px}
+.empty{padding:28px 16px;color:var(--sub);text-align:center}
+@media(min-width:640px){
+  .row{grid-template-columns:200px 1fr 120px;align-items:center}
+  .th{grid-column:auto;margin:0;order:2}.sc{order:3}.det{order:4}
+  .id .nm{display:block;margin:0}
+}
+.sig{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
+.dt{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--sub);display:inline-block;margin-right:3px}
+.dt.on{background:var(--accent);border-color:var(--accent)}
+.dt.bs{border-radius:2px;transform:rotate(45deg);margin-left:6px;border-color:var(--warm)}.dt.bs.on{background:var(--warm)}
+.dt.bs.half{background:linear-gradient(135deg,var(--warm) 50%,transparent 50%)}
+.sig em{font-style:normal;font-size:12px;font-weight:600;color:var(--sub)}
+.sig em.go{color:var(--accent)}.sig em.mid{color:var(--warm)}.sig em.off{font-weight:400}.sig em.boss{color:var(--warm)}
+.row.go{box-shadow:inset 3px 0 0 var(--accent)}.row.boss{box-shadow:inset 3px 0 0 var(--warm)}
+.lv{font-size:12px;color:var(--warm);margin-top:2px}.lv.warn{color:var(--hot)}
+.hot{display:inline-block;font-size:11px;font-weight:700;padding:0 6px;border-radius:8px;margin-left:6px;vertical-align:2px;color:#fff;background:var(--warm)}
+.hot.vh{background:var(--hot)}
+.live{display:inline-block;font-size:11px;padding:0 6px;border-radius:8px;margin-left:6px;vertical-align:2px;background:var(--chip);color:var(--sub)}
+.sec{padding:10px 16px;font-size:13px;background:var(--chip);color:var(--sub);border-top:1px solid var(--line)}
+table{border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums;width:100%}
+td,th{padding:4px 6px;text-align:right;white-space:nowrap;border-top:1px solid var(--line)}
+th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{text-align:left}
+.scroll{overflow-x:auto}
+.pos{color:var(--cheap)}.neg{color:var(--hot)}.dim{color:var(--sub)}
+.mini{position:relative}.mini svg{display:block;width:100%;height:auto}
+.tip{position:absolute;top:0;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:3px 8px;border-radius:6px;white-space:nowrap;display:none;transform:translateX(-50%)}
+.foot{font-size:12px;color:var(--sub);margin-top:18px}
+.foot a{color:var(--sub)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1>便宜度 Dashboard</h1>
+    <p class="note" id="meta">載入中…</p></div>
+    <div class="tabs" id="vt" title="百分位基準"><button data-v="full" aria-pressed="true">全部歷史</button><button data-v="5y" aria-pressed="false">近 5 年</button></div>
+  </div>
+  <div id="alerts"></div>
+  <div class="sum" id="sum"></div>
+  <div class="bar">
+    <div class="tabs" id="tabs">
+      <button data-m="all" aria-pressed="true">全部</button>
+      <button data-m="US" aria-pressed="false">美股</button>
+      <button data-m="TW" aria-pressed="false">台股</button>
+      <button data-m="LEV" aria-pressed="false">槓桿</button>
+    </div>
+    <label class="t"><input type="checkbox" id="only"> 只看便宜區</label>
+    <label class="t"><input type="checkbox" id="cand"> 只看候選進場與重點觀察</label>
+  </div>
+  <div class="legend m"><span>很貴</span><span>合理</span><span>很便宜</span></div>
+  <div class="legend d"><span>標的</span><span><span>很貴</span><span>中貴</span><span>合理</span><span>便宜（20 / 50 / 80 通知）</span><span>很便宜</span></span><span style="text-align:right">分數</span></div>
+  <div class="list" id="list"><div class="empty">載入中…</div></div>
+  <p class="foot">本工具只是輔助紀律，不提供投資建議；分數不預測底部。資料：美股 Yahoo Finance、台股 FinMind（延遲報價）。
+  「全部歷史／近 5 年」是百分位的比較基準：前者跟上市以來比、較嚴格；後者只跟最近 5 年比、便宜區較常出現。</p>
+</div>
+<script>
+var D=null,st={m:"all",only:false,cand:false,open:null,v:"full"};
+try{var sv=localStorage.getItem("cd_v");if(sv==="5y"||sv==="full")st.v=sv}catch(e){}
+var LV=[[80,"極便宜","--cheap"],[50,"很便宜","--cheap"],[20,"便宜","--cool"],[-10,"合理","--sub"],[-33,"小貴","--warm"],[-66,"中貴","--hot"],[-1e9,"很貴","--hot"]];
+var BAND=[[80,"--cheap",1],[50,"--cheap",.65],[20,"--cool",1],[-10,"--mid",1],[-33,"--warm",1],[-66,"--hot",.6],[-1e9,"--hot",1]];
+function lv(s){for(var i=0;i<LV.length;i++)if(s>=LV[i][0])return LV[i]}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function pc(x,d){if(x==null)return'—';if(Math.abs(x)<5e-4)x=0;var v=(x*100).toFixed(d==null?1:d);return'<span class="'+(x>0?"pos":x<0?"neg":"")+'">'+(x>0?"+":"")+v+'%</span>'}
+function pp(x){return x==null?'—':(x*100).toFixed(0)+'%'}
+function C(r){return r.v[st.v].current}
+function stt(r){var c=C(r),n=c.sigs.filter(Boolean).length;if(c.score==null)return["資料不足","off"];
+ if(c.state==="未進便宜區")return["未進便宜區","off"];if(c.state==="轉折確認")return["轉折確認","go"];
+ if(c.state==="重點觀察")return["重點觀察"+(c.trough?"":"（形成中）"),"boss"];if(c.state==="轉折初現")return["轉折初現（"+n+" 顆）","mid"];return["觀察中","wait"]}
+function rank(r){var k=stt(r)[1];return k==="go"?2:k==="boss"?1:0}
+function isLev(r){return r.type==="leveraged"}
+function render(){
+ var items=D.items,cnt=function(f){return items.filter(f).length};
+ document.getElementById("sum").innerHTML=
+  '<div><b style="color:var(--accent)">'+cnt(function(r){return stt(r)[1]==="go"})+'</b><span>候選進場</span></div>'+
+  '<div><b style="color:var(--warm)">'+cnt(function(r){return stt(r)[1]==="boss"})+'</b><span>重點觀察</span></div>'+
+  '<div><b>'+cnt(function(r){return C(r).score>=20})+'</b><span>進入便宜區</span></div>'+
+  '<div><b style="color:var(--hot)">'+cnt(function(r){return C(r).score!=null&&C(r).score<=-33})+'</b><span>中貴以上</span></div>'+
+  '<div><b style="color:var(--warm)">'+cnt(function(r){return !!C(r).heat})+'</b><span>乖離過熱</span></div>';
+ var rows=items.filter(function(r){var c=C(r);return(st.m==="all"||(st.m==="LEV"?isLev(r):r.market===st.m))&&(!st.only||c.score>=20)&&(!st.cand||rank(r)>0)})
+  .sort(function(a,b){return(isLev(a)?1:0)-(isLev(b)?1:0)||rank(b)-rank(a)||(C(b).score==null?-999:C(b).score)-(C(a).score==null?-999:C(a).score)});
+ var h="",seen=false;
+ rows.forEach(function(r){
+  var c=C(r),s=stt(r),L=r.lev,l=c.score==null?null:lv(c.score),p=c.score==null?50:(c.score+100)/2,pf=L?"標的 ":"";
+  if(L&&!seen){h+='<div class="sec">槓桿型 ETF：分數與訊號以對應的一倍標的計算，不代表槓桿產品本身安全</div>';seen=true}
+  var dots="";c.sigs.forEach(function(v){dots+='<i class="dt'+(v?" on":"")+'"></i>'});
+  dots+='<i class="dt bs'+(c.trough?" on":c.trough_forming?" half":"")+'" title="月線 MACD 谷底"></i>';
+  var heat=c.heat?'<span class="hot'+(c.heat==="嚴重過熱"?" vh":"")+'">'+c.heat+'</span>':'';
+  h+='<div class="row'+(s[1]==="go"?" go":s[1]==="boss"?" boss":"")+(st.open===r.symbol?" open":"")+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
+   +'<div class="id"><b>'+esc(r.symbol.replace(".TW",""))+'</b>'+heat+(r.intraday?'<span class="live">盤中</span>':'')+'<span class="nm">'+esc(r.name)+'</span>'
+   +(L?'<div class="lv">'+L.x+' 倍・對應 '+esc(L.underlying)+'</div>':'')+(r.thin?'<div class="lv warn">資料不足，分數僅供參考</div>':'')
+   +'<div class="sig"><span>'+dots+'</span><em class="'+s[1]+'">'+s[0]+'</em></div></div>'
+   +'<div class="sc"><b>'+(c.score==null?'—':c.score.toFixed(0))+'</b><span style="color:var('+(l?l[2]:'--sub')+')">'+(l?l[1]:'')+'</span></div>'
+   +'<div class="th"><i style="left:60%"></i><i style="left:75%"></i><i style="left:90%"></i><u style="left:'+p+'%"></u></div>'
+   +(st.open===r.symbol?detail(r):'<div class="det"></div>')+'</div>';
+ });
+ document.getElementById("list").innerHTML=h||'<div class="empty">沒有符合條件的標的。</div>';
+ if(st.open){var el=document.querySelector('.row.open .mini');if(el)hover(el,D.items.filter(function(r){return r.symbol===st.open})[0])}
+}
+function detail(r){
+ var c=C(r),L=r.lev,b=r.v[st.v].bt,pf=L?"標的 ":"",SN=D.signal_names;
+ var h='<div class="det"><div class="kv"><div>'+pf+'距 52 週高點<b>'+pc(c.dd52)+'</b></div><div>'+pf+'距歷史高點<b>'+pc(c.dd_ath)+'</b></div><div>'+pf+'日線 RSI<b>'+(c.rsi==null?'—':c.rsi.toFixed(0))+'</b></div><div>'+pf+'相對 MA200<b>'+pc(c.ma_dev)+'</b></div><div>價格<b>'+(r.price==null?'—':r.price)+'</b></div></div>';
+ if(L)h+='<h4>槓桿 ETF 本身</h4><div class="kv"><div>離高點<b>'+pc(L.dd_ath)+'</b></div><div>回本所需漲幅<b>'+pc(L.recover,0)+'</b></div><div>近一年實際 − 標的×'+L.x+'<b>'+(L.gap_1y==null?'不足 1 年':pc(L.gap_1y))+'</b></div></div>';
+ var chips='<span class="fl bsf'+(c.trough?" on":"")+(c.trough_forming&&!c.trough?" half":"")+'">月線 MACD 谷底'+(c.trough?"（已確認）":c.trough_forming?"（形成中）":"")+'</span>';
+ SN.forEach(function(n,k){chips+='<span class="fl'+(c.sigs[k]?" on":"")+(k===1&&!c.sigs[1]&&c.s2_forming?" half":"")+'">'+n+(k===1&&!c.sigs[1]&&c.s2_forming?"（形成中）":"")+'</span>'});
+ h+='<h4>轉折訊號（'+c.sigs.filter(Boolean).length+' / 5）'+(r.intraday?'・盤中數值，收盤後才確定':'')+'</h4><div>'+chips+'</div>';
+ if(c.heat)h+='<h4>過熱</h4><div class="kv"><div>'+c.heat+'：相對 MA200 的乖離已在自身歷史前 '+(c.heat==="嚴重過熱"?"1":"5")+'%（或 RSI ≥ 80）。回測顯示過熱後未必會跌，這是「別追高」的提醒，不是賣出訊號。</div></div>';
+ h+='<h4>近 2 年價格與分數（'+esc(r.base)+'）</h4><div class="mini">'+mini(r)+'<div class="tip"></div></div>';
+ h+='<h4>回測摘要（'+(L?'報酬為模擬 '+L.x+' 倍、':'')+'有分數 '+b.years.toFixed(1)+' 年，6 個月中位數）</h4><div class="scroll"><table><tr><th>事件</th><th>次數</th><th>6 個月報酬</th><th>上漲機率</th><th>之後最大再跌</th></tr>';
+ b.rows.forEach(function(e,i){h+='<tr'+(i?'':' class="dim"')+'><td>'+esc(e.label)+'</td><td>'+(i?e.n:'—')+'</td><td>'+pc(e.r126)+'</td><td>'+pp(e.win126)+'</td><td>'+pc(e.mae_med)+'</td></tr>'});
+ var g=b.longest_gap;
+ h+='</table></div><div class="kv" style="margin-top:6px"><div>便宜區時間占比<b>'+pp(b.cheap_share)+'</b></div><div>每年進便宜區<b>'+b.cheap_per_year.toFixed(1)+' 次</b></div><div>最長沒進便宜區<b>'+(g?g.years.toFixed(1)+' 年':'—')+'</b></div></div>';
+ return h+'</div>';
+}
+function mini(r){
+ var W=800,H=150,P=8,ph=100,sy=ph+12,sh=16,d=r.chart.d,p=r.chart.p,s=r.chart["s_"+st.v],n=d.length;
+ var mn=Math.min.apply(null,p),mx=Math.max.apply(null,p),path="",band="",bw=(W-2*P)/(n-1)+.6;
+ function X(i){return P+(W-2*P)*i/(n-1)}function Y(v){return 4+ph-(v-mn)/(mx-mn||1)*(ph-4)}
+ for(var i=0;i<n;i++){path+=(i?"L":"M")+X(i).toFixed(1)+" "+Y(p[i]).toFixed(1);
+  if(s[i]!=null){for(var k=0;k<BAND.length;k++)if(s[i]>=BAND[k][0])break;band+='<rect x="'+(X(i)-bw/2).toFixed(1)+'" y="'+sy+'" width="'+bw.toFixed(2)+'" height="'+sh+'" fill="var('+BAND[k][1]+')" opacity="'+BAND[k][2]+'"/>'}}
+ return '<svg viewBox="0 0 '+W+' '+(sy+sh+2)+'" role="img" aria-label="近兩年價格與分數"><path d="'+path+'" fill="none" stroke="var(--ink)" stroke-width="1.6"/>'+band+'<line class="hx" y1="0" y2="'+(sy+sh)+'" stroke="var(--sub)" style="display:none"/><rect class="hit" x="0" y="0" width="'+W+'" height="'+(sy+sh)+'" fill="transparent"/></svg>';
+}
+function hover(el,r){
+ var svg=el.querySelector("svg"),tip=el.querySelector(".tip"),hx=svg.querySelector(".hx"),hit=svg.querySelector(".hit"),d=r.chart.d,n=d.length;
+ function mv(e){var b=svg.getBoundingClientRect(),x=(e.clientX-b.left)*800/b.width,i=Math.round((x-8)/784*(n-1));if(i<0||i>=n)return;
+  var X=8+784*i/(n-1),s=r.chart["s_"+st.v][i];hx.setAttribute("x1",X);hx.setAttribute("x2",X);hx.style.display="";
+  tip.style.display="block";tip.style.left=Math.min(Math.max(X*b.width/800,70),b.width-70)+"px";tip.textContent=d[i]+"　"+r.chart.p[i]+"　分數 "+(s==null?"—":s.toFixed(0))}
+ hit.addEventListener("mousemove",mv);hit.addEventListener("touchmove",function(e){mv(e.touches[0])},{passive:true});
+ hit.addEventListener("mouseleave",function(){tip.style.display="none";hx.style.display="none"});
+}
+function alerts(){
+ var h="";Object.keys(D.groups||{}).forEach(function(g){var s=D.groups[g];if(s.length>=D.group_alert_min)h+='<div class="alert">'+esc(g)+' 有 '+s.length+' 檔同時在便宜區（'+s.map(esc).join("、")+'），分批時留意這一塊的總曝險。</div>'});
+ if(D.failed&&D.failed.length)h+='<div class="alert err">這次更新抓不到：'+D.failed.map(esc).join("、")+'（沿用上次資料或未顯示）</div>';
+ document.getElementById("alerts").innerHTML=h;
+}
+function setV(v){st.v=v;try{localStorage.setItem("cd_v",v)}catch(e){}[].forEach.call(document.getElementById("vt").children,function(x){x.setAttribute("aria-pressed",x.dataset.v===v)});render()}
+document.getElementById("vt").addEventListener("click",function(e){var b=e.target.closest("button");if(b)setV(b.dataset.v)});
+document.getElementById("tabs").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;st.m=b.dataset.m;[].forEach.call(this.children,function(x){x.setAttribute("aria-pressed",x===b)});render()});
+document.getElementById("only").addEventListener("change",function(){st.only=this.checked;render()});
+document.getElementById("cand").addEventListener("change",function(){st.cand=this.checked;render()});
+function tog(e){if(e.target.closest(".det"))return;var r=e.target.closest(".row");if(!r)return;if(e.type==="keydown"&&e.key!=="Enter"&&e.key!==" ")return;e.preventDefault();st.open=st.open===r.dataset.t?null:r.dataset.t;render()}
+document.getElementById("list").addEventListener("click",tog);
+document.getElementById("list").addEventListener("keydown",tog);
+fetch("data.json?t="+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(j){
+ D=j;document.getElementById("meta").textContent="更新時間 "+j.generated+"（台灣時間）・台股盤中與收盤後、美股盤中與收盤後自動更新";
+ alerts();setV(st.v);
+}).catch(function(e){document.getElementById("list").innerHTML='<div class="empty">資料載入失敗（'+esc(e.message)+'），請稍後重新整理。</div>'});
+</script>
+</body>
+</html>

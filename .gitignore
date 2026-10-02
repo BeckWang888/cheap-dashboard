@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+data/
+report.html
+.claude/
+site/data.json

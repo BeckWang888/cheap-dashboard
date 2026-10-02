@@ -1,0 +1,13 @@
+{
+  "thresholds": [20, 50, 80],
+  "notify": {
+    "cross": true,
+    "confirm": true,
+    "trough": true,
+    "heat": false,
+    "group": true
+  },
+  "cooldown_days": 7,
+  "group_alert_min": 3,
+  "site_url": ""
+}
