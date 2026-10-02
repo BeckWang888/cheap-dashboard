@@ -111,7 +111,9 @@
   }
 
   function parseLot(seg, isTW, today) {
-    var warn = [], qty = null, px = null, r;
+    var warn = [], qty = null, px = null, note = "", r;
+    // 備註：「備註」後面到句號為止都算備註，先拿掉，免得裡面的數字被誤認成股數或價格
+    if ((r = seg.match(/備註\s*[:：]?\s*([^。；;\n]*)/))) { note = r[1].replace(/[，,\s]+$/, "").trim(); seg = seg.replace(r[0], " "); }
     var dt = parseDate(seg, today);
     var rest = dt[1] ? seg.replace(dt[1], " ") : seg;
     if ((r = rest.match(/(\d+(?:\.\d+)?)\s*張/))) { qty = Math.round(Number(r[1]) * 1000); rest = rest.replace(r[0], " "); }
@@ -119,10 +121,9 @@
     if ((r = rest.match(new RegExp("(?:" + PRICE_KW + ")\\s*(?:是|為|:|大概|約)?\\s*(\\d+(?:\\.\\d+)?)")))) { px = Number(r[1]); }
     else if ((r = rest.match(/(\d+(?:\.\d+)?)\s*(?:元|塊|美元|美金)/))) { px = Number(r[1]); }
     if (/賣/.test(seg) && qty) qty = -qty;
-    if (!dt[0]) warn.push("沒有日期");
     if (qty == null) warn.push("沒有股數");
     if (px == null) warn.push("沒有價格");
-    return { date: dt[0], qty: qty, px: px, warn: warn };
+    return { date: dt[0], qty: qty, px: px, note: note, warn: warn };
   }
 
   function parse(text, opts) {

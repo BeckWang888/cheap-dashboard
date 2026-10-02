@@ -45,7 +45,7 @@ test("現金與萬", () => {
 
 test("缺資料會提醒", () => {
   const r = parse("TSLA 10股");
-  assert.deepStrictEqual(r[0].warn, ["沒有帳戶", "沒有日期", "沒有價格"]);
+  assert.deepStrictEqual(r[0].warn, ["沒有帳戶", "沒有價格"]);
 });
 
 test("賣出為負數", () => {
@@ -66,4 +66,10 @@ test("語音輸入常見格式：沒有空格、全形標點、三千股", () =>
 test("美股用美元結尾", () => {
   const r = parse("第一金美股 NVDA 2026年1月15號 12股 182.5美元");
   assert.deepStrictEqual([r[0].acct, r[0].px], ["fb-us", 182.5]);
+});
+
+test("不念日期也不會提醒；備註", () => {
+  const r = parse("華南台股 0050 3000股 成本150 備註長期持有，跌到130再加碼。2330 200股 成本 1050");
+  assert.deepStrictEqual(r.map(x => [x.sym, x.date, x.qty, x.px, x.note, x.warn.length]), [
+    ["0050", "", 3000, 150, "長期持有,跌到130再加碼", 0], ["2330", "", 200, 1050, "", 0]]);
 });

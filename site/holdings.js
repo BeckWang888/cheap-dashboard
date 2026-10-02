@@ -136,7 +136,7 @@
       if (open) h += acctDetail(id, ps, conv, dc, total);
       h += "</div>";
     });
-    if (!pos.length && !Object.keys(S.h.cash).length) h += '<div class="empty">還沒有持倉。用下方的「新增持倉」念或打字輸入，例如：<br>「華南台股，0050，2024 年 3 月 5 號買 3000 股，成本 150」</div>';
+    if (!pos.length && !Object.keys(S.h.cash).length) h += '<div class="empty">還沒有持倉。用下方的「新增持倉」念或打字輸入，例如：<br>「華南台股，0050，3000 股，成本 150」</div>';
     h += "</div>";
     if (empty.length && (pos.length || Object.keys(S.h.cash).length)) h += '<p class="note" style="margin-top:6px">沒有持倉的帳戶：' + empty.map(esc).join("、") + "</p>";
 
@@ -160,7 +160,7 @@
       if (S.open[k]) {
         h += '<tr class="lots"><td colspan="9">' + p.lots.map(function (l) {
           var del = S.confirmDel === l.id;
-          return '<div class="lot"><span>' + esc(l.date || "日期未填") + "</span><span>" + (l.qty < 0 ? "賣 " : "買 ") + num(Math.abs(l.qty), 4) + " 股</span><span>@ " + num(l.px, 4) + "</span>"
+          return '<div class="lot">' + (l.date ? "<span>" + esc(l.date) + "</span>" : "") + "<span>" + (l.qty < 0 ? "賣 " : "買 ") + num(Math.abs(l.qty), 4) + " 股</span><span>@ " + num(l.px, 4) + "</span>" + (l.note ? '<span class="dim">' + esc(l.note) + "</span>" : "")
             + (token() ? '<button class="lk" data-edit="' + esc(l.id) + '">編輯</button><button class="lk' + (del ? " danger" : "") + '" data-del="' + esc(l.id) + '">' + (del ? "確定刪除？" : "刪除") + "</button>" : "") + "</div>";
         }).join("") + "</td></tr>";
       }
@@ -176,27 +176,28 @@
   function inputCard() {
     if (!token()) return '<div class="card"><h3>新增持倉</h3><p class="note">要先在下方「存檔設定」貼上 GitHub 存取權杖，才能新增或修改。</p></div>';
     var h = '<div class="card"><h3>新增／修改持倉</h3>'
-      + '<p class="note">按手機鍵盤上的麥克風一路念下去，念完按「整理成表格」。每一檔照「代碼、買進日、幾股或幾張、成本」的順序；換券商時先念券商和台股／美股。<br>例：「華南台股。0050，2024 年 3 月 5 號買 3000 股，成本 150。0052，去年 8 月買 2 張，成本 210。Moomoo。SNXX，今年 6 月 10 號買 50 股，價格 32.5。Moomoo 美元現金 3200。」賣出就說「賣」。</p>'
+      + '<p class="note">按手機鍵盤上的麥克風一路念下去，念完按「整理成表格」。每一檔念「代碼、幾股或幾張、成本」就好，日期可以不念；想加備註就說「備註」再接內容。換券商時先念券商和台股／美股。<br>例：「華南台股。0050，3000 股，成本 150，備註長期持有。0052，2 張，成本 210。Moomoo。SNXX，50 股，價格 32.5。Moomoo 美元現金 3200。」賣出就說「賣」。</p>'
       + '<textarea id="hin" rows="5" placeholder="在這裡念或打字…">' + esc(ls("cd_draft") || "") + "</textarea>"
       + '<div class="bar" style="margin-top:8px"><button class="btn" id="hparse">整理成表格</button><button class="btn ghost" id="hadd">手動加一列</button></div>';
     if (S.rows.length) {
-      h += '<div class="scroll"><table class="ht edit"><tr><th>類型</th><th>帳戶</th><th>代碼</th><th>日期</th><th>股數</th><th>價格／金額</th><th></th></tr>';
+      h += '<div class="scroll"><table class="ht edit"><tr><th>類型</th><th>帳戶</th><th>代碼</th><th>股數</th><th>價格／金額</th><th>日期（選填）</th><th>備註（選填）</th><th></th></tr>';
       S.rows.forEach(function (r, i) {
         var bad = r.warn && r.warn.length;
         var acctSel = '<select data-i="' + i + '" data-f="acct"><option value="">選帳戶</option>' + ACCTS.map(function (a) { return '<option value="' + a.id + '"' + (a.id === r.acct ? " selected" : "") + ">" + a.name + "</option>"; }).join("") + "</select>";
         var typeSel = '<select data-i="' + i + '" data-f="kind">' + [["buy", "買進"], ["sell", "賣出"], ["cash", "現金"]].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === r.kind ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select>";
         h += '<tr class="' + (bad ? "warn" : "") + '"><td>' + typeSel + (r.id ? '<div class="dim" style="font-size:11px">修改既有</div>' : "") + "</td><td>" + acctSel + "</td>";
         if (r.kind === "cash") {
-          h += '<td><select data-i="' + i + '" data-f="ccy"><option value="TWD"' + (r.ccy === "TWD" ? " selected" : "") + '>台幣</option><option value="USD"' + (r.ccy === "USD" ? " selected" : "") + ">美元</option></select></td><td></td><td></td>"
-            + '<td><input data-i="' + i + '" data-f="amount" inputmode="decimal" value="' + esc(r.amount == null ? "" : r.amount) + '"></td>';
+          h += '<td><select data-i="' + i + '" data-f="ccy"><option value="TWD"' + (r.ccy === "TWD" ? " selected" : "") + '>台幣</option><option value="USD"' + (r.ccy === "USD" ? " selected" : "") + ">美元</option></select></td><td></td>"
+            + '<td><input data-i="' + i + '" data-f="amount" inputmode="decimal" value="' + esc(r.amount == null ? "" : r.amount) + '"></td><td></td><td></td>';
         } else {
           h += '<td><input data-i="' + i + '" data-f="sym" value="' + esc(r.sym || "") + '" size="7"></td>'
-            + '<td><input data-i="' + i + '" data-f="date" value="' + esc(r.date || "") + '" placeholder="2026-01-31" size="10"></td>'
             + '<td><input data-i="' + i + '" data-f="qty" inputmode="decimal" value="' + esc(r.qty == null ? "" : Math.abs(r.qty)) + '" size="7"></td>'
-            + '<td><input data-i="' + i + '" data-f="px" inputmode="decimal" value="' + esc(r.px == null ? "" : r.px) + '" size="7"></td>';
+            + '<td><input data-i="' + i + '" data-f="px" inputmode="decimal" value="' + esc(r.px == null ? "" : r.px) + '" size="7"></td>'
+            + '<td><input data-i="' + i + '" data-f="date" value="' + esc(r.date || "") + '" placeholder="可不填" size="10"></td>'
+            + '<td><input data-i="' + i + '" data-f="note" value="' + esc(r.note || "") + '" placeholder="例：長期持有" size="12"></td>';
         }
         h += '<td><button class="lk" data-rm="' + i + '">移除</button></td></tr>';
-        if (bad) h += '<tr class="warn"><td colspan="7" class="neg" style="font-size:12px">' + r.warn.map(esc).join("、") + "，請補上</td></tr>";
+        if (bad) h += '<tr class="warn"><td colspan="8" class="neg" style="font-size:12px">' + r.warn.map(esc).join("、") + "，請補上</td></tr>";
       });
       h += '</table></div><div class="bar" style="margin-top:8px"><button class="btn" id="hsave"' + (S.busy ? " disabled" : "") + ">" + (S.busy ? "存檔中…" : "確認存入（" + S.rows.length + " 筆）") + '</button><button class="btn ghost" id="hclear">清除表格</button></div>';
     }
@@ -216,7 +217,7 @@
   // ---------- 互動 ----------
   function rowFromParsed(x) {
     if (x.type === "cash") return { kind: "cash", acct: x.acct, ccy: x.ccy || (x.acct && /tw$/.test(x.acct) ? "TWD" : "USD"), amount: x.amount, warn: x.warn };
-    return { kind: x.qty < 0 ? "sell" : "buy", acct: x.acct, sym: x.sym, date: x.date, qty: x.qty == null ? null : Math.abs(x.qty), px: x.px, warn: x.warn };
+    return { kind: x.qty < 0 ? "sell" : "buy", acct: x.acct, sym: x.sym, date: x.date, qty: x.qty == null ? null : Math.abs(x.qty), px: x.px, note: x.note || "", warn: x.warn };
   }
   function validate(r) {
     var w = [];
@@ -224,7 +225,6 @@
     if (r.kind === "cash") { if (!(Number(r.amount) >= 0) || r.amount === "" || r.amount == null) w.push("沒有金額"); }
     else {
       if (!r.sym) w.push("沒有代碼");
-      if (!r.date) w.push("沒有日期");
       if (!(Number(r.qty) > 0)) w.push("沒有股數");
       if (!(Number(r.px) > 0)) w.push("沒有價格");
     }
@@ -242,7 +242,8 @@
         return;
       }
       var lot = { id: r.id || "l" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), acct: r.acct, sym: String(r.sym).toUpperCase().trim(),
-        date: r.date, qty: (r.kind === "sell" ? -1 : 1) * Number(r.qty), px: Number(r.px) };
+        date: r.date || "", qty: (r.kind === "sell" ? -1 : 1) * Number(r.qty), px: Number(r.px) };
+      if (r.note && String(r.note).trim()) lot.note = String(r.note).trim();
       var at = h.lots.findIndex(function (l) { return l.id === lot.id; });
       if (at >= 0) h.lots[at] = lot; else h.lots.push(lot);
       var sc = S.data && S.data.items.filter(function (it) { return it.symbol.replace(/\.TW$/, "") === lot.sym; })[0];
@@ -275,13 +276,13 @@
       S.msg = got.length ? "整理出 " + got.length + " 筆，檢查後按「確認存入」。" : "沒有認出任何代碼。每一檔要先念代碼或名稱，例如「0050」「台積電」「TSLA」。";
       render(); return;
     }
-    if (t.closest("#hadd")) { S.rows.push({ kind: "buy", acct: "", sym: "", date: "", qty: null, px: null, warn: [] }); render(); return; }
+    if (t.closest("#hadd")) { S.rows.push({ kind: "buy", acct: "", sym: "", date: "", qty: null, px: null, note: "", warn: [] }); render(); return; }
     if (t.closest("#hclear")) { S.rows = []; S.msg = ""; render(); return; }
     if (t.closest("#hsave")) { commit(); return; }
     if ((b = t.closest("[data-rm]"))) { S.rows.splice(+b.dataset.rm, 1); render(); return; }
     if ((b = t.closest("[data-edit]"))) {
       var l = S.h.lots.filter(function (x) { return x.id === b.dataset.edit; })[0];
-      if (l) S.rows.push({ id: l.id, kind: l.qty < 0 ? "sell" : "buy", acct: l.acct, sym: l.sym, date: l.date, qty: Math.abs(l.qty), px: l.px, warn: [] });
+      if (l) S.rows.push({ id: l.id, kind: l.qty < 0 ? "sell" : "buy", acct: l.acct, sym: l.sym, date: l.date, qty: Math.abs(l.qty), px: l.px, note: l.note || "", warn: [] });
       S.msg = "已放進下方表格，改完按「確認存入」。"; render();
       var inp = document.getElementById("hin"); if (inp) inp.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
