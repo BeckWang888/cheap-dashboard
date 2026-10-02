@@ -87,7 +87,7 @@ def compose(events: list, scores: dict) -> tuple[str, str, int]:
 
 def send(title: str, message: str, priority: int = 3, click: str = "") -> bool:
     """發到 ntfy。沒設定 NTFY_TOPIC 時只印出來（本機測試用）。"""
-    topic = os.environ.get("NTFY_TOPIC")
+    topic = (os.environ.get("NTFY_TOPIC") or "").strip()
     if not topic:
         print(f"[未設定 NTFY_TOPIC，只印出]\n{title}\n{message}")
         return False
@@ -98,5 +98,10 @@ def send(title: str, message: str, priority: int = 3, click: str = "") -> bool:
     import certifi
     req = urllib.request.Request(server, data=json.dumps(body).encode("utf-8"),
                                  headers={"Content-Type": "application/json"}, method="POST")
-    with urllib.request.urlopen(req, context=ssl.create_default_context(cafile=certifi.where()), timeout=30) as r:
-        return r.status == 200
+    try:
+        with urllib.request.urlopen(req, context=ssl.create_default_context(cafile=certifi.where()), timeout=30) as r:
+            return r.status == 200
+    except Exception as e:  # 推播失敗不影響資料更新
+        detail = e.read().decode("utf-8", "replace") if hasattr(e, "read") else ""
+        print(f"[警告] 推播失敗：{e} {detail}")
+        return False
