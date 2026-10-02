@@ -18,7 +18,7 @@
   function signed(v, ccy) { if (v == null || isNaN(v)) return "—"; return '<span class="' + (v > 0 ? "pos" : v < 0 ? "neg" : "") + '">' + (v > 0 ? "+" : "") + money(v, ccy) + "</span>"; }
   function pct(x, d) { if (x == null || !isFinite(x)) return "—"; return '<span class="' + (x > 0 ? "pos" : x < 0 ? "neg" : "") + '">' + (x > 0 ? "+" : "") + (x * 100).toFixed(d == null ? 1 : d) + "%</span>"; }
   function num(x, d) { return x == null ? "—" : Number(x).toLocaleString("en-US", { maximumFractionDigits: d == null ? 4 : d }); }
-  function isTW(sym) { return /^\d/.test(sym); }
+  function isTW(sym) { return /\d/.test(sym); }   // 台股代碼都有數字（含 AU9901 黃金現貨）
   function acctName(id) { var a = ACCTS.filter(function (x) { return x.id === id; })[0]; return a ? a.name : "（未指定）"; }
   function fx() { return S.prices && S.prices.fx ? S.prices.fx.price : null; }
   function toTWD(v, ccy) { return ccy === "USD" ? (fx() ? v * fx() : null) : v; }
@@ -31,7 +31,7 @@
     h.updated = new Date().toISOString();
     return GH.put("holdings.json", h, S.sha, message).then(function (sha) { S.sha = sha; S.h = h; });
   }
-  function normalizeH(h) { h.lots = h.lots || []; h.cash = h.cash || {}; h.names = h.names || {}; return h; }
+  function normalizeH(h) { h.lots = h.lots || []; h.cash = h.cash || {}; h.names = h.names || {}; h.manual = h.manual || {}; return h; }
 
   // ---------- 計算 ----------
   function positions() {
@@ -45,6 +45,8 @@
     });
     return Object.keys(map).map(function (k) {
       var p = map[k], q = S.prices && S.prices.q[p.sym];
+      var man = S.h.manual[p.sym];
+      if (man && man.price > 0 && (!q || q.est)) q = { price: man.price, prev: null, chg: null, date: man.date || "", manual: true };  // 手動價格優先於估算
       p.ccy = isTW(p.sym) ? "TWD" : "USD";
       p.avg = p.qty ? p.cost / p.qty : null;
       p.price = q ? q.price : null;
@@ -130,10 +132,12 @@
       var nm = S.h.names[p.sym] || (sc ? "" : "");
       var symCell = S.renaming === k
         ? '<input id="hren" value="' + esc(p.sym) + '" size="7" autocapitalize="characters"> <button class="lk" data-ren-ok="' + esc(k) + '">確定</button><button class="lk" data-ren-no="1">取消</button>'
-        : "<b>" + esc(p.sym) + "</b>" + (nm ? ' <span class="dim">' + esc(nm) + "</span>" : "") + (token() ? ' <button class="lk" data-ren="' + esc(k) + '" title="修改代碼" aria-label="修改代碼">✎</button>' : "") + (p.q ? "" : ' <span class="neg" style="font-size:12px">抓不到價格，代碼可能有誤</span>');
+        : "<b>" + esc(p.sym) + "</b>" + (nm ? ' <span class="dim">' + esc(nm) + "</span>" : "") + (token() ? ' <button class="lk" data-ren="' + esc(k) + '" title="修改代碼" aria-label="修改代碼">✎</button>' : "") + (p.q ? "" : ' <span class="neg" style="font-size:12px">抓不到價格，請確認代碼或手動輸入價格</span>');
+      if (S.manualEdit === p.sym) symCell += '<div style="margin-top:4px">現價 <input id="hman" inputmode="decimal" size="8" value="' + esc((S.h.manual[p.sym] || {}).price || "") + '"> <button class="lk" data-man-ok="' + esc(p.sym) + '">儲存</button><button class="lk" data-man-no="1">取消</button>' + (S.h.manual[p.sym] ? '<button class="lk" data-man-clear="' + esc(p.sym) + '">改回自動</button>' : "") + "</div>";
       h += '<tr class="prow" data-k="' + esc(k) + '"><td>' + symCell + "</td>"
         + "<td>" + num(p.qty, 4) + "</td><td>" + num(p.avg, 2) + "</td>"
-        + "<td>" + (p.q ? num(p.price, 2) + ' <span class="dim">' + p.q.date.slice(5).replace("-", "/") + "</span>" : '<span class="dim">更新中</span>') + "</td>"
+        + "<td>" + (p.q ? num(p.price, 2) + ' <span class="dim">' + (p.q.manual ? "手動" : p.q.est ? "估算" : String(p.q.date).slice(5).replace("-", "/")) + "</span>" : '<span class="dim">—</span>')
+        + (token() && (!p.q || p.q.manual || p.q.est) ? ' <button class="lk" data-man="' + esc(p.sym) + '" title="手動輸入價格">' + (p.q ? "改價格" : "輸入價格") + "</button>" : "") + "</td>"
         + "<td>" + (p.q ? pct(p.q.chg, 2) : "—") + "</td>"
         + "<td>" + money(conv(p.mv, p.ccy), dc) + "</td>"
         + "<td>" + signed(conv(p.pnl, p.ccy), dc) + " " + pct(p.cost ? p.pnl / p.cost : null) + "</td>"
@@ -273,6 +277,21 @@
     if (t.closest("#hadd")) { S.rows.push({ kind: "buy", acct: "", sym: "", date: "", qty: null, px: null, note: "", warn: [] }); render(); return; }
     if (t.closest("#hclear")) { S.rows = []; S.msg = ""; render(); return; }
     if (t.closest("#hsave")) { commit(); return; }
+    if ((b = t.closest("[data-man]"))) { S.manualEdit = b.dataset.man; render(); var mi = document.getElementById("hman"); if (mi) mi.focus(); return; }
+    if (t.closest("[data-man-no]")) { S.manualEdit = null; render(); return; }
+    if ((b = t.closest("[data-man-ok]")) || (b = t.closest("[data-man-clear]"))) {
+      var msym = b.dataset.manOk || b.dataset.manClear, hm = JSON.parse(JSON.stringify(S.h)), clear = !!b.dataset.manClear;
+      if (clear) delete hm.manual[msym];
+      else {
+        var v = Number(document.getElementById("hman").value);
+        if (!(v > 0)) { S.msg = "請輸入大於 0 的價格。"; render(); return; }
+        hm.manual[msym] = { price: v, date: new Date().toISOString().slice(0, 10) };
+      }
+      S.manualEdit = null;
+      saveHoldings(hm, "手動價格 " + msym).then(function () { S.msg = clear ? "已改回自動抓價格。" : "已存 " + msym + " 的手動價格。"; render(); })
+        .catch(function (e) { S.msg = e.message; if (e.conflict) loadHoldings().then(render, render); else render(); });
+      return;
+    }
     if ((b = t.closest("[data-ren]"))) { S.renaming = b.dataset.ren; render(); var ri = document.getElementById("hren"); if (ri) { ri.focus(); ri.select(); } return; }
     if ((b = t.closest("[data-ren-ok]"))) { renameSym(b.dataset.renOk); return; }
     if (t.closest("[data-ren-no]")) { S.renaming = null; render(); return; }
@@ -323,6 +342,7 @@
     el.addEventListener("input", onInput);
     el.addEventListener("change", onInput);
     el.addEventListener("keydown", function (e) {
+      if (e.target.id === "hman" && e.key === "Enter") { e.preventDefault(); var ok = document.querySelector("[data-man-ok]"); if (ok) ok.click(); return; }
       if (e.target.id !== "hren") return;
       if (e.key === "Enter") { e.preventDefault(); renameSym(S.renaming); }
       else if (e.key === "Escape") { S.renaming = null; render(); }

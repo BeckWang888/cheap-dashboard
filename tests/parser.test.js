@@ -73,3 +73,9 @@ test("不念日期也不會提醒；備註", () => {
   assert.deepStrictEqual(r.map(x => [x.sym, x.date, x.qty, x.px, x.note, x.warn.length]), [
     ["0050", "", 3000, 150, "長期持有,跌到130再加碼", 0], ["2330", "", 200, 1050, "", 0]]);
 });
+
+test("AU9901 黃金現貨（英文字母＋數字、念成臺銀金或分開念）", () => {
+  const r = parse("第一金台股 AU9901 13 股 成本 236309。臺銀金 2股 成本 4300。AU 9901 1股 價格 4200");
+  assert.deepStrictEqual(r.map(x => [x.acct, x.sym, x.qty, x.px]), [
+    ["fb-tw", "AU9901", 13, 236309], ["fb-tw", "AU9901", 2, 4300], ["fb-tw", "AU9901", 1, 4200]]);
+});
