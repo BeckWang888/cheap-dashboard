@@ -107,6 +107,15 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 .btn.ghost{background:var(--chip);color:var(--ink);font-weight:400}.btn[disabled]{opacity:.6}
 .lk{font:inherit;font-size:13px;background:none;border:0;color:var(--accent);cursor:pointer;padding:2px 4px}.lk.danger{color:var(--hot);font-weight:600}
 .card a{color:var(--accent)}
+.wl{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.wl li{display:flex;gap:8px;align-items:center;padding:8px 10px;border-top:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+.wl li:first-child{border-top:0}
+.wl .hd{cursor:grab;font-size:18px;color:var(--sub);padding:4px 6px;touch-action:none;user-select:none}
+.wl .ws{min-width:64px}.wl .wt{font-size:12px;color:var(--sub)}
+.wl input,.wadd input,.wadd select{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 7px;min-width:0}
+.wl input{flex:1 1 120px}.wl input.wg{flex:0 1 110px}
+.wl .sortable-ghost{opacity:.4}
+.wadd{display:flex;gap:8px;flex-wrap:wrap}.wadd input{flex:1 1 140px}
 .foot{font-size:12px;color:var(--sub);margin-top:18px}
 .foot a{color:var(--sub)}
 </style>
@@ -131,19 +140,26 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
     </div>
     <label class="t"><input type="checkbox" id="only"> 只看便宜區</label>
     <label class="t"><input type="checkbox" id="cand"> 只看候選進場與重點觀察</label>
+    <div class="tabs" id="sortt" title="排序"><button data-s="custom" aria-pressed="true">自訂順序</button><button data-s="score" aria-pressed="false">依分數</button></div>
+    <button class="btn ghost" id="wedit">編輯清單</button>
   </div>
   <div class="legend m"><span>很貴</span><span>合理</span><span>很便宜</span></div>
   <div class="legend d"><span>標的</span><span><span>很貴</span><span>中貴</span><span>合理</span><span>便宜（20 / 50 / 80 通知）</span><span>很便宜</span></span><span style="text-align:right">分數</span></div>
+  <div id="wl" hidden></div>
   <div class="list" id="list"><div class="empty">載入中…</div></div>
   </div>
   <div id="holdings" hidden></div>
   <p class="foot">本工具只是輔助紀律，不提供投資建議；分數不預測底部。資料：美股 Yahoo Finance、台股 FinMind（延遲報價）。
   「全部歷史／近 5 年」是百分位的比較基準：前者跟上市以來比、較嚴格；後者只跟最近 5 年比、便宜區較常出現。</p>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.6/Sortable.min.js"></script>
+<script src="gh.js"></script>
 <script src="parser.js"></script>
+<script src="watchlist.js"></script>
 <script src="holdings.js"></script>
 <script>
-var D=null,st={m:"all",only:false,cand:false,open:null,v:"full"};
+var D=null,st={m:"all",only:false,cand:false,open:null,v:"full",sort:"custom"};
+try{if(localStorage.getItem("cd_sort")==="score")st.sort="score"}catch(e){}
 try{var sv=localStorage.getItem("cd_v");if(sv==="5y"||sv==="full")st.v=sv}catch(e){}
 var LV=[[80,"極便宜","--cheap"],[50,"很便宜","--cheap"],[20,"便宜","--cool"],[-10,"合理","--sub"],[-33,"小貴","--warm"],[-66,"中貴","--hot"],[-1e9,"很貴","--hot"]];
 var BAND=[[80,"--cheap",1],[50,"--cheap",.65],[20,"--cool",1],[-10,"--mid",1],[-33,"--warm",1],[-66,"--hot",.6],[-1e9,"--hot",1]];
@@ -166,11 +182,11 @@ function render(){
   '<div><b style="color:var(--hot)">'+cnt(function(r){return C(r).score!=null&&C(r).score<=-33})+'</b><span>中貴以上</span></div>'+
   '<div><b style="color:var(--warm)">'+cnt(function(r){return !!C(r).heat})+'</b><span>乖離過熱</span></div>';
  var rows=items.filter(function(r){var c=C(r);return(st.m==="all"||(st.m==="LEV"?isLev(r):r.market===st.m))&&(!st.only||c.score>=20)&&(!st.cand||rank(r)>0)})
-  .sort(function(a,b){return(isLev(a)?1:0)-(isLev(b)?1:0)||rank(b)-rank(a)||(C(b).score==null?-999:C(b).score)-(C(a).score==null?-999:C(a).score)});
+  .sort(function(a,b){if(st.sort==="custom")return 0;return(isLev(a)?1:0)-(isLev(b)?1:0)||rank(b)-rank(a)||(C(b).score==null?-999:C(b).score)-(C(a).score==null?-999:C(a).score)});
  var h="",seen=false;
  rows.forEach(function(r){
   var c=C(r),s=stt(r),L=r.lev,l=c.score==null?null:lv(c.score),p=c.score==null?50:(c.score+100)/2,pf=L?"標的 ":"";
-  if(L&&!seen){h+='<div class="sec">槓桿型 ETF：分數與訊號以對應的一倍標的計算，不代表槓桿產品本身安全</div>';seen=true}
+  if(L&&!seen&&st.sort!=="custom"){h+='<div class="sec">槓桿型 ETF：分數與訊號以對應的一倍標的計算，不代表槓桿產品本身安全</div>';seen=true}
   var dots="";c.sigs.forEach(function(v){dots+='<i class="dt'+(v?" on":"")+'"></i>'});
   dots+='<i class="dt bs'+(c.trough?" on":c.trough_forming?" half":"")+'" title="月線 MACD 谷底"></i>';
   var heat=c.heat?'<span class="hot'+(c.heat==="嚴重過熱"?" vh":"")+'">'+c.heat+'</span>':'';
@@ -230,6 +246,14 @@ document.getElementById("vt").addEventListener("click",function(e){var b=e.targe
 document.getElementById("tabs").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;st.m=b.dataset.m;[].forEach.call(this.children,function(x){x.setAttribute("aria-pressed",x===b)});render()});
 document.getElementById("only").addEventListener("change",function(){st.only=this.checked;render()});
 document.getElementById("cand").addEventListener("change",function(){st.cand=this.checked;render()});
+function setSort(v){st.sort=v;try{localStorage.setItem("cd_sort",v)}catch(e){}[].forEach.call(document.getElementById("sortt").children,function(x){x.setAttribute("aria-pressed",x.dataset.s===v)});if(D)render()}
+document.getElementById("sortt").addEventListener("click",function(e){var b=e.target.closest("button");if(b)setSort(b.dataset.s)});
+document.getElementById("wedit").addEventListener("click",function(){WL.open()});
+// 清單存檔後：先照新順序排、移除刪掉的；新增的要等下一次更新才有分數
+window.onWatchlistSaved=function(list){if(!D)return;var idx={};list.forEach(function(it,i){idx[it.symbol]=i});
+ D.items=D.items.filter(function(r){return r.symbol in idx}).sort(function(a,b){return idx[a.symbol]-idx[b.symbol]});
+ var added=list.filter(function(it){return !D.items.some(function(r){return r.symbol===it.symbol})}).length;
+ setSort("custom");document.getElementById("alerts").insertAdjacentHTML("afterbegin",'<div class="alert">清單已儲存'+(added?'，新增的 '+added+' 檔約 2 分鐘後出現（重新整理頁面）':'')+'。</div>')};
 function tog(e){if(e.target.closest(".det"))return;var r=e.target.closest(".row");if(!r)return;if(e.type==="keydown"&&e.key!=="Enter"&&e.key!==" ")return;e.preventDefault();st.open=st.open===r.dataset.t?null:r.dataset.t;render()}
 document.getElementById("list").addEventListener("click",tog);
 document.getElementById("list").addEventListener("keydown",tog);
@@ -238,6 +262,7 @@ function route(){var h=location.hash==="#holdings"?"holdings":"cheap";
  [].forEach.call(document.querySelectorAll(".nav a"),function(a){if(a.dataset.view===h)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
  if(h==="holdings")Holdings.start()}
 window.addEventListener("hashchange",route);route();
+[].forEach.call(document.getElementById("sortt").children,function(x){x.setAttribute("aria-pressed",x.dataset.s===st.sort)});
 fetch("data.json?t="+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(j){
  D=j;document.getElementById("meta").textContent="更新時間 "+j.generated+"（台灣時間）・台股盤中與收盤後、美股盤中與收盤後自動更新";
  alerts();setV(st.v);

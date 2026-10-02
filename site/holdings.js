@@ -4,14 +4,10 @@
   var CAP = 0.10;                // 單一標的佔總資產的提醒上限
   var P = window.HoldParse;
   var ACCTS = P.ACCOUNTS;
-  var host = location.hostname.endsWith(".github.io");
-  var REPO = host ? location.hostname.split(".")[0] + "/" + location.pathname.split("/")[1] : "BeckWang888/cheap-dashboard";
-  var API = "https://api.github.com/repos/" + REPO + "/contents/holdings.json";
+  var REPO = GH.REPO, ls = GH.ls, token = GH.token;
 
-  var S = { h: null, sha: null, prices: null, data: null, ccy: "USD", open: {}, rows: [], msg: "", busy: false, confirmDel: null };
-  function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return null; } }
+  var S = { h: null, sha: null, prices: null, data: null, ccy: "USD", open: {}, rows: [], msg: "", busy: false, confirmDel: null, renaming: null };
   S.ccy = ls("cd_ccy") === "TWD" ? "TWD" : "USD";
-  function token() { return ls("cd_gh_token") || ""; }
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function money(v, ccy, dp) {
@@ -28,29 +24,12 @@
   function toTWD(v, ccy) { return ccy === "USD" ? (fx() ? v * fx() : null) : v; }
 
   // ---------- GitHub 讀寫 ----------
-  function b64decode(s) { var bin = atob(s.replace(/\n/g, "")); var u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new TextDecoder().decode(u); }
-  function b64encode(str) { var u = new TextEncoder().encode(str), bin = ""; for (var i = 0; i < u.length; i++) bin += String.fromCharCode(u[i]); return btoa(bin); }
-  function headers() { var h = { "Accept": "application/vnd.github+json" }; if (token()) h.Authorization = "Bearer " + token(); return h; }
   function loadHoldings() {
-    if (!host) {  // 本機預覽：直接讀 repo 裡的檔案（不能存檔）
-      return fetch("../holdings.json?t=" + Date.now()).then(function (r) { return r.json(); }).then(function (j) { S.sha = "local"; S.h = normalizeH(j); });
-    }
-    return fetch(API + "?ref=main&t=" + Date.now(), { headers: headers(), cache: "no-store" }).then(function (r) {
-      if (r.status === 401) throw new Error("存取權杖無效或已過期，請到下方「存檔設定」重新貼上");
-      if (!r.ok) throw new Error("讀取持倉失敗（" + r.status + "）");
-      return r.json();
-    }).then(function (j) { S.sha = j.sha; S.h = normalizeH(JSON.parse(b64decode(j.content))); });
+    return GH.get("holdings.json").then(function (r) { S.sha = r.sha; S.h = normalizeH(r.data); });
   }
   function saveHoldings(h, message) {
     h.updated = new Date().toISOString();
-    var body = { message: message, content: b64encode(JSON.stringify(h, null, 1) + "\n"), sha: S.sha, branch: "main" };
-    return fetch(API, { method: "PUT", headers: Object.assign({ "Content-Type": "application/json" }, headers()), body: JSON.stringify(body) })
-      .then(function (r) {
-        if (r.status === 409 || r.status === 422) throw new Error("持倉在別的裝置剛被改過，已重新載入，請再操作一次");
-        if (r.status === 401 || r.status === 403 || r.status === 404) throw new Error("存檔被拒絕：存取權杖沒有這個 repo 的寫入權限");
-        if (!r.ok) throw new Error("存檔失敗（" + r.status + "）");
-        return r.json();
-      }).then(function (j) { S.sha = j.content.sha; S.h = h; });
+    return GH.put("holdings.json", h, S.sha, message).then(function (sha) { S.sha = sha; S.h = h; });
   }
   function normalizeH(h) { h.lots = h.lots || []; h.cash = h.cash || {}; h.names = h.names || {}; return h; }
 
@@ -149,7 +128,10 @@
     ps.sort(function (a, b) { return (conv(b.mv || 0, b.ccy) || 0) - (conv(a.mv || 0, a.ccy) || 0); }).forEach(function (p) {
       var sc = scoreOf(p.sym), w = total && p.mv != null ? toTWD(p.mv, p.ccy) / total : null, k = id + "|" + p.sym;
       var nm = S.h.names[p.sym] || (sc ? "" : "");
-      h += '<tr class="prow" data-k="' + esc(k) + '"><td><b>' + esc(p.sym) + "</b>" + (nm ? ' <span class="dim">' + esc(nm) + "</span>" : "") + "</td>"
+      var symCell = S.renaming === k
+        ? '<input id="hren" value="' + esc(p.sym) + '" size="7" autocapitalize="characters"> <button class="lk" data-ren-ok="' + esc(k) + '">確定</button><button class="lk" data-ren-no="1">取消</button>'
+        : "<b>" + esc(p.sym) + "</b>" + (nm ? ' <span class="dim">' + esc(nm) + "</span>" : "") + (token() ? ' <button class="lk" data-ren="' + esc(k) + '" title="修改代碼" aria-label="修改代碼">✎</button>' : "") + (p.q ? "" : ' <span class="neg" style="font-size:12px">抓不到價格，代碼可能有誤</span>');
+      h += '<tr class="prow" data-k="' + esc(k) + '"><td>' + symCell + "</td>"
         + "<td>" + num(p.qty, 4) + "</td><td>" + num(p.avg, 2) + "</td>"
         + "<td>" + (p.q ? num(p.price, 2) + ' <span class="dim">' + p.q.date.slice(5).replace("-", "/") + "</span>" : '<span class="dim">更新中</span>') + "</td>"
         + "<td>" + (p.q ? pct(p.q.chg, 2) : "—") + "</td>"
@@ -256,8 +238,20 @@
       render();
     }).catch(function (e) {
       S.busy = false; S.msg = e.message;
-      if (/別的裝置/.test(e.message)) loadHoldings().then(render, render); else render();
+      if (e.conflict) loadHoldings().then(render, render); else render();
     });
+  }
+  function renameSym(k) {
+    var inp = document.getElementById("hren");
+    var to = inp ? inp.value.trim().toUpperCase() : "";
+    var acct = k.split("|")[0], from = k.slice(acct.length + 1);
+    if (!to || to === from) { S.renaming = null; render(); return; }
+    var h = JSON.parse(JSON.stringify(S.h)), n = 0;
+    h.lots.forEach(function (l) { if (l.acct === acct && l.sym === from) { l.sym = to; n++; } });
+    S.renaming = null;
+    saveHoldings(h, "持倉代碼 " + from + " → " + to).then(function () {
+      S.msg = "已把 " + from + " 改成 " + to + "（" + n + " 筆）。新代碼的價格約 2 分鐘後出現。"; render();
+    }).catch(function (e) { S.msg = e.message; if (e.conflict) loadHoldings().then(render, render); else render(); });
   }
   function deleteLot(id) {
     var h = JSON.parse(JSON.stringify(S.h));
@@ -279,6 +273,9 @@
     if (t.closest("#hadd")) { S.rows.push({ kind: "buy", acct: "", sym: "", date: "", qty: null, px: null, note: "", warn: [] }); render(); return; }
     if (t.closest("#hclear")) { S.rows = []; S.msg = ""; render(); return; }
     if (t.closest("#hsave")) { commit(); return; }
+    if ((b = t.closest("[data-ren]"))) { S.renaming = b.dataset.ren; render(); var ri = document.getElementById("hren"); if (ri) { ri.focus(); ri.select(); } return; }
+    if ((b = t.closest("[data-ren-ok]"))) { renameSym(b.dataset.renOk); return; }
+    if (t.closest("[data-ren-no]")) { S.renaming = null; render(); return; }
     if ((b = t.closest("[data-rm]"))) { S.rows.splice(+b.dataset.rm, 1); render(); return; }
     if ((b = t.closest("[data-edit]"))) {
       var l = S.h.lots.filter(function (x) { return x.id === b.dataset.edit; })[0];
@@ -296,8 +293,8 @@
       var v = document.getElementById("htok").value.trim();
       if (!v) return;
       ls("cd_gh_token", v);
-      fetch("https://api.github.com/repos/" + REPO, { headers: headers() }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
-        S.msg = j && j.permissions && j.permissions.push ? "權杖可以寫入，設定完成。" : "權杖已儲存，但它看起來沒有這個 repo 的寫入權限，請確認 Contents 是 Read and write。";
+      GH.canWrite().then(function (ok) {
+        S.msg = ok ? "權杖可以寫入，設定完成。" : "權杖已儲存，但它看起來沒有這個 repo 的寫入權限，請確認 Contents 是 Read and write。";
         render();
       });
       return;
@@ -325,6 +322,11 @@
     el.addEventListener("click", onClick);
     el.addEventListener("input", onInput);
     el.addEventListener("change", onInput);
+    el.addEventListener("keydown", function (e) {
+      if (e.target.id !== "hren") return;
+      if (e.key === "Enter") { e.preventDefault(); renameSym(S.renaming); }
+      else if (e.key === "Escape") { S.renaming = null; render(); }
+    });
     render();
     Promise.all([
       loadHoldings(),
