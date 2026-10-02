@@ -12,7 +12,7 @@ on:
   workflow_dispatch: {}      # 也可以在 Actions 頁面手動按「Run workflow」
   push:                      # 改了持倉、清單或設定就馬上更新（持倉頁存檔後約 2 分鐘出現新價格）
     branches: [main]
-    paths: [holdings.json, watchlist.json, config.json]
+    paths: [holdings.json, watchlist.json, config.json, "site/**"]
 
 permissions:
   contents: write
