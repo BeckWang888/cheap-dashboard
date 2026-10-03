@@ -193,7 +193,9 @@ def main():
     events += notify.group_events(groups, prev or {}, cfg)
     if payload["market"]:
         events += notify.market_events(payload["market"]["summary"], prev or {}, cfg)
-        state["market"] = {k: v["hot"] for k, v in payload["market"]["summary"].items()}
+        # 只在開啟市場推播時記錄，避免關著時記下「已過熱」、開啟後永遠不通知
+        if cfg.get("notify", {}).get("market"):
+            state["market"] = {k: v["hot"] for k, v in payload["market"]["summary"].items()}
     state["groups"] = {g: len(s) for g, s in groups.items()}
     if failed:
         # 抓不到的標的保留舊狀態，避免下次恢復時重複通知
