@@ -79,3 +79,8 @@ test("AU9901 黃金現貨（英文字母＋數字、念成臺銀金或分開念�
   assert.deepStrictEqual(r.map(x => [x.acct, x.sym, x.qty, x.px]), [
     ["fb-tw", "AU9901", 13, 236309], ["fb-tw", "AU9901", 2, 4300], ["fb-tw", "AU9901", 1, 4200]]);
 });
+
+test("總成本自動換算成每單位成本；台錢當數量", () => {
+  const r = parse("第一金台股 臺銀金 13台錢 總成本 236309。0050 2張 總共 30萬");
+  assert.deepStrictEqual(r.map(x => [x.sym, x.qty, x.px]), [["AU9901", 13, 18177.62], ["0050", 2000, 150]]);
+});

@@ -85,18 +85,24 @@ def holdings_prices(now_tw) -> dict:
     h = read_json(ROOT / "holdings.json", {})
     syms = sorted({l["sym"] for l in h.get("lots", []) if l.get("sym")})
     out = {"generated": now_tw.strftime("%Y-%m-%d %H:%M"), "q": {}, "missing": []}
-    gold = None
+    gold, tpex = None, None
     for sym in syms:
-        if sym == "AU9901":
-            # 台銀金（黃金現貨）找不到免費報價：用國際金價 × 美元匯率 ÷ 31.1035 估算每公克台幣價格
+        if sym in ("AU9901", "AU9902"):
+            # 櫃買中心黃金現貨（臺銀金／一銀金），報價單位是「台錢」（3.75 公克）
+            if tpex is None:
+                tpex = data.tpex_gold()
+            if sym in tpex:
+                out["q"][sym] = tpex[sym]
+                continue
+            # 抓不到時用國際金價估算：美元/盎司 × 匯率 ÷ 31.1035 × 3.75 ＝ 台幣/台錢
             if gold is None:
                 _, g = data.recent_close("GC=F")
                 _, f = data.recent_close("TWD=X")
-                gold = (g * f.reindex(g.index).ffill() / 31.1035).dropna() if not g.empty and not f.empty else pd.Series(dtype=float)
+                gold = (g * f.reindex(g.index).ffill() / 31.1035 * 3.75).dropna() if not g.empty and not f.empty else pd.Series(dtype=float)
             if gold.empty:
                 out["missing"].append(sym)
             else:
-                out["q"][sym] = dict(quote(gold), ys="GC=F×TWD÷31.1035", ccy="TWD", est=True)
+                out["q"][sym] = dict(quote(gold), ys="國際金價估算", ccy="TWD", est=True)
             continue
         try:
             ys, s = data.recent_close(sym)

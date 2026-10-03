@@ -76,7 +76,7 @@
     "(＠HN＠|＠FB＠|＠MM＠|＠ET＠)" +                                  // 1 券商
     "|(台股|美股)" +                                                  // 2 市場
     "|(現金)" +                                                       // 3 現金
-    "|(?<![A-Z\\d.\\/\\-]|(?:" + PRICE_KW + "|現金|美元|美金|台幣)\\s*(?:是|為|:|大概|約)?\\s*)" +
+    "|(?<![A-Z\\d.\\/\\-]|(?:" + PRICE_KW + "|總成本|總共|總價|總金額|一共|現金|美元|美金|台幣)\\s*(?:是|為|:|大概|約)?\\s*)" +
     "([A-Z]{1,3}\\d{3,6}|\\d{4,6}[A-Z]?)(?![\\d.\\/\\-]|\\s*(?:年|月|日|號|股|張|元|塊|美|%|萬|千|塊錢))" + // 4 台股代碼
     "|\\b([A-Z]{1,5}(?:\\.[A-Z])?)\\b",                                // 5 美股代碼
     "g");
@@ -120,7 +120,11 @@
     var rest = dt[1] ? seg.replace(dt[1], " ") : seg;
     if ((r = rest.match(/(\d+(?:\.\d+)?)\s*張/))) { qty = Math.round(Number(r[1]) * 1000); rest = rest.replace(r[0], " "); }
     else if ((r = rest.match(/(\d+(?:\.\d+)?)\s*股/))) { qty = Number(r[1]); rest = rest.replace(r[0], " "); }
-    if ((r = rest.match(new RegExp("(?:" + PRICE_KW + ")\\s*(?:是|為|:|大概|約)?\\s*(\\d+(?:\\.\\d+)?)")))) { px = Number(r[1]); }
+    else if ((r = rest.match(/(\d+(?:\.\d+)?)\s*(?:台錢|臺錢|錢)/))) { qty = Number(r[1]); rest = rest.replace(r[0], " "); }
+    var total = rest.match(/(?:總成本|總共|總價|總金額|一共)\s*(?:是|為|:|大概|約)?\s*(\d+(?:\.\d+)?)/);
+    if (total) { rest = rest.replace(total[0], " "); if (qty) px = Math.round(Number(total[1]) / Math.abs(qty) * 100) / 100; }
+    if (px != null) { /* 已由總成本換算 */ }
+    else if ((r = rest.match(new RegExp("(?:" + PRICE_KW + ")\\s*(?:是|為|:|大概|約)?\\s*(\\d+(?:\\.\\d+)?)")))) { px = Number(r[1]); }
     else if ((r = rest.match(/(\d+(?:\.\d+)?)\s*(?:元|塊|美元|美金)/))) { px = Number(r[1]); }
     if (/賣/.test(seg) && qty) qty = -qty;
     if (qty == null) warn.push("沒有股數");

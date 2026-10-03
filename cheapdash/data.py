@@ -133,3 +133,28 @@ def recent_close(symbol: str) -> tuple[str, pd.Series]:
         if not df.empty:
             return ys, df["Close"].dropna()
     return "", pd.Series(dtype=float)
+
+
+def tpex_gold() -> dict:
+    """櫃買中心黃金現貨最新報價（免 key）。回傳 {代碼: {price, date, prev, chg, ys, ccy}}，價格單位是台幣／台錢。"""
+    import certifi
+    ctx = ssl.create_default_context(cafile=certifi.where())
+    req = urllib.request.Request("https://www.tpex.org.tw/openapi/v1/tpex_gold_latest", headers={"User-Agent": "Mozilla/5.0"})
+    try:
+        with urllib.request.urlopen(req, context=ctx, timeout=30) as r:
+            rows = json.load(r)
+    except Exception as e:
+        print(f"[警告] 櫃買黃金報價抓取失敗：{e}")
+        return {}
+    out = {}
+    for x in rows:
+        try:
+            price = float(x["TradingLatestTradingInfo.LatestPrice"] or x["QuotedBuyingB.Price"])
+            chg = float(x["QuotedBuyingChange"]) / 100  # 欄位是百分比
+            d = x["Date"]  # 民國年，例如 1151002
+            date_s = f"{int(d[:-4]) + 1911}-{d[-4:-2]}-{d[-2:]}"
+        except (KeyError, ValueError, TypeError):
+            continue
+        out[x["GoldCode"]] = {"price": price, "date": date_s, "prev": round(price / (1 + chg), 2),
+                              "chg": round(chg, 5), "ys": "櫃買黃金現貨", "ccy": "TWD"}
+    return out
