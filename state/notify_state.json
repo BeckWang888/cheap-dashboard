@@ -8,7 +8,8 @@
     "20": true,
     "50": true,
     "80": true
-   }
+   },
+   "sweet": false
   },
   "VOO": {
    "state": "未進便宜區",
@@ -18,7 +19,8 @@
     "20": true,
     "50": true,
     "80": true
-   }
+   },
+   "sweet": false
   },
   "0050.TW": {
    "state": "未進便宜區",
@@ -28,7 +30,8 @@
     "20": true,
     "50": true,
     "80": true
-   }
+   },
+   "sweet": false
   },
   "SOXX": {
    "state": "未進便宜區",
@@ -38,7 +41,8 @@
     "20": true,
     "50": true,
     "80": true
-   }
+   },
+   "sweet": false
   },
   "IBB": {
    "state": "未進便宜區",
@@ -48,7 +52,8 @@
     "20": true,
     "50": true,
     "80": true
-   }
+   },
+   "sweet": false
   },
   "SMCI": {
    "state": "未進便宜區",
@@ -58,17 +63,19 @@
     "20": true,
     "50": true,
     "80": true
-   }
+   },
+   "sweet": false
   },
   "TSLA": {
-   "state": "重點觀察",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "形成中",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
-   }
+   },
+   "sweet": false
   },
   "AMD": {
    "state": "未進便宜區",
@@ -78,7 +85,8 @@
     "20": true,
     "50": true,
     "80": true
-   }
+   },
+   "sweet": false
   },
   "SOXL": {
    "state": "未進便宜區",
@@ -88,7 +96,8 @@
     "20": true,
     "50": true,
     "80": true
-   }
+   },
+   "sweet": false
   },
   "USD": {
    "state": "未進便宜區",
@@ -98,7 +107,8 @@
     "20": true,
     "50": true,
     "80": true
-   }
+   },
+   "sweet": false
   },
   "GGLL": {
    "state": "轉折確認",
@@ -106,9 +116,10 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
-   }
+   },
+   "sweet": false
   }
  },
  "sent": {
