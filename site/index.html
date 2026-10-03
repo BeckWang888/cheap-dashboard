@@ -110,12 +110,19 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 .wl{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .wl li{display:flex;gap:8px;align-items:center;padding:8px 10px;border-top:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
 .wl li:first-child{border-top:0}
+.dh{cursor:grab;color:var(--sub);font-size:16px;padding:2px 8px 2px 0;touch-action:none;user-select:none;vertical-align:1px}
+.row.sortable-ghost{opacity:.4}
 .wl .hd{cursor:grab;font-size:18px;color:var(--sub);padding:4px 6px;touch-action:none;user-select:none}
 .wl .ws{min-width:64px}.wl .wt{font-size:12px;color:var(--sub)}
 .wl input,.wadd input,.wadd select{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 7px;min-width:0}
 .wl input{flex:1 1 120px}.wl input.wg{flex:0 1 110px}
 .wl .sortable-ghost{opacity:.4}
 .wadd{display:flex;gap:8px;flex-wrap:wrap}.wadd input{flex:1 1 140px}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.sgrid label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
+.sgrid input{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+.tg{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);cursor:pointer}
+.tg:first-of-type{border-top:0}.tg input{margin-top:4px}.tg b{display:block;font-size:14px;font-weight:600}.tg .dim{font-size:12px}
 .foot{font-size:12px;color:var(--sub);margin-top:18px}
 .foot a{color:var(--sub)}
 </style>
@@ -127,7 +134,7 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
     <p class="note" id="meta">載入中…</p></div>
     <div class="tabs" id="vt" title="百分位基準"><button data-v="full" aria-pressed="true">全部歷史</button><button data-v="5y" aria-pressed="false">近 5 年</button></div>
   </div>
-  <nav class="nav"><a href="#" data-view="cheap" aria-current="page">便宜度</a><a href="#holdings" data-view="holdings">持倉</a></nav>
+  <nav class="nav"><a href="#" data-view="cheap" aria-current="page">便宜度</a><a href="#holdings" data-view="holdings">持倉</a><a href="#settings" data-view="settings">設定</a></nav>
   <div id="cheap">
   <div id="alerts"></div>
   <div class="sum" id="sum"></div>
@@ -144,11 +151,12 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
     <button class="btn ghost" id="wedit">編輯清單</button>
   </div>
   <div class="legend m"><span>很貴</span><span>合理</span><span>很便宜</span></div>
-  <div class="legend d"><span>標的</span><span><span>很貴</span><span>中貴</span><span>合理</span><span>便宜（20 / 50 / 80 通知）</span><span>很便宜</span></span><span style="text-align:right">分數</span></div>
+  <div class="legend d"><span>標的</span><span><span>很貴</span><span>中貴</span><span>合理</span><span>便宜（白色刻度＝通知門檻）</span><span>很便宜</span></span><span style="text-align:right">分數</span></div>
   <div id="wl" hidden></div>
   <div class="list" id="list"><div class="empty">載入中…</div></div>
   </div>
   <div id="holdings" hidden></div>
+  <div id="settings" hidden></div>
   <p class="foot">本工具只是輔助紀律，不提供投資建議；分數不預測底部。資料：美股 Yahoo Finance、台股 FinMind（延遲報價）。
   「全部歷史／近 5 年」是百分位的比較基準：前者跟上市以來比、較嚴格；後者只跟最近 5 年比、便宜區較常出現。</p>
 </div>
@@ -157,6 +165,7 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 <script src="parser.js"></script>
 <script src="watchlist.js"></script>
 <script src="holdings.js"></script>
+<script src="settings.js"></script>
 <script>
 var D=null,st={m:"all",only:false,cand:false,open:null,v:"full",sort:"custom"};
 try{if(localStorage.getItem("cd_sort")==="score")st.sort="score"}catch(e){}
@@ -191,15 +200,16 @@ function render(){
   dots+='<i class="dt bs'+(c.trough?" on":c.trough_forming?" half":"")+'" title="月線 MACD 谷底"></i>';
   var heat=c.heat?'<span class="hot'+(c.heat==="嚴重過熱"?" vh":"")+'">'+c.heat+'</span>':'';
   h+='<div class="row'+(s[1]==="go"?" go":s[1]==="boss"?" boss":"")+(st.open===r.symbol?" open":"")+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
-   +'<div class="id"><b>'+esc(r.symbol.replace(".TW",""))+'</b>'+heat+(r.intraday?'<span class="live">盤中</span>':'')+'<span class="nm">'+esc(r.name)+'</span>'
+   +'<div class="id">'+(canDrag()?'<span class="dh" title="拖曳排序" aria-label="拖曳排序">☰</span>':'')+'<b>'+esc(r.symbol.replace(".TW",""))+'</b>'+heat+(r.intraday?'<span class="live">盤中</span>':'')+'<span class="nm">'+esc(r.name)+'</span>'
    +pxLine(r)
    +(L?'<div class="lv">'+L.x+' 倍・對應 '+esc(L.underlying)+'</div>':'')+(r.thin?'<div class="lv warn">資料不足，分數僅供參考</div>':'')
    +'<div class="sig"><span>'+dots+'</span><em class="'+s[1]+'">'+s[0]+'</em></div></div>'
    +'<div class="sc"><b>'+(c.score==null?'—':c.score.toFixed(0))+'</b><span style="color:var('+(l?l[2]:'--sub')+')">'+(l?l[1]:'')+'</span></div>'
-   +'<div class="th"><i style="left:60%"></i><i style="left:75%"></i><i style="left:90%"></i><u style="left:'+p+'%"></u></div>'
+   +'<div class="th">'+(D.thresholds||[20,50,80]).map(function(t){return'<i style="left:'+((t+100)/2)+'%"></i>'}).join("")+'<u style="left:'+p+'%"></u></div>'
    +(st.open===r.symbol?detail(r):'<div class="det"></div>')+'</div>';
  });
  document.getElementById("list").innerHTML=h||'<div class="empty">沒有符合條件的標的。</div>';
+ setupDrag();
  if(st.open){var el=document.querySelector('.row.open .mini');if(el)hover(el,D.items.filter(function(r){return r.symbol===st.open})[0])}
 }
 function fmtPx(v){return v==null?'—':v>=1000?v.toLocaleString("en-US",{maximumFractionDigits:1}):v.toFixed(2)}
@@ -254,13 +264,30 @@ window.onWatchlistSaved=function(list){if(!D)return;var idx={};list.forEach(func
  D.items=D.items.filter(function(r){return r.symbol in idx}).sort(function(a,b){return idx[a.symbol]-idx[b.symbol]});
  var added=list.filter(function(it){return !D.items.some(function(r){return r.symbol===it.symbol})}).length;
  setSort("custom");document.getElementById("alerts").insertAdjacentHTML("afterbegin",'<div class="alert">清單已儲存'+(added?'，新增的 '+added+' 檔約 2 分鐘後出現（重新整理頁面）':'')+'。</div>')};
-function tog(e){if(e.target.closest(".det"))return;var r=e.target.closest(".row");if(!r)return;if(e.type==="keydown"&&e.key!=="Enter"&&e.key!==" ")return;e.preventDefault();st.open=st.open===r.dataset.t?null:r.dataset.t;render()}
+// 主畫面直接拖曳排序：只有「自訂順序」且沒有篩選時才能拖，放開後存回 watchlist.json
+var listSortable=null;
+function canDrag(){return st.sort==="custom"&&st.m==="all"&&!st.only&&!st.cand&&!!window.Sortable}
+function setupDrag(){
+ if(listSortable){listSortable.destroy();listSortable=null}
+ if(!canDrag())return;
+ listSortable=Sortable.create(document.getElementById("list"),{handle:".dh",draggable:".row",animation:150,forceFallback:true,fallbackTolerance:3,onEnd:function(ev){
+  if(ev.oldIndex===ev.newIndex)return;
+  var order=[].map.call(document.querySelectorAll("#list .row"),function(x){return x.dataset.t});
+  var pos={};order.forEach(function(s,i){pos[s]=i});
+  D.items.sort(function(a,b){return(pos[a.symbol]==null?999:pos[a.symbol])-(pos[b.symbol]==null?999:pos[b.symbol])});
+  render();
+  WL.saveOrder(order).then(function(msg){note(msg)},function(e){note(e.message,true)});
+ }});
+}
+function note(msg,err){var a=document.getElementById("alerts");a.querySelectorAll(".alert.tmp").forEach(function(x){x.remove()});
+ a.insertAdjacentHTML("afterbegin",'<div class="alert tmp'+(err?' err':'')+'">'+esc(msg)+'</div>');setTimeout(function(){a.querySelectorAll(".alert.tmp").forEach(function(x){x.remove()})},6000)}
+function tog(e){if(e.target.closest(".det")||e.target.closest(".dh"))return;var r=e.target.closest(".row");if(!r)return;if(e.type==="keydown"&&e.key!=="Enter"&&e.key!==" ")return;e.preventDefault();st.open=st.open===r.dataset.t?null:r.dataset.t;render()}
 document.getElementById("list").addEventListener("click",tog);
 document.getElementById("list").addEventListener("keydown",tog);
-function route(){var h=location.hash==="#holdings"?"holdings":"cheap";
- document.getElementById("cheap").hidden=h!=="cheap";document.getElementById("holdings").hidden=h!=="holdings";document.getElementById("vt").hidden=h!=="cheap";
+function route(){var h=location.hash==="#holdings"?"holdings":location.hash==="#settings"?"settings":"cheap";
+ document.getElementById("cheap").hidden=h!=="cheap";document.getElementById("holdings").hidden=h!=="holdings";document.getElementById("settings").hidden=h!=="settings";document.getElementById("vt").hidden=h!=="cheap";
  [].forEach.call(document.querySelectorAll(".nav a"),function(a){if(a.dataset.view===h)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
- if(h==="holdings")Holdings.start()}
+ if(h==="holdings")Holdings.start();if(h==="settings")Settings.start()}
 window.addEventListener("hashchange",route);route();
 [].forEach.call(document.getElementById("sortt").children,function(x){x.setAttribute("aria-pressed",x.dataset.s===st.sort)});
 fetch("data.json?t="+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(j){

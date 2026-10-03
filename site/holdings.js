@@ -1,7 +1,7 @@
 /* 持倉分頁：讀寫 repo 裡的 holdings.json（透過 GitHub API），價格來自 prices.json。 */
 (function () {
   "use strict";
-  var CAP = 0.10;                // 單一標的佔總資產的提醒上限
+  var CAP = 0.10;                // 單一標的佔總資產的提醒上限（設定頁可改，載入 data.json 後覆蓋）
   var P = window.HoldParse;
   var ACCTS = P.ACCOUNTS;
   var REPO = GH.REPO, ls = GH.ls, token = GH.token;
@@ -61,7 +61,9 @@
     if (!S.data) return null;
     var v = ls("cd_v") === "5y" ? "5y" : "full";
     var it = S.data.items.filter(function (r) { return r.symbol.replace(/\.TW$/, "") === sym; })[0];
-    return it ? { score: it.v[v].current.score, level: it.v[v].current.level, group: it.group } : null;
+    if (it) return { score: it.v[v].current.score, level: it.v[v].current.level, group: it.group };
+    var q = S.prices && S.prices.q[sym];   // 不在觀察清單的持股：用持股自己的分數
+    return q && q["s_" + v] ? { score: q["s_" + v].score, level: q["s_" + v].level, group: "" } : null;
   }
 
   // ---------- 畫面 ----------
@@ -141,7 +143,7 @@
         + "<td>" + (p.q ? pct(p.q.chg, 2) : "—") + "</td>"
         + "<td>" + money(conv(p.mv, p.ccy), dc) + "</td>"
         + "<td>" + signed(conv(p.pnl, p.ccy), dc) + " " + pct(p.cost ? p.pnl / p.cost : null) + "</td>"
-        + "<td" + (w != null && w > CAP ? ' class="neg" title="超過單一標的 10% 上限"' : "") + ">" + (w == null ? "—" : (w * 100).toFixed(1) + "%" + (w > CAP ? " ⚠" : "")) + "</td>"
+        + "<td" + (w != null && w > CAP ? ' class="neg" title="超過單一持股上限 ' + Math.round(CAP * 100) + '%"' : "") + ">" + (w == null ? "—" : (w * 100).toFixed(1) + "%" + (w > CAP ? " ⚠" : "")) + "</td>"
         + "<td>" + (sc && sc.score != null ? sc.score.toFixed(0) + " " + esc(sc.level) : '<span class="dim">—</span>') + "</td></tr>";
       if (S.open[k]) {
         h += '<tr class="lots"><td colspan="9">' + p.lots.map(function (l) {
@@ -351,7 +353,7 @@
     Promise.all([
       loadHoldings(),
       fetch("prices.json?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.prices = j; }, function () {}),
-      fetch("data.json?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.data = j; }, function () {})
+      fetch("data.json?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.data = j; if (j && j.position_cap) CAP = j.position_cap; }, function () {})
     ]).then(render, function (e) { S.msg = e.message; render(); });
   }
   window.Holdings = { start: start };

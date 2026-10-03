@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
-from cheapdash import backtest, data, notify
+from cheapdash import backtest, data, meta, notify
 from cheapdash.model import SIGNAL_NAMES, compute
 from cheapdash.summary import current, lev_info, lev_target, num
 
@@ -80,7 +80,7 @@ def read_json(path: Path, default):
         return default
 
 
-def holdings_prices(now_tw) -> dict:
+def holdings_prices(now_tw, watched: set) -> dict:
     """持倉頁要的現價與匯率。持股不在觀察清單裡也會抓。"""
     h = read_json(ROOT / "holdings.json", {})
     syms = sorted({l["sym"] for l in h.get("lots", []) if l.get("sym")})
@@ -113,6 +113,15 @@ def holdings_prices(now_tw) -> dict:
             out["missing"].append(sym)
             continue
         out["q"][sym] = dict(quote(s), ys=ys, ccy="TWD" if ys.endswith((".TW", ".TWO")) else "USD")
+        # 不在觀察清單裡的持股也算便宜度（以自身歷史計算）
+        if sym not in watched:
+            try:
+                hist = data.load(sym + ".TW" if ys.endswith((".TW", ".TWO")) else sym, refresh=True)["Close"]
+                for name, window in VARIANTS.items():
+                    c = current(compute(hist, window))
+                    out["q"][sym]["s_" + name] = {"score": c["score"], "level": c["level"], "state": c["state"]}
+            except Exception as e:
+                print(f"[警告] 持股 {sym} 便宜度計算失敗：{e}")
     _, fx = data.recent_close("TWD=X")
     out["fx"] = quote(fx) if not fx.empty else None
     return out
@@ -136,6 +145,15 @@ def log_signals(results: list, today: str):
 def main():
     cfg = read_json(ROOT / "config.json", {})
     items = read_json(ROOT / "watchlist.json", [])
+    # 新增時只填代碼的標的：自動補上名稱、類型、槓桿對應標的，並寫回 watchlist.json
+    changed = False
+    for i, it in enumerate(items):
+        if not it.get("name") or it.get("type") in (None, "", "auto") or not it.get("market"):
+            items[i] = meta.resolve(it, [x["symbol"] for x in items])
+            print("自動判斷", it["symbol"], "→", items[i].get("name"), items[i].get("type"), items[i].get("underlying", ""))
+            changed = True
+    if changed:
+        (ROOT / "watchlist.json").write_text(json.dumps(items, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     results, failed = [], []
     for it in items:
         try:
@@ -156,10 +174,11 @@ def main():
     STATE.mkdir(exist_ok=True)
     payload = {"generated": now_tw.strftime("%Y-%m-%d %H:%M"), "signal_names": SIGNAL_NAMES,
                "thresholds": cfg.get("thresholds", [20, 50, 80]), "group_alert_min": cfg.get("group_alert_min", 3),
+               "position_cap": cfg.get("position_cap", 0.10),
                "groups": groups, "failed": failed, "items": results}
     (SITE / "data.json").write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     log_signals(results, now_tw.strftime("%Y-%m-%d"))
-    prices = holdings_prices(now_tw)
+    prices = holdings_prices(now_tw, {r["symbol"].replace(".TW", "") for r in results})
     (SITE / "prices.json").write_text(json.dumps(prices, ensure_ascii=False), encoding="utf-8")
 
     prev = read_json(STATE / "notify_state.json", None)

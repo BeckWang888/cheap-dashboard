@@ -1,5 +1,9 @@
 {
-  "thresholds": [20, 50, 80],
+  "thresholds": [
+    20,
+    50,
+    80
+  ],
   "notify": {
     "cross": true,
     "confirm": true,
@@ -9,5 +13,6 @@
   },
   "cooldown_days": 7,
   "group_alert_min": 3,
-  "site_url": "https://beckwang888.github.io/cheap-dashboard/"
+  "site_url": "https://beckwang888.github.io/cheap-dashboard/",
+  "position_cap": 0.1
 }
