@@ -69,11 +69,11 @@ def _load_yahoo(symbol: str) -> pd.DataFrame:
     return df
 
 
-def _load_yahoo_recent(symbol: str, period: str = "5d") -> pd.DataFrame:
+def _load_yahoo_recent(symbol: str, period: str = "5d", auto_adjust: bool = False) -> pd.DataFrame:
     try:
         _fix_ca_bundle()
         import yfinance as yf
-        df = yf.Ticker(symbol).history(period=period, auto_adjust=False)
+        df = yf.Ticker(symbol).history(period=period, auto_adjust=auto_adjust)
     except Exception as e:
         print(f"[警告] {symbol} 盤中報價抓取失敗：{e}")
         return pd.DataFrame()
@@ -100,6 +100,12 @@ def load(symbol: str, refresh: bool = False) -> pd.DataFrame:
                 df = pd.concat([df, today.iloc[[-1]][df.columns]])
         else:
             df = _load_yahoo(symbol)
+            # Yahoo 的完整歷史有時會晚好幾個小時才補上最新一天（在 GitHub 主機上遇過），
+            # 再用近 5 天的報價補上比較新的日子
+            if not df.empty:
+                recent = _load_yahoo_recent(symbol, "5d", auto_adjust=True)
+                if not recent.empty and recent.index[-1] > df.index[-1]:
+                    df = pd.concat([df, recent[recent.index > df.index[-1]][df.columns]])
     except Exception as e:
         print(f"[警告] {symbol} 下載錯誤：{e}")
         df = pd.DataFrame()
