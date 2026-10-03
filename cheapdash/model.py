@@ -4,13 +4,15 @@ import pandas as pd
 
 from .indicators import closed_bars, macd_hist, rsi, sma
 
-WEIGHTS = {"dd": 0.6, "ma": 0.2, "rsi": 0.2}
+WEIGHTS = {"dd": 0.5, "ma": 0.0, "rsi": 0.5}  # 2026-10 依 calibrate.py 校準：各門檻表現最穩定
 LEVELS = [(80, "極便宜"), (50, "很便宜"), (20, "便宜"), (-10, "合理"), (-33, "小貴"), (-66, "中貴")]
 LEVEL_ORDER = ["極便宜", "很便宜", "便宜", "合理", "小貴", "中貴", "很貴"]
 SIGNAL_NAMES = ["日線 MACD 綠柱縮短", "週線 MACD 綠柱縮短", "RSI 回升", "價格止穩", "站回 20 日均線"]
 WARMUP = 756  # 每個指標至少累積 3 年歷史才開始算百分位
 # 個股過熱：相對 MA200 的乖離落在自身歷史前 5%（或 RSI ≥ 80）＝過熱；前 1% ＝嚴重過熱
 HOT_PCT, VERY_HOT_PCT, HOT_RSI = 0.95, 0.99, 80
+# 甜蜜點（回測勝率較高的情境）：分數 ≥ 80，或月線 MACD 谷底已確認且分數 ≥ 50
+SWEET_SCORE, SWEET_TROUGH_SCORE = 80, 50
 
 
 def level(score: float) -> str:
@@ -117,4 +119,8 @@ def compute(close: pd.Series, window: int | None = None, now=None, closed_today:
         default="觀察中",
     )
     df["state"] = np.where(df["score"].isna(), "", state)
+    sweet_hi = df["score"] >= SWEET_SCORE
+    sweet_tr = df["trough"] & (df["score"] >= SWEET_TROUGH_SCORE)
+    df["sweet"] = sweet_hi | sweet_tr
+    df["sweet_why"] = np.where(sweet_hi, f"分數 ≥ {SWEET_SCORE}", np.where(sweet_tr, f"月線谷底確認且分數 ≥ {SWEET_TROUGH_SCORE}", ""))
     return df

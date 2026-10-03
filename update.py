@@ -25,8 +25,9 @@ CHART_DAYS = 520  # 展開後的小圖顯示最近約 2 年
 
 
 def bt_summary(res: dict) -> dict:
-    keep = ["任意日買進（基準）", "分數跨上 20", "分數跨上 50", "分數跨上 80", "狀態變成「轉折確認」"]
-    rows = [{k: e[k] for k in ("label", "n", "r126", "win126", "mae_med")} for e in res["events"] if e["label"] in keep]
+    keep = ["任意日買進（基準）", "進入甜蜜點", "分數跨上 20", "分數跨上 50", "分數跨上 80", "狀態變成「轉折確認」"]
+    rows = [{k: e[k] for k in ("label", "n", "r126", "win126", "mae_med", "mae_p10")} for e in res["events"] if e["label"] in keep]
+    rows.sort(key=lambda r: keep.index(r["label"]))
     z = res["zones"]
     return {"rows": rows, "cheap_share": z["cheap_share"], "cheap_per_year": z["cheap_per_year"],
             "longest_gap": z["longest_gap"], "years": z["years"]}

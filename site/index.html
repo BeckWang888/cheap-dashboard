@@ -9,7 +9,7 @@
 :root{
   --bg:#eef1f4;--panel:#fff;--ink:#1b2430;--sub:#5d6978;--line:#d9dfe6;
   --hot:#c2452d;--warm:#e0a24a;--mid:#c9d0d8;--cool:#6fb79c;--cheap:#12805f;
-  --accent:#12805f;--chip:#e3e8ee;
+  --accent:#12805f;--chip:#e3e8ee;--gold:#b7791f;--goldbg:#fdf3dc;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){--bg:#10161d;--panel:#18202a;--ink:#e6ebf1;--sub:#93a0af;--line:#2a3441;--hot:#e0644a;--warm:#d9a04c;--mid:#3a4553;--cool:#4fa88a;--cheap:#3ec9a0;--accent:#3ec9a0;--chip:#232d3a}
@@ -130,6 +130,12 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 .mi:first-of-type{border-top:0}.mi .bar2{grid-column:1/-1;height:6px;border-radius:3px;background:var(--chip);position:relative;overflow:hidden}
 .mi .bar2 i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--mid),var(--warm) 80%,var(--hot))}
 .mi .bt{grid-column:1/-1;font-size:12px;color:var(--sub)}.mi .v{text-align:right;font-variant-numeric:tabular-nums}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--gold:#e6b450;--goldbg:#3a2f17}}
+:root[data-theme="dark"]{--gold:#e6b450;--goldbg:#3a2f17}
+.row.sweet{box-shadow:inset 0 0 0 2px var(--gold);background:var(--goldbg)}
+.sw{display:inline-block;font-size:11px;font-weight:700;padding:0 7px;border-radius:8px;margin-left:6px;vertical-align:2px;background:var(--gold);color:#fff}
+.swbox{border:1px solid var(--gold);background:var(--goldbg);border-radius:10px;padding:10px 12px;font-size:13px;margin-top:10px}
+.swbox b.t{color:var(--gold)}
 .foot{font-size:12px;color:var(--sub);margin-top:18px}
 .foot a{color:var(--sub)}
 </style>
@@ -188,11 +194,12 @@ function C(r){return r.v[st.v].current}
 function stt(r){var c=C(r),n=c.sigs.filter(Boolean).length;if(c.score==null)return["資料不足","off"];
  if(c.state==="未進便宜區")return["未進便宜區","off"];if(c.state==="轉折確認")return["轉折確認","go"];
  if(c.state==="重點觀察")return["重點觀察"+(c.trough?"":"（形成中）"),"boss"];if(c.state==="轉折初現")return["轉折初現（"+n+" 顆）","mid"];return["觀察中","wait"]}
-function rank(r){var k=stt(r)[1];return k==="go"?2:k==="boss"?1:0}
+function rank(r){var k=stt(r)[1];return C(r).sweet?3:k==="go"?2:k==="boss"?1:0}
 function isLev(r){return r.type==="leveraged"}
 function render(){
  var items=D.items,cnt=function(f){return items.filter(f).length};
  document.getElementById("sum").innerHTML=
+  '<div><b style="color:var(--gold)">'+cnt(function(r){return !!C(r).sweet})+'</b><span>甜蜜點</span></div>'+
   '<div><b style="color:var(--accent)">'+cnt(function(r){return stt(r)[1]==="go"})+'</b><span>候選進場</span></div>'+
   '<div><b style="color:var(--warm)">'+cnt(function(r){return stt(r)[1]==="boss"})+'</b><span>重點觀察</span></div>'+
   '<div><b>'+cnt(function(r){return C(r).score>=20})+'</b><span>進入便宜區</span></div>'+
@@ -207,11 +214,11 @@ function render(){
   var dots="";c.sigs.forEach(function(v){dots+='<i class="dt'+(v?" on":"")+'"></i>'});
   dots+='<i class="dt bs'+(c.trough?" on":c.trough_forming?" half":"")+'" title="月線 MACD 谷底"></i>';
   var heat=c.heat?'<span class="hot'+(c.heat==="嚴重過熱"?" vh":"")+'">'+c.heat+'</span>':'';
-  h+='<div class="row'+(s[1]==="go"?" go":s[1]==="boss"?" boss":"")+(st.open===r.symbol?" open":"")+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
+  h+='<div class="row'+(c.sweet?" sweet":s[1]==="go"?" go":s[1]==="boss"?" boss":"")+(st.open===r.symbol?" open":"")+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
    +'<div class="id">'+(canDrag()?'<span class="dh" title="拖曳排序" aria-label="拖曳排序">☰</span>':'')+'<b>'+esc(r.symbol.replace(".TW",""))+'</b>'+heat+(r.intraday?'<span class="live">盤中</span>':'')+'<span class="nm">'+esc(r.name)+'</span>'
    +pxLine(r)
    +(L?'<div class="lv">'+L.x+' 倍・對應 '+esc(L.underlying)+'</div>':'')+(r.thin?'<div class="lv warn">資料不足，分數僅供參考</div>':'')
-   +'<div class="sig"><span>'+dots+'</span><em class="'+s[1]+'">'+s[0]+'</em></div></div>'
+   +'<div class="sig"><span>'+dots+'</span><em class="'+s[1]+'">'+s[0]+'</em>'+(c.sweet?'<span class="sw">甜蜜點</span>':'')+'</div></div>'
    +'<div class="sc"><b>'+(c.score==null?'—':c.score.toFixed(0))+'</b><span style="color:var('+(l?l[2]:'--sub')+')">'+(l?l[1]:'')+'</span></div>'
    +'<div class="th">'+(D.thresholds||[20,50,80]).map(function(t){return'<i style="left:'+((t+100)/2)+'%"></i>'}).join("")+'<u style="left:'+p+'%"></u></div>'
    +(st.open===r.symbol?detail(r):'<div class="det"></div>')+'</div>';
@@ -232,6 +239,12 @@ function detail(r){
  h+='<h4>轉折訊號（'+c.sigs.filter(Boolean).length+' / 5）'+(r.intraday?'・盤中數值，收盤後才確定':'')+'</h4><div>'+chips+'</div>';
  if(c.heat)h+='<h4>過熱</h4><div class="kv"><div>'+c.heat+'：相對 MA200 的乖離已在自身歷史前 '+(c.heat==="嚴重過熱"?"1":"5")+'%（或 RSI ≥ 80）。回測顯示過熱後未必會跌，這是「別追高」的提醒，不是賣出訊號。</div></div>';
  h+='<h4>近 2 年價格與分數（'+esc(r.base)+'）</h4><div class="mini">'+mini(r)+'<div class="tip"></div></div>';
+ if(c.sweet){var sw=b.rows.filter(function(e){return e.label==="進入甜蜜點"})[0],bs=b.rows[0];
+  h+='<div class="swbox"><b class="t">甜蜜點：'+esc(c.sweet_why)+'</b><br>'
+   +(sw&&sw.n?'這檔過去進入甜蜜點 '+sw.n+' 次，之後 6 個月中位數 '+pc(sw.r126)+'（任意日 '+pc(bs.r126)+'），上漲機率 '+pp(sw.win126)+'（任意日 '+pp(bs.win126)+'）；期間通常還會再跌 '+pc(sw.mae_med)+'，最糟 1 成再跌 '+pc(sw.mae_p10)+'。':'這檔過去樣本不足，參考整體回測：所有標的平均比任意日多約 6～9 個百分點。')
+   +(sw&&sw.n&&sw.n<5?' <b>樣本少於 5 次，參考就好。</b>':'')
+   +(r.type==="stock"?'<br>個股跌深有時是基本面出問題（例如財報、產業衰退），進場前先確認原因。':r.type==="leveraged"?'<br>槓桿 ETF 波動放大，分數以一倍標的計算，不代表槓桿產品本身安全。':'')
+   +'<br><span class="dim">勝率較高不代表穩賺，照你的分批規則進場。</span></div>'}
  h+='<h4>回測摘要（'+(L?'報酬為模擬 '+L.x+' 倍、':'')+'有分數 '+b.years.toFixed(1)+' 年，6 個月中位數）</h4><div class="scroll"><table><tr><th>事件</th><th>次數</th><th>6 個月報酬</th><th>上漲機率</th><th>之後最大再跌</th></tr>';
  b.rows.forEach(function(e,i){h+='<tr'+(i?'':' class="dim"')+'><td>'+esc(e.label)+'</td><td>'+(i?e.n:'—')+'</td><td>'+pc(e.r126)+'</td><td>'+pp(e.win126)+'</td><td>'+pc(e.mae_med)+'</td></tr>'});
  var g=b.longest_gap;

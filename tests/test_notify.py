@@ -40,6 +40,15 @@ def test_confirm_and_trough_transitions():
     assert [k for _, k, _ in ev] == ["trough已確認"]
 
 
+def test_sweet_spot_event():
+    st = {"items": {"X": {"state": "觀察中", "sweet": False, "armed": {}}}}
+    c = cur(85); c["sweet"] = True; c["sweet_why"] = "分數 ≥ 80"
+    ev, st = notify.find_events([{"symbol": "X", "current": c}], st, CFG)
+    assert ("X", "sweet", "進入甜蜜點（分數 ≥ 80）") in ev
+    ev, st = notify.find_events([{"symbol": "X", "current": c}], st, CFG)
+    assert not any(k == "sweet" for _, k, _ in ev)   # 持續在甜蜜點不重複通知
+
+
 def test_cooldown():
     state = {"sent": {}}
     e = [("X", "cross20", "跨上 20")]

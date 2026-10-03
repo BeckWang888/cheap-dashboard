@@ -33,6 +33,9 @@ def find_events(items: list, prev: dict, cfg: dict) -> tuple[list, dict]:
                 else:
                     armed[k] = was_armed
         cur["armed"] = armed
+        cur["sweet"] = bool(c.get("sweet"))
+        if on.get("sweet", True) and cur["sweet"] and not p.get("sweet"):
+            events.append((sym, "sweet", f"進入甜蜜點（{c.get('sweet_why', '')}）"))
         if on["confirm"] and c["state"] == "轉折確認" and p.get("state") != "轉折確認":
             events.append((sym, "confirm", "轉折確認"))
         if on["trough"] and cur["trough"] and cur["trough"] != p.get("trough"):
@@ -95,7 +98,7 @@ def compose(events: list, scores: dict) -> tuple[str, str, int]:
         sc = scores.get(s)
         head = f"{s} {sc:.0f} 分" if sc is not None else s
         lines.append(f"{head}｜{'、'.join(by_sym[s])}")
-    urgent = any(k in ("cross80", "confirm") for _, k, _ in events)
+    urgent = any(k in ("cross80", "confirm", "sweet") for _, k, _ in events)
     title = f"便宜度提醒：{len(order)} 項"
     return title, "\n".join(lines), 4 if urgent else 3
 

@@ -10,7 +10,8 @@
     "trough": true,
     "heat": false,
     "group": true,
-    "market": false
+    "market": true,
+    "sweet": true
   },
   "cooldown_days": 7,
   "group_alert_min": 3,

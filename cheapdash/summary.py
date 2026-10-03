@@ -32,6 +32,7 @@ def current(m: pd.DataFrame) -> dict:
         "trough": bool(last["trough"]), "trough_forming": m.attrs.get("trough_forming", False),
         "s2_forming": m.attrs.get("s2_forming", False),
         "heat": last["heat"],
+        "sweet": bool(last["sweet"]), "sweet_why": last["sweet_why"],
     }
 
 

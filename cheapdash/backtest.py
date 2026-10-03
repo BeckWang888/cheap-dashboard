@@ -142,6 +142,7 @@ def run(df: pd.DataFrame, target: pd.Series) -> dict:
     rows.append(summarize("月線谷底確認（便宜區內）", fwd, tr))
     tr_all = df.index[df["trough_event"] & score.notna()]
     rows.append(summarize("月線谷底確認（不論分數）", fwd, tr_all))
+    rows.append(summarize("進入甜蜜點", fwd, state_events(df["sweet"].map({True: "y", False: ""}), "y")))
     heat = df["heat"].where(score.notna(), "")
     rows.append(summarize("進入「過熱」（追高）", fwd, state_events(heat.replace("嚴重過熱", "過熱"), "過熱")))
     rows.append(summarize("進入「嚴重過熱」（追高）", fwd, state_events(heat, "嚴重過熱")))

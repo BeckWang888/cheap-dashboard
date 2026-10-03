@@ -31,7 +31,7 @@
     h.updated = new Date().toISOString();
     return GH.put("holdings.json", h, S.sha, message).then(function (sha) { S.sha = sha; S.h = h; });
   }
-  function normalizeH(h) { h.lots = h.lots || []; h.cash = h.cash || {}; h.names = h.names || {}; h.manual = h.manual || {}; return h; }
+  function normalizeH(h) { h.lots = h.lots || []; h.cash = h.cash || {}; h.names = h.names || {}; h.manual = h.manual || {}; h.targets = h.targets || {}; return h; }
 
   // ---------- 計算 ----------
   function positions() {
@@ -128,7 +128,7 @@
   }
 
   function acctDetail(id, ps, conv, dc, total) {
-    var h = '<div class="det" style="display:block"><div class="scroll"><table class="ht"><tr><th>代碼</th><th>股數</th><th>均價</th><th>現價</th><th>今日</th><th>市值</th><th>損益</th><th>佔總資產</th><th>便宜度</th></tr>';
+    var h = '<div class="det" style="display:block"><div class="scroll"><table class="ht"><tr><th>代碼</th><th>股數</th><th>均價</th><th>現價</th><th>今日</th><th>市值</th><th>損益</th><th>佔總資產</th><th>目標</th><th>便宜度</th></tr>';
     ps.sort(function (a, b) { return (conv(b.mv || 0, b.ccy) || 0) - (conv(a.mv || 0, a.ccy) || 0); }).forEach(function (p) {
       var sc = scoreOf(p.sym), w = total && p.mv != null ? toTWD(p.mv, p.ccy) / total : null, k = id + "|" + p.sym;
       var nm = S.h.names[p.sym] || (sc ? "" : "");
@@ -144,9 +144,10 @@
         + "<td>" + money(conv(p.mv, p.ccy), dc) + "</td>"
         + "<td>" + signed(conv(p.pnl, p.ccy), dc) + " " + pct(p.cost ? p.pnl / p.cost : null) + "</td>"
         + "<td" + (w != null && w > CAP ? ' class="neg" title="超過單一持股上限 ' + Math.round(CAP * 100) + '%"' : "") + ">" + (w == null ? "—" : (w * 100).toFixed(1) + "%" + (w > CAP ? " ⚠" : "")) + "</td>"
+        + "<td>" + targetCell(p.sym, w, total, p.mv != null ? toTWD(p.mv, p.ccy) : null) + "</td>"
         + "<td>" + (sc && sc.score != null ? sc.score.toFixed(0) + " " + esc(sc.level) : '<span class="dim">—</span>') + "</td></tr>";
       if (S.open[k]) {
-        h += '<tr class="lots"><td colspan="9">' + p.lots.map(function (l) {
+        h += '<tr class="lots"><td colspan="10">' + p.lots.map(function (l) {
           var del = S.confirmDel === l.id;
           return '<div class="lot">' + (l.date ? "<span>" + esc(l.date) + "</span>" : "") + "<span>" + (l.qty < 0 ? "賣 " : "買 ") + num(Math.abs(l.qty), 4) + " 股</span><span>@ " + num(l.px, 4) + "</span>" + (l.note ? '<span class="dim">' + esc(l.note) + "</span>" : "")
             + (token() ? '<button class="lk" data-edit="' + esc(l.id) + '">編輯</button><button class="lk' + (del ? " danger" : "") + '" data-del="' + esc(l.id) + '">' + (del ? "確定刪除？" : "刪除") + "</button>" : "") + "</div>";
@@ -159,6 +160,24 @@
     if (cs.length || token()) h += '<div class="kv" style="margin-top:8px"><div>現金<b>' + (cs.length ? cs.map(function (c) { return money(Number(cash[c]), c) + (c === "USD" ? " 美元" : " 台幣"); }).join("、") : "未填") + "</b></div>"
       + (token() ? '<div><button class="lk" data-cash="' + esc(id) + '">修改現金</button></div>' : "") + "</div>";
     return h + "</div>";
+  }
+
+  // 目標比重：同一代碼跨帳戶共用一個目標（佔總資產 %），顯示到目標還差多少台幣
+  function targetCell(sym, w, total, mvTWD) {
+    var t = S.h.targets[sym];
+    if (S.targetEdit === sym) {
+      return '<input id="htgt" inputmode="decimal" size="4" value="' + esc(t == null ? "" : t) + '">% <button class="lk" data-tgt-ok="' + esc(sym) + '">存</button><button class="lk" data-tgt-no="1">取消</button>';
+    }
+    var pen = token() ? ' <button class="lk" data-tgt="' + esc(sym) + '" title="設定目標比重" aria-label="設定目標比重">✎</button>' : "";
+    if (t == null) return '<span class="dim">—</span>' + pen;
+    var gap = total && mvTWD != null ? t / 100 * total - symTotalTWD(sym) : null;
+    var txt = gap == null ? "" : Math.abs(gap) < total * 0.002 ? '<span class="dim">已達標</span>'
+      : gap > 0 ? '<span class="pos">差 ' + money(gap, "TWD") + "</span>" : '<span class="neg">超 ' + money(-gap, "TWD") + "</span>";
+    return t + "% " + txt + pen;
+  }
+  function symTotalTWD(sym) {   // 同一代碼在所有帳戶的市值合計（台幣）
+    return positions().filter(function (p) { return p.sym === sym && p.mv != null; })
+      .reduce(function (a, p) { return a + (toTWD(p.mv, p.ccy) || 0); }, 0);
   }
 
   function inputCard() {
@@ -279,6 +298,21 @@
     if (t.closest("#hadd")) { S.rows.push({ kind: "buy", acct: "", sym: "", date: "", qty: null, px: null, note: "", warn: [] }); render(); return; }
     if (t.closest("#hclear")) { S.rows = []; S.msg = ""; render(); return; }
     if (t.closest("#hsave")) { commit(); return; }
+    if ((b = t.closest("[data-tgt]"))) { S.targetEdit = b.dataset.tgt; render(); var ti = document.getElementById("htgt"); if (ti) ti.focus(); return; }
+    if (t.closest("[data-tgt-no]")) { S.targetEdit = null; render(); return; }
+    if ((b = t.closest("[data-tgt-ok]"))) {
+      var tsym = b.dataset.tgtOk, raw = document.getElementById("htgt").value.trim(), ht = JSON.parse(JSON.stringify(S.h));
+      if (raw === "") delete ht.targets[tsym];
+      else {
+        var tv = Number(raw);
+        if (!(tv >= 0 && tv <= 100)) { S.msg = "目標比重請填 0～100 的數字（%），清空代表取消目標。"; render(); return; }
+        ht.targets[tsym] = tv;
+      }
+      S.targetEdit = null;
+      saveHoldings(ht, "目標比重 " + tsym).then(function () { S.msg = raw === "" ? "已取消 " + tsym + " 的目標。" : "已設定 " + tsym + " 目標 " + raw + "%。"; render(); })
+        .catch(function (e) { S.msg = e.message; if (e.conflict) loadHoldings().then(render, render); else render(); });
+      return;
+    }
     if ((b = t.closest("[data-man]"))) { S.manualEdit = b.dataset.man; render(); var mi = document.getElementById("hman"); if (mi) mi.focus(); return; }
     if (t.closest("[data-man-no]")) { S.manualEdit = null; render(); return; }
     if ((b = t.closest("[data-man-ok]")) || (b = t.closest("[data-man-clear]"))) {
@@ -344,6 +378,7 @@
     el.addEventListener("input", onInput);
     el.addEventListener("change", onInput);
     el.addEventListener("keydown", function (e) {
+      if (e.target.id === "htgt" && e.key === "Enter") { e.preventDefault(); var tk = document.querySelector("[data-tgt-ok]"); if (tk) tk.click(); return; }
       if (e.target.id === "hman" && e.key === "Enter") { e.preventDefault(); var ok = document.querySelector("[data-man-ok]"); if (ok) ok.click(); return; }
       if (e.target.id !== "hren") return;
       if (e.key === "Enter") { e.preventDefault(); renameSym(S.renaming); }
