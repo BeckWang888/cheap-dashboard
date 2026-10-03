@@ -5,3 +5,4 @@ report.html
 .claude/
 site/data.json
 site/prices.json
+calibration.csv
