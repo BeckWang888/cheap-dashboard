@@ -7,7 +7,8 @@
     ["confirm", "狀態變成「轉折確認」", "便宜區內 3 個以上轉折訊號，且日線或週線 MACD 亮起"],
     ["trough", "月線 MACD 谷底（重點觀察）", "月中出現會先通知「形成中」，月底收盤再通知「已確認」"],
     ["group", "同族群同時進便宜區", "例如半導體／AI 有 3 檔以上同時便宜，提醒你留意總曝險"],
-    ["heat", "個股乖離過熱", "回測顯示過熱後不一定會跌，預設關閉"]
+    ["heat", "個股乖離過熱", "回測顯示過熱後不一定會跌，預設關閉"],
+    ["market", "整體市場過熱", "美股或台股有 2 個以上市場溫度指標過熱時通知；回測顯示預測力有限，預設關閉"]
   ];
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function el() { return document.getElementById("settings"); }

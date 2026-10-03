@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
-from cheapdash import backtest, data, meta, notify
+from cheapdash import backtest, data, market, meta, notify
 from cheapdash.model import SIGNAL_NAMES, compute
 from cheapdash.summary import current, lev_info, lev_target, num
 
@@ -176,6 +176,11 @@ def main():
                "thresholds": cfg.get("thresholds", [20, 50, 80]), "group_alert_min": cfg.get("group_alert_min", 3),
                "position_cap": cfg.get("position_cap", 0.10),
                "groups": groups, "failed": failed, "items": results}
+    try:
+        payload["market"] = market.build()
+    except Exception as e:
+        print(f"[警告] 市場溫度計算失敗：{e}")
+        payload["market"] = None
     (SITE / "data.json").write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     log_signals(results, now_tw.strftime("%Y-%m-%d"))
     prices = holdings_prices(now_tw, {r["symbol"].replace(".TW", "") for r in results})
@@ -185,6 +190,9 @@ def main():
     cur = [{"symbol": r["symbol"], "current": r["v"]["full"]["current"]} for r in results]
     events, state = notify.find_events(cur, prev or {}, cfg)
     events += notify.group_events(groups, prev or {}, cfg)
+    if payload["market"]:
+        events += notify.market_events(payload["market"]["summary"], prev or {}, cfg)
+        state["market"] = {k: v["hot"] for k, v in payload["market"]["summary"].items()}
     state["groups"] = {g: len(s) for g, s in groups.items()}
     if failed:
         # 抓不到的標的保留舊狀態，避免下次恢復時重複通知

@@ -123,6 +123,13 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 .sgrid input{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
 .tg{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);cursor:pointer}
 .tg:first-of-type{border-top:0}.tg input{margin-top:4px}.tg b{display:block;font-size:14px;font-weight:600}.tg .dim{font-size:12px}
+#mkt summary{cursor:pointer;font-size:15px}#mkt summary .chip{margin-left:8px}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:1px 8px;border-radius:10px;background:var(--chip);color:var(--sub)}
+.chip.hot{background:var(--warm);color:#1b2430}.chip.vhot{background:var(--hot);color:#fff}
+.mi{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 0;border-top:1px solid var(--line)}
+.mi:first-of-type{border-top:0}.mi .bar2{grid-column:1/-1;height:6px;border-radius:3px;background:var(--chip);position:relative;overflow:hidden}
+.mi .bar2 i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--mid),var(--warm) 80%,var(--hot))}
+.mi .bt{grid-column:1/-1;font-size:12px;color:var(--sub)}.mi .v{text-align:right;font-variant-numeric:tabular-nums}
 .foot{font-size:12px;color:var(--sub);margin-top:18px}
 .foot a{color:var(--sub)}
 </style>
@@ -137,6 +144,7 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
   <nav class="nav"><a href="#" data-view="cheap" aria-current="page">便宜度</a><a href="#holdings" data-view="holdings">持倉</a><a href="#settings" data-view="settings">設定</a></nav>
   <div id="cheap">
   <div id="alerts"></div>
+  <details class="card" id="mkt" hidden><summary id="mkt-sum">市場溫度</summary><div id="mkt-body"></div></details>
   <div class="sum" id="sum"></div>
   <div class="bar">
     <div class="tabs" id="tabs">
@@ -246,6 +254,21 @@ function hover(el,r){
  hit.addEventListener("mousemove",mv);hit.addEventListener("touchmove",function(e){mv(e.touches[0])},{passive:true});
  hit.addEventListener("mouseleave",function(){tip.style.display="none";hx.style.display="none"});
 }
+function marketCard(){
+ var M=D.market,box=document.getElementById("mkt");if(!M||!M.indicators||!M.indicators.length){box.hidden=true;return}
+ box.hidden=false;var NM={US:"美股",TW:"台股"};
+ var chips=Object.keys(M.summary).map(function(k){var s=M.summary[k];return'<span class="chip'+(s.hot>=2?" vhot":s.hot?" hot":"")+'">'+NM[k]+" "+s.hot+"/"+s.total+" 過熱</span>"}).join("");
+ document.getElementById("mkt-sum").innerHTML="<b>市場溫度</b>"+chips;
+ var f=function(x,fmt){return fmt==="pct"?(x>0?"+":"")+(x*100).toFixed(1)+"%":x.toFixed(1)};
+ var h='<p class="note" style="margin:6px 0">每個指標和自己的歷史比，百分位越高越熱；前 10% 算過熱、前 3% 算嚴重過熱。下面的回測是「進入過熱後」大盤 6 個月的中位數報酬和基準比較：美股的過熱指標歷史上沒有預測力（強勢常延續），台股稍有參考價值。當作「別追高、別加碼」的提醒，不是賣出訊號。</p>';
+ ["US","TW"].forEach(function(mk){M.indicators.filter(function(x){return x.market===mk}).forEach(function(x){
+  var b=x.bt_hot,base=x.bt_base;
+  h+='<div class="mi"><div><b>'+esc(x.name)+'</b> <span class="dim" style="font-size:12px">'+NM[mk]+'</span>'+(x.status?' <span class="chip'+(x.status==="嚴重過熱"?" vhot":" hot")+'">'+x.status+'</span>':'')+'</div>'
+   +'<div class="v">'+f(x.value,x.fmt)+' <span class="dim" style="font-size:12px">前 '+Math.max(1,Math.round((1-x.heat)*100))+'%</span></div>'
+   +'<div class="bar2"><i style="width:'+(x.heat*100).toFixed(0)+'%"></i></div>'
+   +'<div class="bt">過熱後 6 個月：'+pc(b.r126)+'（上漲機率 '+pp(b.win126)+'，'+b.n+' 次）・任意日：'+pc(base.r126)+'（'+pp(base.win126)+'）・資料自 '+x.since.slice(0,4)+' 年</div></div>'})});
+ document.getElementById("mkt-body").innerHTML=h;
+}
 function alerts(){
  var h="";Object.keys(D.groups||{}).forEach(function(g){var s=D.groups[g];if(s.length>=D.group_alert_min)h+='<div class="alert">'+esc(g)+' 有 '+s.length+' 檔同時在便宜區（'+s.map(esc).join("、")+'），分批時留意這一塊的總曝險。</div>'});
  if(D.failed&&D.failed.length)h+='<div class="alert err">這次更新抓不到：'+D.failed.map(esc).join("、")+'（沿用上次資料或未顯示）</div>';
@@ -292,7 +315,7 @@ window.addEventListener("hashchange",route);route();
 [].forEach.call(document.getElementById("sortt").children,function(x){x.setAttribute("aria-pressed",x.dataset.s===st.sort)});
 fetch("data.json?t="+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(j){
  D=j;document.getElementById("meta").textContent="更新時間 "+j.generated+"（台灣時間）・台股盤中與收盤後、美股盤中與收盤後自動更新";
- alerts();setV(st.v);
+ alerts();marketCard();setV(st.v);
 }).catch(function(e){document.getElementById("list").innerHTML='<div class="empty">資料載入失敗（'+esc(e.message)+'），請稍後重新整理。</div>'});
 </script>
 </body>

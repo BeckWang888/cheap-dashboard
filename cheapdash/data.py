@@ -117,7 +117,7 @@ def load(symbol: str, refresh: bool = False) -> pd.DataFrame:
     df = df[["Open", "High", "Low", "Close", "Volume"]].dropna(subset=["Close"])
     df = df[~df.index.duplicated(keep="last")]
 
-    jumps = df["Close"].pct_change().abs()
+    jumps = df["Close"].pct_change().abs() if not symbol.startswith("^") else pd.Series(dtype=float)  # 指數（如 VIX）大幅波動是正常的
     for d, j in jumps[jumps > 0.4].items():
         print(f"[注意] {symbol} {d.date()} 單日變動 {j:.0%}，請確認是否為未還原的分割")
     df.to_csv(path)

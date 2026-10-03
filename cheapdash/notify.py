@@ -57,6 +57,21 @@ def group_events(groups: dict, prev: dict, cfg: dict) -> list:
     return out
 
 
+MARKET_NAMES = {"US": "美股", "TW": "台股"}
+
+
+def market_events(summary: dict, prev: dict, cfg: dict) -> list:
+    """市場溫度：一個市場有 2 個以上指標過熱、且上次還沒有時提醒（預設關閉）。"""
+    if not cfg["notify"].get("market"):
+        return []
+    out = []
+    for mkt, s in summary.items():
+        was = prev.get("market", {}).get(mkt, 0)
+        if s["hot"] >= 2 > was:
+            out.append((MARKET_NAMES.get(mkt, mkt) + "市場", "market", f"{s['hot']}/{s['total']} 個指標過熱，先別追高"))
+    return out
+
+
 def apply_cooldown(events: list, state: dict, cfg: dict, today: date) -> list:
     keep = []
     for sym, key, text in events:
