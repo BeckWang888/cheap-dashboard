@@ -125,7 +125,12 @@
  "sent": {
   "TSLA|trough形成中": "2026-10-03",
   "GGLL|confirm": "2026-10-03",
-  "TSLA|cross50": "2026-10-03"
+  "TSLA|cross50": "2026-10-03",
+  "台股市場|market": "2026-10-03"
+ },
+ "market": {
+  "US": 0,
+  "TW": 2
  },
  "groups": {}
 }
