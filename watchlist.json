@@ -266,5 +266,33 @@
   "underlying": "MAGS",
   "x": 2,
   "group": ""
+ },
+ {
+  "symbol": "DRAM",
+  "market": "US",
+  "type": "etf",
+  "group": "半導體/AI",
+  "name": "Roundhill Memory ETF"
+ },
+ {
+  "symbol": "MU",
+  "name": "美光",
+  "market": "US",
+  "type": "stock",
+  "group": "半導體/AI"
+ },
+ {
+  "symbol": "SOXQ",
+  "name": "Invesco 費城半導體 ETF",
+  "market": "US",
+  "type": "etf",
+  "group": "半導體/AI"
+ },
+ {
+  "symbol": "VT",
+  "name": "全球股市 ETF",
+  "market": "US",
+  "type": "etf",
+  "group": ""
  }
 ]

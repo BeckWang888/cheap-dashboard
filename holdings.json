@@ -325,6 +325,70 @@
    "date": "",
    "qty": 70,
    "px": 106.790857
+  },
+  {
+   "id": "m01",
+   "acct": "moomoo",
+   "sym": "DRAM",
+   "date": "",
+   "qty": 3,
+   "px": 49.603
+  },
+  {
+   "id": "m02",
+   "acct": "moomoo",
+   "sym": "MU",
+   "date": "",
+   "qty": 1,
+   "px": 481.76
+  },
+  {
+   "id": "m03",
+   "acct": "moomoo",
+   "sym": "QQQ",
+   "date": "",
+   "qty": 1.3805,
+   "px": 602.963
+  },
+  {
+   "id": "m04",
+   "acct": "moomoo",
+   "sym": "SNXX",
+   "date": "",
+   "qty": 203,
+   "px": 23.527
+  },
+  {
+   "id": "m05",
+   "acct": "moomoo",
+   "sym": "SOXL",
+   "date": "",
+   "qty": 37,
+   "px": 178.488
+  },
+  {
+   "id": "m06",
+   "acct": "moomoo",
+   "sym": "SOXQ",
+   "date": "",
+   "qty": 1,
+   "px": 70.36
+  },
+  {
+   "id": "m07",
+   "acct": "moomoo",
+   "sym": "SOXX",
+   "date": "",
+   "qty": 1,
+   "px": 517.74
+  },
+  {
+   "id": "m08",
+   "acct": "moomoo",
+   "sym": "VT",
+   "date": "",
+   "qty": 0.0025,
+   "px": 156.0
   }
  ],
  "cash": {},
@@ -358,7 +422,13 @@
   "MUU": "2倍 美光",
   "PLTR": "Palantir",
   "TSLA": "特斯拉",
-  "IBB": "生技 ETF"
+  "IBB": "生技 ETF",
+  "DRAM": "Roundhill 記憶體 ETF",
+  "MU": "美光",
+  "QQQ": "那斯達克 100 ETF",
+  "SOXQ": "Invesco 費城半導體 ETF",
+  "SOXX": "半導體 ETF",
+  "VT": "全球股市 ETF"
  },
  "updated": "2026-10-02T03:21:11.500Z"
 }
