@@ -42,7 +42,6 @@
 便宜度：6 每日總結推播　7 用 state/signal_log.csv 驗證訊號準確度　8 估值參考（本益比，只當參考欄）　9 新聞標題與財報日
 穩定與方便：10 cron-job.org 讓排程準時（需使用者註冊）　11 加到手機主畫面（PWA）　12 網頁直接上傳截圖用 AI 辨識（需 Anthropic API）
 Claude 的建議優先順序：6 每日總結推播、2 資產走勢圖。
-另有排程提醒 `remind-update-holdings-via-claude`（2026-10-06 12:30 ntfy），使用者已完成截圖登打，可問是否取消。
 
 ## 已知陷阱
 - 專案路徑含中文：curl_cffi 讀不到憑證，`data._fix_ca_bundle()` 會把 certifi 複製到英文路徑。
