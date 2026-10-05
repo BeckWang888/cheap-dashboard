@@ -37,6 +37,13 @@
 ## 帳戶（holdings.json 的 acct）
 `hn-tw` 華南金台股、`hn-us` 華南金美股、`fb-tw` 第一金台股、`fb-us` 第一金美股、`moomoo`、`etoro`。2026-10-05 已依截圖登打全部 6 個帳戶的持股與現金。新增持股時也要加進 watchlist（使用者要求：有持倉就一定要觀察）。
 
+## 後續可做（2026-10-05 列給使用者，尚未決定；使用者問「後續可以做什麼」時列出這份）
+持倉：1 已實現損益與交易紀錄　2 資產走勢圖（每日記總資產畫曲線）　3 配息追蹤與除息提醒　4 持倉頁拖曳排序　5 調整產業分類與提醒門檻
+便宜度：6 每日總結推播　7 用 state/signal_log.csv 驗證訊號準確度　8 估值參考（本益比，只當參考欄）　9 新聞標題與財報日
+穩定與方便：10 cron-job.org 讓排程準時（需使用者註冊）　11 加到手機主畫面（PWA）　12 網頁直接上傳截圖用 AI 辨識（需 Anthropic API）
+Claude 的建議優先順序：6 每日總結推播、2 資產走勢圖。
+另有排程提醒 `remind-update-holdings-via-claude`（2026-10-06 12:30 ntfy），使用者已完成截圖登打，可問是否取消。
+
 ## 已知陷阱
 - 專案路徑含中文：curl_cffi 讀不到憑證，`data._fix_ca_bundle()` 會把 certifi 複製到英文路徑。
 - Git 在 Windows 會轉 CRLF；已設 `core.autocrlf false`。用 python 改檔時寫入 `newline="\n"`；bash heredoc 遇長中文內容容易壞，改用 Write 工具寫暫存檔。
