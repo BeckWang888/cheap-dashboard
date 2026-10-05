@@ -96,6 +96,8 @@ def load(symbol: str, refresh: bool = False) -> pd.DataFrame:
             # FinMind 收盤後才更新，盤中用 Yahoo 的延遲報價補上今天這根
             # （還原是往回調整舊價格，最新價格本來就是原始價，可以直接接上）
             today = _load_yahoo_recent(symbol)
+            if today.empty:  # 上櫃股票在 Yahoo 是 .TWO
+                today = _load_yahoo_recent(symbol[:-3] + ".TWO")
             if not today.empty and today.index[-1] > df.index[-1]:
                 df = pd.concat([df, today.iloc[[-1]][df.columns]])
         else:

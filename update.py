@@ -37,7 +37,8 @@ def analyze(item: dict) -> dict:
     tz, close_t = MARKETS[item["market"]]
     now = datetime.now(tz)
     lev = item["type"] == "leveraged"
-    base = item["underlying"] if lev else item["symbol"]
+    # proxy：本身沒有歷史價格的標的（例如黃金現貨 AU9901）改用代理標的算分數
+    base = item["underlying"] if lev else item.get("proxy") or item["symbol"]
     close = data.load(base, refresh=True)["Close"]
     last_day = close.index[-1].date()
     closed_today = last_day < now.date() or now.time() >= close_t
@@ -62,6 +63,9 @@ def analyze(item: dict) -> dict:
         real = data.load(item["symbol"], refresh=True)["Close"]
         out["lev"] = lev_info(real, close, item["x"], base)
         out["quote"] = quote(real)
+    if item.get("proxy"):
+        own = data.tpex_gold().get(item["symbol"].replace(".TW", "")) if item["symbol"].startswith("AU") else None
+        out["quote"] = own or out["quote"]
     out["price"] = out["quote"]["price"]
     return out
 

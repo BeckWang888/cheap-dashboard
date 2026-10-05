@@ -81,5 +81,190 @@
   "underlying": "GOOGL",
   "x": 2,
   "group": ""
+ },
+ {
+  "symbol": "00631L.TW",
+  "name": "元大台灣50正2",
+  "market": "TW",
+  "type": "leveraged",
+  "underlying": "0050.TW",
+  "x": 2,
+  "group": ""
+ },
+ {
+  "symbol": "00663L.TW",
+  "name": "國泰臺灣加權正2",
+  "market": "TW",
+  "type": "leveraged",
+  "underlying": "0050.TW",
+  "x": 2,
+  "group": ""
+ },
+ {
+  "symbol": "00685L.TW",
+  "name": "群益臺灣加權正2",
+  "market": "TW",
+  "type": "leveraged",
+  "underlying": "0050.TW",
+  "x": 2,
+  "group": ""
+ },
+ {
+  "symbol": "0052.TW",
+  "name": "富邦科技",
+  "market": "TW",
+  "type": "etf",
+  "group": ""
+ },
+ {
+  "symbol": "00892.TW",
+  "name": "富邦台灣半導體",
+  "market": "TW",
+  "type": "etf",
+  "group": "半導體/AI"
+ },
+ {
+  "symbol": "00947.TW",
+  "name": "台新臺灣IC設計",
+  "market": "TW",
+  "type": "etf",
+  "group": "半導體/AI"
+ },
+ {
+  "symbol": "00830.TW",
+  "name": "國泰費城半導體",
+  "market": "TW",
+  "type": "etf",
+  "group": "半導體/AI"
+ },
+ {
+  "symbol": "00941.TW",
+  "name": "中信上游半導體",
+  "market": "TW",
+  "type": "etf",
+  "group": "半導體/AI"
+ },
+ {
+  "symbol": "00990A.TW",
+  "name": "主動元大AI新經濟",
+  "market": "TW",
+  "type": "etf",
+  "group": "半導體/AI"
+ },
+ {
+  "symbol": "00995A.TW",
+  "name": "主動中信台灣卓越",
+  "market": "TW",
+  "type": "etf",
+  "group": ""
+ },
+ {
+  "symbol": "009816.TW",
+  "name": "凱基台灣TOP50",
+  "market": "TW",
+  "type": "etf",
+  "group": ""
+ },
+ {
+  "symbol": "00662.TW",
+  "name": "富邦NASDAQ",
+  "market": "TW",
+  "type": "etf",
+  "group": ""
+ },
+ {
+  "symbol": "009800.TW",
+  "name": "中信NASDAQ",
+  "market": "TW",
+  "type": "etf",
+  "group": ""
+ },
+ {
+  "symbol": "009801.TW",
+  "name": "中信美國創新科技",
+  "market": "TW",
+  "type": "etf",
+  "group": ""
+ },
+ {
+  "symbol": "00757.TW",
+  "name": "統一FANG+",
+  "market": "TW",
+  "type": "etf",
+  "group": ""
+ },
+ {
+  "symbol": "6940.TW",
+  "name": "格斯科技",
+  "market": "TW",
+  "type": "stock",
+  "group": ""
+ },
+ {
+  "symbol": "AU9901.TW",
+  "name": "臺銀金（以國際金價計分）",
+  "market": "TW",
+  "type": "etf",
+  "proxy": "GC=F",
+  "group": ""
+ },
+ {
+  "symbol": "GOOG",
+  "name": "Alphabet",
+  "market": "US",
+  "type": "stock",
+  "group": ""
+ },
+ {
+  "symbol": "PLTR",
+  "name": "Palantir",
+  "market": "US",
+  "type": "stock",
+  "group": "半導體/AI"
+ },
+ {
+  "symbol": "AMDC",
+  "name": "2倍 AMD",
+  "market": "US",
+  "type": "leveraged",
+  "underlying": "AMD",
+  "x": 2,
+  "group": "半導體/AI"
+ },
+ {
+  "symbol": "MUU",
+  "name": "2倍 美光",
+  "market": "US",
+  "type": "leveraged",
+  "underlying": "MU",
+  "x": 2,
+  "group": "半導體/AI"
+ },
+ {
+  "symbol": "SKUU",
+  "name": "2倍 SK海力士",
+  "market": "US",
+  "type": "leveraged",
+  "underlying": "000660.KS",
+  "x": 2,
+  "group": "半導體/AI"
+ },
+ {
+  "symbol": "SNXX",
+  "name": "2倍 SNDK",
+  "market": "US",
+  "type": "leveraged",
+  "underlying": "SNDK",
+  "x": 2,
+  "group": "半導體/AI"
+ },
+ {
+  "symbol": "MAGX",
+  "name": "2倍 七巨頭",
+  "market": "US",
+  "type": "leveraged",
+  "underlying": "MAGS",
+  "x": 2,
+  "group": ""
  }
 ]

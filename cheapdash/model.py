@@ -77,7 +77,8 @@ def compute(close: pd.Series, window: int | None = None, now=None, closed_today:
     for key, col in [("dd", "dd52"), ("ma", "ma_dev"), ("rsi", "rsi")]:
         u = 1 - past_pct_rank(df[col].to_numpy(), window)
         df["u_" + key] = u
-        score = score + WEIGHTS[key] * (2 * u - 1)
+        if WEIGHTS[key]:  # 權重 0 的指標不參與，免得它缺資料時整個分數變成空值
+            score = score + WEIGHTS[key] * (2 * u - 1)
     df["score"] = 100 * score
 
     r = df["rsi"]

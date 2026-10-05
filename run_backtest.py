@@ -18,7 +18,7 @@ REFRESH = "--refresh" in sys.argv
 
 def analyze(item: dict) -> dict:
     lev = item["type"] == "leveraged"
-    base = item["underlying"] if lev else item["symbol"]
+    base = item["underlying"] if lev else item.get("proxy") or item["symbol"]
     close = data.load(base, REFRESH)["Close"]
     target = lev_target(close, item["x"]) if lev else close
 

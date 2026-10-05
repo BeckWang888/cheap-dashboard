@@ -65,6 +65,8 @@ def summarize(label: str, fwd: pd.DataFrame, dates) -> dict:
 
 def zone_stats(score: pd.Series) -> dict:
     s = score.dropna()
+    if s.empty:  # 歷史太短還沒有分數（新上市 ETF）
+        return {"shares": {n: 0.0 for n in LEVEL_ORDER}, "cheap_share": 0.0, "cheap_per_year": 0.0, "longest_gap": None, "years": 0.0}
     lv = s.map(level)
     shares = {name: float((lv == name).mean()) for name in LEVEL_ORDER}
     years = len(s) / 252
@@ -92,6 +94,8 @@ def simulate(target: pd.Series, score: pd.Series) -> dict:
     左側分批：現金先放著（不計利息），依 TRANCHES 在跨上 20 / 50 / 80 時投入 20% / 30% / 50%
     （換算成「當下現金」的比例：20/100、30/80、50/50）。"""
     s = score.dropna()
+    if s.empty:
+        return None
     t = target.loc[s.index[0]:]
     month_start = t.index.to_series().groupby(t.index.to_period("M")).first()
     deposit_days = set(month_start.to_numpy())
