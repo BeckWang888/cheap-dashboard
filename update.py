@@ -45,7 +45,7 @@ def analyze(item: dict) -> dict:
     target = lev_target(close, item["x"]) if lev else close
     naive_now = now.replace(tzinfo=None)
 
-    out = {k: item.get(k) for k in ("symbol", "name", "market", "type", "group")}
+    out = {k: item.get(k) for k in ("symbol", "name", "market", "type", "group", "theme", "x")}
     out["base"] = base
     out["intraday"] = not closed_today
     out["quote"] = quote(close)

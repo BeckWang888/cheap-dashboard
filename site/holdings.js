@@ -8,6 +8,7 @@
 
   var S = { h: null, sha: null, prices: null, data: null, ccy: "USD", open: {}, rows: [], msg: "", busy: false, confirmDel: null, renaming: null };
   S.ccy = ls("cd_ccy") === "TWD" ? "TWD" : "USD";
+  S.chart = ls("cd_chart") || "alloc";
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function money(v, ccy, dp) {
@@ -66,101 +67,291 @@
     return q && q["s_" + v] ? { score: q["s_" + v].score, level: q["s_" + v].level, group: "" } : null;
   }
 
+  // ---------- 分類 ----------
+  var RISK = [   // 顏色跟著類別固定，不跟排名變
+    ["大盤 ETF", "var(--c1)"], ["槓桿 ETF", "var(--c2)"], ["產業／主題 ETF", "var(--c3)"],
+    ["黃金", "var(--c4)"], ["個股", "var(--c7)"], ["現金", "var(--cnull)"]
+  ];
+  var THEME_COLOR = { "半導體": "var(--c1)", "記憶體": "var(--c2)", "美股大盤": "var(--c3)", "台股大盤": "var(--c4)",
+    "AI／軟體": "var(--c5)", "黃金": "var(--c6)", "生技": "var(--c7)", "電動車": "var(--c8)", "全球": "var(--cnull2)", "其他": "var(--cnull)" };
+  var ACCT_COLOR = { "hn-tw": "var(--c1)", "hn-us": "var(--c2)", "fb-tw": "var(--c3)", "fb-us": "var(--c4)", "moomoo": "var(--c5)", "etoro": "var(--c7)" };
+  function metaOf(sym) {
+    var it = S.data && S.data.items.filter(function (r) { return r.symbol.replace(/\.TW$/, "") === sym; })[0];
+    var v = ls("cd_v") === "5y" ? "5y" : "full";
+    if (it) return { name: it.name, type: it.type, theme: it.theme || "其他", group: it.group, x: it.x, cur: it.v[v].current };
+    var q = S.prices && S.prices.q[sym];
+    return { name: S.h.names[sym] || sym, type: "stock", theme: "其他", group: "", cur: q && q["s_" + v] ? q["s_" + v] : null };
+  }
+  function riskOf(m, sym) {
+    if (sym === "AU9901" || m.theme === "黃金") return "黃金";
+    if (m.type === "leveraged") return "槓桿 ETF";
+    if (m.type === "stock") return "個股";
+    return /大盤|全球/.test(m.theme) ? "大盤 ETF" : "產業／主題 ETF";
+  }
+
+  // ---------- 彙總：同一代碼跨帳戶合併（台幣）----------
+  function summarize() {
+    var pos = positions(), by = {}, cashTW = 0, cashUS = 0, acctVal = {}, missing = 0;
+    pos.forEach(function (p) {
+      var mv = p.mv != null ? toTWD(p.mv, p.ccy) : null;
+      if (mv == null) { missing++; return; }
+      var c = toTWD(p.cost, p.ccy), t = toTWD(p.today || 0, p.ccy);
+      var s = by[p.sym] || (by[p.sym] = { sym: p.sym, mv: 0, cost: 0, today: 0, qty: 0, ccy: p.ccy, q: p.q, accts: [] });
+      s.mv += mv; s.cost += c; s.today += t; s.qty += p.qty; s.accts.push(p.acct);
+      acctVal[p.acct] = (acctVal[p.acct] || 0) + mv;
+    });
+    Object.keys(S.h.cash).forEach(function (a) {
+      var c = S.h.cash[a];
+      Object.keys(c).forEach(function (ccy) {
+        var v = toTWD(Number(c[ccy]) || 0, ccy); if (v == null) return;
+        if (ccy === "USD") cashUS += v; else cashTW += v;
+        acctVal[a] = (acctVal[a] || 0) + v;
+      });
+    });
+    var syms = Object.keys(by).map(function (k) { var s = by[k]; s.m = metaOf(s.sym); s.risk = riskOf(s.m, s.sym); s.pnl = s.mv - s.cost; return s; });
+    var stock = syms.reduce(function (a, s) { return a + s.mv; }, 0);
+    var cost = syms.reduce(function (a, s) { return a + s.cost; }, 0);
+    var today = syms.reduce(function (a, s) { return a + s.today; }, 0);
+    return { pos: pos, syms: syms, stock: stock, cost: cost, today: today, cashTW: cashTW, cashUS: cashUS,
+             cash: cashTW + cashUS, total: stock + cashTW + cashUS, acctVal: acctVal, missing: missing };
+  }
+
+  // ---------- 環圈圖 ----------
+  function donut(slices, centerTop, centerBottom) {
+    var R = 70, C = 2 * Math.PI * R, tot = slices.reduce(function (a, s) { return a + s.v; }, 0), off = 0, h = "";
+    var gap = slices.filter(function (s) { return s.v > 0; }).length > 1 ? 2 : 0;
+    slices.forEach(function (s) {
+      var len = tot ? s.v / tot * C : 0;
+      if (len <= 0) return;
+      var seg = Math.max(0, len - gap);
+      h += '<circle r="' + R + '" cx="90" cy="90" fill="none" stroke="' + s.c + '" stroke-width="26" stroke-dasharray="' + seg.toFixed(2) + " " + (C - seg).toFixed(2)
+        + '" stroke-dashoffset="' + (-off).toFixed(2) + '" transform="rotate(-90 90 90)"><title>' + esc(s.k) + "：" + money(s.v, "TWD") + "（" + (s.v / tot * 100).toFixed(1) + "%）</title></circle>";
+      off += len;
+    });
+    return '<svg viewBox="0 0 180 180" class="dn" role="img" aria-label="' + esc(centerTop) + '">' + h
+      + '<text x="90" y="84" text-anchor="middle" class="dn-t">' + esc(centerTop) + '</text><text x="90" y="106" text-anchor="middle" class="dn-v">' + esc(centerBottom) + "</text></svg>";
+  }
+  function legend(slices) {
+    var tot = slices.reduce(function (a, s) { return a + s.v; }, 0);
+    return '<ul class="lg">' + slices.filter(function (s) { return s.v > 0; }).map(function (s) {
+      return '<li><i style="background:' + s.c + '"></i><span class="lk2">' + esc(s.k) + "</span><b>" + (s.v / tot * 100).toFixed(1) + '%</b><span class="dim">' + compact(s.v) + "</span></li>";
+    }).join("") + "</ul>";
+  }
+  function compact(v) { return Math.abs(v) >= 1e4 ? (v < 0 ? "-" : "") + (Math.abs(v) / 1e4).toFixed(Math.abs(v) >= 1e6 ? 0 : 1) + " 萬" : money(v, "TWD"); }
+
+  function chartSlices(sm, kind) {
+    var g = {};
+    function add(k, v) { g[k] = (g[k] || 0) + v; }
+    if (kind === "alloc") {
+      sm.syms.forEach(function (s) { add(isTW(s.sym) ? "台股" : "美股", s.mv); });
+      add("現金（台幣）", sm.cashTW); add("現金（美元）", sm.cashUS);
+      var AC = { "台股": "var(--c1)", "美股": "var(--c2)", "現金（台幣）": "var(--cnull)", "現金（美元）": "var(--cnull2)" };
+      return ["台股", "美股", "現金（台幣）", "現金（美元）"].map(function (k) { return { k: k, v: g[k] || 0, c: AC[k] }; });
+    }
+    if (kind === "risk") {
+      sm.syms.forEach(function (s) { add(s.risk, s.mv); }); add("現金", sm.cash);
+      return RISK.map(function (r) { return { k: r[0], v: g[r[0]] || 0, c: r[1] }; });
+    }
+    if (kind === "theme") {
+      sm.syms.forEach(function (s) { add(s.m.theme, s.mv); });
+      return Object.keys(g).sort(function (a, b) { return g[b] - g[a]; })
+        .map(function (k) { return { k: k, v: g[k], c: THEME_COLOR[k] || "var(--cnull)" }; });
+    }
+    if (kind === "acct") {
+      return ACCTS.map(function (a) { return { k: a.name, v: sm.acctVal[a.id] || 0, c: ACCT_COLOR[a.id] }; });
+    }
+    return [];
+  }
+  var CHARTS = [["alloc", "資產配置"], ["risk", "風險類別"], ["theme", "產業主題"], ["acct", "帳戶"], ["top", "持股排行"]];
+
+  function chartCard(sm) {
+    var kind = S.chart || "alloc";
+    var h = '<div class="card"><div class="tabs ctabs" id="hchart">' + CHARTS.map(function (c) { return '<button data-ch="' + c[0] + '" aria-pressed="' + (c[0] === kind) + '">' + c[1] + "</button>"; }).join("") + "</div>";
+    if (kind === "top") {
+      var list = sm.syms.slice().sort(function (a, b) { return b.mv - a.mv; });
+      var max = list.length ? list[0].mv : 1;
+      h += '<p class="note" style="margin:10px 0 6px">每檔佔總資產的比例（同一檔在不同券商合併計算）。紅線是單一持股上限 ' + Math.round(CAP * 100) + "%。</p><div class='topb'>";
+      list.forEach(function (s) {
+        var w = s.mv / sm.total, over = w > CAP;
+        h += '<div class="tb"><span class="tbn"><b>' + esc(s.sym) + '</b> <span class="dim">' + esc(s.m.name || "") + '</span></span><span class="tbbar"><i style="width:' + (s.mv / max * 100).toFixed(1) + "%;background:" + (over ? "var(--hot)" : "var(--c1)") + '"></i>'
+          + '<u style="left:' + Math.min(100, CAP * sm.total / max * 100).toFixed(1) + '%"></u></span><span class="tbv' + (over ? " neg" : "") + '">' + (w * 100).toFixed(1) + "%" + (over ? " ⚠" : "") + "</span></div>";
+      });
+      return h + "</div></div>";
+    }
+    var sl = chartSlices(sm, kind);
+    var center = kind === "theme" ? ["股票部位", compact(sm.stock)] : ["總資產", compact(sm.total)];
+    var notes = { alloc: "台股、美股與現金的比例。", risk: "由穩到積極：大盤 ETF、產業 ETF、個股、槓桿 ETF；現金與黃金是緩衝。", theme: "只算股票部位，依產業或主題分類。", acct: "每個帳戶的總值（含現金）。" };
+    return h + '<div class="dnw">' + donut(sl, center[0], center[1]) + legend(sl) + "</div><p class='note' style='margin:4px 0 0'>" + notes[kind] + "</p></div>";
+  }
+
+  // ---------- 損益與漲跌 ----------
+  function pnlCard(sm) {
+    var mode = S.pnlMode || "total";
+    var rows = sm.syms.map(function (s) {
+      var v = mode === "total" ? (s.cost ? s.pnl / s.cost : 0) : mode === "today" ? (s.q && s.q.chg != null ? s.q.chg : 0) : s.pnl;
+      return { s: s, v: v };
+    }).sort(function (a, b) { return b.v - a.v; });
+    var max = Math.max.apply(null, rows.map(function (r) { return Math.abs(r.v); }).concat([1e-9]));
+    var showAll = S.pnlAll || rows.length <= 12;
+    var shown = showAll ? rows : rows.slice(0, 6).concat([null]).concat(rows.slice(-6));
+    var h = '<div class="card"><div class="hd2"><h3>損益與漲跌</h3><div class="tabs" id="hpnl">'
+      + [["total", "總報酬"], ["today", "今日"], ["amt", "損益金額"]].map(function (o) { return '<button data-pm="' + o[0] + '" aria-pressed="' + (o[0] === mode) + '">' + o[1] + "</button>"; }).join("") + "</div></div><div class='pl'>";
+    shown.forEach(function (r) {
+      if (!r) { h += '<div class="plgap">⋯ 中間還有 ' + (rows.length - 12) + " 檔</div>"; return; }
+      var w = Math.abs(r.v) / max * 50, up = r.v >= 0;
+      var label = mode === "amt" ? (r.v > 0 ? "+" : "") + compact(r.v) : (r.v > 0 ? "+" : "") + (r.v * 100).toFixed(mode === "today" ? 2 : 1) + "%";
+      h += '<div class="plr"><span class="pln"><b>' + esc(r.s.sym) + '</b></span><span class="plbar"><i class="' + (up ? "up" : "dn2") + '" style="' + (up ? "left:50%" : "right:50%") + ";width:" + w.toFixed(1) + '%"></i><em></em></span><span class="plv ' + (r.v > 0 ? "pos" : r.v < 0 ? "neg" : "") + '">' + label + "</span></div>";
+    });
+    h += "</div>";
+    if (rows.length > 12) h += '<button class="lk" id="hpnlall" style="margin-top:6px">' + (showAll ? "只看前後 6 名" : "顯示全部 " + rows.length + " 檔") + "</button>";
+    var nUp = rows.filter(function (r) { return r.v > 0; }).length, nDn = rows.filter(function (r) { return r.v < 0; }).length;
+    h += '<p class="note" style="margin:6px 0 0">' + nUp + " 檔上漲、" + nDn + " 檔下跌" + (mode === "today" ? "（今日漲跌，盤中為即時價）" : "（以成本計算，同一檔各券商合併）") + "</p></div>";
+    return h;
+  }
+
+  // ---------- 提醒與建議 ----------
+  function adviceCard(sm) {
+    var A = [];   // [等級, 標題, 說明]
+    var cashR = sm.total ? sm.cash / sm.total : 0;
+    sm.syms.forEach(function (s) {
+      var w = s.mv / sm.total;
+      if (w > CAP) A.push(["warn", s.sym + " 佔總資產 " + (w * 100).toFixed(1) + "%", "超過單一持股上限 " + Math.round(CAP * 100) + "%，先別再加碼。"]);
+    });
+    var lev = sm.syms.filter(function (s) { return s.risk === "槓桿 ETF"; }).reduce(function (a, s) { return a + s.mv; }, 0) / (sm.total || 1);
+    if (lev > 0.15) A.push([lev > 0.25 ? "warn" : "caution", "槓桿 ETF 佔總資產 " + (lev * 100).toFixed(1) + "%", "槓桿產品波動與耗損大，建議控制在 15% 以內；大跌時虧損會放大 2～4 倍。"]);
+    var semi = sm.syms.filter(function (s) { return /半導體|記憶體/.test(s.m.theme); }).reduce(function (a, s) { return a + s.mv; }, 0) / (sm.stock || 1);
+    if (semi > 0.4) A.push(["caution", "半導體與記憶體佔股票部位 " + (semi * 100).toFixed(0) + "%", "這個族群常一起漲跌，分散到其他產業可以降低單一產業修正的衝擊。"]);
+    if (cashR < 0.1) A.push(["caution", "現金只剩 " + (cashR * 100).toFixed(1) + "%", "左側分批需要子彈，遇到便宜區時可能沒有資金。"]);
+    else if (cashR > 0.4) A.push(["info", "現金佔 " + (cashR * 100).toFixed(1) + "%", "現金充足，可以等便宜度到門檻時分批進場。"]);
+    var M = S.data && S.data.market;
+    if (M && M.summary) {
+      var share = function (tw) { return sm.syms.filter(function (s) { return isTW(s.sym) === tw; }).reduce(function (a, s) { return a + s.mv; }, 0) / (sm.total || 1); };
+      if (M.summary.TW && M.summary.TW.hot >= 2) A.push(["caution", "台股市場過熱（" + M.summary.TW.hot + "/" + M.summary.TW.total + " 個指標）", "台股部位佔總資產 " + (share(true) * 100).toFixed(0) + "%。過熱時先別追高、別加碼。"]);
+      if (M.summary.US && M.summary.US.hot >= 2) A.push(["caution", "美股市場過熱（" + M.summary.US.hot + "/" + M.summary.US.total + " 個指標）", "美股部位佔總資產 " + (share(false) * 100).toFixed(0) + "%。過熱時先別追高、別加碼。"]);
+    }
+    sm.syms.forEach(function (s) {
+      var c = s.m.cur;
+      if (c && c.sweet) A.push(["chance", s.sym + " 在甜蜜點", (c.sweet_why || "") + "，回測勝率較高。依分批規則決定是否加碼。"]);
+      else if (c && c.score != null && c.score >= 50) A.push(["chance", s.sym + " 很便宜（" + c.score.toFixed(0) + " 分）", "可以依分批規則考慮加碼。"]);
+      if (c && c.score != null && c.score <= -66 && s.mv / sm.total > 0.03) A.push(["info", s.sym + " 目前很貴（" + c.score.toFixed(0) + " 分）", "佔總資產 " + (s.mv / sm.total * 100).toFixed(1) + "%，暫緩加碼；有獲利可考慮是否部分了結。"]);
+      var r = s.cost ? s.pnl / s.cost : 0;
+      if (r < -0.25) A.push([s.risk === "個股" || s.risk === "槓桿 ETF" ? "warn" : "caution", s.sym + " 虧損 " + (r * 100).toFixed(0) + "%", s.risk === "槓桿 ETF" ? "槓桿 ETF 回本需要更大的漲幅，確認是否還符合你的計畫。" : "檢查是否有基本面變化，再決定續抱、停損或分批攤平。"]);
+      var t = S.h.targets[s.sym];
+      if (t != null) { var gap = t / 100 * sm.total - s.mv; if (gap > sm.total * 0.01) A.push(["info", s.sym + " 距目標 " + t + "% 還差 " + compact(gap), "可等便宜度到門檻時補足。"]); }
+    });
+    var order = { warn: 0, caution: 1, chance: 2, info: 3 }, label = { warn: "警示", caution: "注意", chance: "機會", info: "資訊" };
+    A.sort(function (a, b) { return order[a[0]] - order[b[0]]; });
+    var h = '<div class="card"><h3>提醒與建議</h3>';
+    if (!A.length) h += '<p class="note">目前沒有需要注意的地方。</p>';
+    else h += '<ul class="adv">' + A.slice(0, S.advAll ? 99 : 6).map(function (a) {
+      return '<li class="' + a[0] + '"><span class="ab">' + label[a[0]] + "</span><div><b>" + esc(a[1]) + '</b><span class="dim">' + esc(a[2]) + "</span></div></li>";
+    }).join("") + "</ul>" + (A.length > 6 ? '<button class="lk" id="hadvall">' + (S.advAll ? "收起" : "顯示全部 " + A.length + " 則") + "</button>" : "");
+    return h + '<p class="note" style="margin:6px 0 0">依你的設定與回測自動產生，僅供參考，不是投資建議。</p></div>';
+  }
+
   // ---------- 畫面 ----------
   function render() {
     var el = document.getElementById("holdings");
     if (!S.h) { el.innerHTML = '<div class="card empty">' + esc(S.msg || "載入持倉中…") + "</div>"; return; }
-    var pos = positions(), fxv = fx();
-    var totStock = 0, totCash = 0, totCost = 0, totToday = 0, totPrev = 0, semi = 0, missing = 0;
-    pos.forEach(function (p) {
-      if (p.mv == null) { missing++; return; }
-      var mv = toTWD(p.mv, p.ccy), c = toTWD(p.cost, p.ccy), t = toTWD(p.today || 0, p.ccy);
-      if (mv == null) { missing++; return; }
-      totStock += mv; totCost += c; totToday += t; totPrev += mv - t;
-      var sc = scoreOf(p.sym); if (sc && sc.group) semi += mv;
-    });
-    Object.keys(S.h.cash).forEach(function (a) { var c = S.h.cash[a]; Object.keys(c).forEach(function (ccy) { var v = toTWD(Number(c[ccy]) || 0, ccy); if (v != null) totCash += v; }); });
-    var total = totStock + totCash;
-
-    var h = '<div class="hsum">'
-      + '<div class="big"><span>總資產（台幣）</span><b>' + money(total, "TWD") + "</b></div>"
-      + '<div><span>今日</span><b>' + signed(totToday, "TWD") + "</b><i>" + pct(totPrev ? totToday / totPrev : null, 2) + "</i></div>"
-      + '<div><span>總損益</span><b>' + signed(totStock - totCost, "TWD") + "</b><i>" + pct(totCost ? (totStock - totCost) / totCost : null) + "</i></div>"
-      + '<div><span>現金</span><b>' + money(totCash, "TWD") + "</b><i>佔 " + (total ? (totCash / total * 100).toFixed(1) : "0") + "%</i></div>"
-      + '<div><span>半導體／AI</span><b>' + (total ? (semi / total * 100).toFixed(1) + "%" : "—") + "</b><i>依觀察清單分類</i></div>"
-      + "</div>";
+    var sm = summarize(), fxv = fx();
+    var cashR = sm.total ? sm.cash / sm.total : 0;
+    var h = '<div class="hero"><span class="dim">總資產（台幣）</span><b class="hb">' + money(sm.total, "TWD") + "</b>"
+      + '<div class="hero2"><span>今日 ' + signed(sm.today, "TWD") + " " + pct(sm.stock - sm.today ? sm.today / (sm.stock - sm.today) : null, 2) + "</span>"
+      + "<span>總損益 " + signed(sm.stock - sm.cost, "TWD") + " " + pct(sm.cost ? (sm.stock - sm.cost) / sm.cost : null) + "</span></div>"
+      + '<div class="hbar" role="img" aria-label="股票 ' + ((1 - cashR) * 100).toFixed(0) + "%、現金 " + (cashR * 100).toFixed(0) + '%"><i style="width:' + ((1 - cashR) * 100).toFixed(1) + '%"></i></div>'
+      + '<div class="hbl"><span><i class="sw2" style="background:var(--c1)"></i>股票 ' + compact(sm.stock) + "（" + ((1 - cashR) * 100).toFixed(0) + '%）</span><span><i class="sw2" style="background:var(--cnull)"></i>現金 ' + compact(sm.cash) + "（" + (cashR * 100).toFixed(0) + "%）</span></div></div>";
     h += '<p class="note">美元匯率 ' + (fxv ? fxv.toFixed(3) + "（" + S.prices.fx.date.slice(5).replace("-", "/") + "）" : "—")
       + "・價格更新 " + esc(S.prices ? S.prices.generated : "—")
-      + (missing ? '・<span class="neg">' + missing + " 檔還沒有價格，存檔後約 2 分鐘更新</span>" : "") + "</p>";
-    h += '<div class="bar"><span class="dim" style="font-size:14px">美股顯示</span><div class="tabs" id="hccy">'
-      + '<button data-c="USD" aria-pressed="' + (S.ccy === "USD") + '">美元</button><button data-c="TWD" aria-pressed="' + (S.ccy === "TWD") + '">台幣</button></div></div>';
+      + (sm.missing ? '・<span class="neg">' + sm.missing + " 檔還沒有價格</span>" : "")
+      + '・<button class="lk" id="hupdn">漲跌色：' + (upDown() === "tw" ? "紅漲綠跌" : "綠漲紅跌") + "</button></p>";
+    h += chartCard(sm) + adviceCard(sm) + pnlCard(sm);
 
-    // 帳戶列表
     var byAcct = {};
-    pos.forEach(function (p) { (byAcct[p.acct] = byAcct[p.acct] || []).push(p); });
+    sm.pos.forEach(function (p) { (byAcct[p.acct] = byAcct[p.acct] || []).push(p); });
     var ids = ACCTS.map(function (a) { return a.id; }).concat(Object.keys(byAcct).filter(function (k) { return !ACCTS.some(function (a) { return a.id === k; }); }));
     var empty = [];
+    h += '<div class="bar" style="margin-top:6px"><h3 style="margin:0;font-size:16px">各帳戶</h3><span class="dim" style="font-size:14px;margin-left:auto">美股顯示</span><div class="tabs" id="hccy">'
+      + '<button data-c="USD" aria-pressed="' + (S.ccy === "USD") + '">美元</button><button data-c="TWD" aria-pressed="' + (S.ccy === "TWD") + '">台幣</button></div></div>';
     h += '<div class="list">';
     ids.forEach(function (id) {
       var ps = byAcct[id] || [], cash = S.h.cash[id] || {};
       var hasCash = Object.keys(cash).some(function (c) { return Number(cash[c]); });
       if (!ps.length && !hasCash) { empty.push(acctName(id)); return; }
       var a = ACCTS.filter(function (x) { return x.id === id; })[0] || { market: "US", ccy: "USD" };
-      var dc = a.market === "TW" ? "TWD" : S.ccy;     // 顯示幣別
-      function conv(v, ccy) { if (v == null) return null; return dc === ccy ? v : dc === "TWD" ? toTWD(v, ccy) : (fxv ? v / fxv : null); }
+      var dc = a.market === "TW" ? "TWD" : S.ccy;
+      var conv = function (v, ccy) { if (v == null) return null; return dc === ccy ? v : dc === "TWD" ? toTWD(v, ccy) : (fxv ? v / fxv : null); };
       var mv = 0, cost = 0, today = 0, cashV = 0;
       ps.forEach(function (p) { if (p.mv != null) { mv += conv(p.mv, p.ccy); cost += conv(p.cost, p.ccy); today += conv(p.today || 0, p.ccy); } });
       Object.keys(cash).forEach(function (c) { cashV += conv(Number(cash[c]) || 0, c) || 0; });
       var open = S.open[id];
       h += '<div class="row hrow' + (open ? " open" : "") + '" tabindex="0" data-acct="' + esc(id) + '">'
-        + '<div class="id"><b>' + esc(acctName(id)) + '</b><span class="nm">' + ps.length + " 檔" + (cashV ? "・現金 " + money(cashV, dc) : "") + "</span></div>"
+        + '<div class="id"><i class="sw2" style="background:' + (ACCT_COLOR[id] || "var(--cnull)") + '"></i><b>' + esc(acctName(id)) + '</b><span class="nm">' + ps.length + " 檔" + (cashV ? "・現金 " + money(cashV, dc) : "") + "</span></div>"
         + '<div class="hv"><b>' + money(mv + cashV, dc) + '</b><span>今日 ' + signed(today, dc) + "</span></div>"
         + '<div class="sc"><b style="font-size:17px">' + pct(cost ? (mv - cost) / cost : null) + '</b><span class="dim" style="font-weight:400">' + signed(mv - cost, dc) + "</span></div>";
-      if (open) h += acctDetail(id, ps, conv, dc, total);
+      if (open) h += acctDetail(id, ps, conv, dc, sm.total, mv + cashV);
       h += "</div>";
     });
-    if (!pos.length && !Object.keys(S.h.cash).length) h += '<div class="empty">還沒有持倉。用下方的「新增持倉」念或打字輸入，例如：<br>「華南台股，0050，3000 股，成本 150」</div>';
+    if (!sm.pos.length && !Object.keys(S.h.cash).length) h += '<div class="empty">還沒有持倉。用下方的「新增持倉」念或打字輸入，例如：<br>「華南台股，0050，3000 股，成本 150」</div>';
     h += "</div>";
-    if (empty.length && (pos.length || Object.keys(S.h.cash).length)) h += '<p class="note" style="margin-top:6px">沒有持倉的帳戶：' + empty.map(esc).join("、") + "</p>";
-
+    if (empty.length && sm.pos.length) h += '<p class="note" style="margin-top:6px">沒有持倉的帳戶：' + empty.map(esc).join("、") + "</p>";
     h += inputCard() + settingsCard();
     el.innerHTML = h;
   }
 
-  function acctDetail(id, ps, conv, dc, total) {
-    var h = '<div class="det" style="display:block"><div class="scroll"><table class="ht"><tr><th>代碼</th><th>股數</th><th>均價</th><th>現價</th><th>今日</th><th>市值</th><th>損益</th><th>佔總資產</th><th>目標</th><th>便宜度</th></tr>';
+  // 帳戶展開：每檔一列（佔帳戶比重條＋市值＋報酬率），點一下看完整資料與操作
+  function acctDetail(id, ps, conv, dc, total, acctTotal) {
+    var h = '<div class="det" style="display:block">';
     ps.sort(function (a, b) { return (conv(b.mv || 0, b.ccy) || 0) - (conv(a.mv || 0, a.ccy) || 0); }).forEach(function (p) {
-      var sc = scoreOf(p.sym), w = total && p.mv != null ? toTWD(p.mv, p.ccy) / total : null, k = id + "|" + p.sym;
-      var nm = S.h.names[p.sym] || (sc ? "" : "");
-      var symCell = S.renaming === k
-        ? '<input id="hren" value="' + esc(p.sym) + '" size="7" autocapitalize="characters"> <button class="lk" data-ren-ok="' + esc(k) + '">確定</button><button class="lk" data-ren-no="1">取消</button>'
-        : "<b>" + esc(p.sym) + "</b>" + (nm ? ' <span class="dim">' + esc(nm) + "</span>" : "") + (token() ? ' <button class="lk" data-ren="' + esc(k) + '" title="修改代碼" aria-label="修改代碼">✎</button>' : "") + (p.q ? "" : ' <span class="neg" style="font-size:12px">抓不到價格，請確認代碼或手動輸入價格</span>');
-      if (S.manualEdit === p.sym) symCell += '<div style="margin-top:4px">現價 <input id="hman" inputmode="decimal" size="8" value="' + esc((S.h.manual[p.sym] || {}).price || "") + '"> <button class="lk" data-man-ok="' + esc(p.sym) + '">儲存</button><button class="lk" data-man-no="1">取消</button>' + (S.h.manual[p.sym] ? '<button class="lk" data-man-clear="' + esc(p.sym) + '">改回自動</button>' : "") + "</div>";
-      h += '<tr class="prow" data-k="' + esc(k) + '"><td>' + symCell + "</td>"
-        + "<td>" + num(p.qty, 4) + "</td><td>" + num(p.avg, 2) + "</td>"
-        + "<td>" + (p.q ? num(p.price, 2) + ' <span class="dim">' + (p.q.manual ? "手動" : p.q.est ? "估算" : String(p.q.date).slice(5).replace("-", "/")) + "</span>" : '<span class="dim">—</span>')
-        + (token() && (!p.q || p.q.manual || p.q.est) ? ' <button class="lk" data-man="' + esc(p.sym) + '" title="手動輸入價格">' + (p.q ? "改價格" : "輸入價格") + "</button>" : "") + "</td>"
-        + "<td>" + (p.q ? pct(p.q.chg, 2) : "—") + "</td>"
-        + "<td>" + money(conv(p.mv, p.ccy), dc) + "</td>"
-        + "<td>" + signed(conv(p.pnl, p.ccy), dc) + " " + pct(p.cost ? p.pnl / p.cost : null) + "</td>"
-        + "<td" + (w != null && w > CAP ? ' class="neg" title="超過單一持股上限 ' + Math.round(CAP * 100) + '%"' : "") + ">" + (w == null ? "—" : (w * 100).toFixed(1) + "%" + (w > CAP ? " ⚠" : "")) + "</td>"
-        + "<td>" + targetCell(p.sym, w, total, p.mv != null ? toTWD(p.mv, p.ccy) : null) + "</td>"
-        + "<td>" + (sc && sc.score != null ? sc.score.toFixed(0) + " " + esc(sc.level) : '<span class="dim">—</span>') + "</td></tr>";
-      if (S.open[k]) {
-        h += '<tr class="lots"><td colspan="10">' + p.lots.map(function (l) {
-          var del = S.confirmDel === l.id;
-          return '<div class="lot">' + (l.date ? "<span>" + esc(l.date) + "</span>" : "") + "<span>" + (l.qty < 0 ? "賣 " : "買 ") + num(Math.abs(l.qty), 4) + " 股</span><span>@ " + num(l.px, 4) + "</span>" + (l.note ? '<span class="dim">' + esc(l.note) + "</span>" : "")
-            + (token() ? '<button class="lk" data-edit="' + esc(l.id) + '">編輯</button><button class="lk' + (del ? " danger" : "") + '" data-del="' + esc(l.id) + '">' + (del ? "確定刪除？" : "刪除") + "</button>" : "") + "</div>";
-        }).join("") + "</td></tr>";
-      }
+      var m = metaOf(p.sym), c = m.cur, k = id + "|" + p.sym;
+      var mvC = conv(p.mv, p.ccy), wA = acctTotal && mvC != null ? mvC / acctTotal : 0, wT = total && p.mv != null ? toTWD(p.mv, p.ccy) / total : null;
+      var r = p.cost && p.pnl != null ? p.pnl / p.cost : null;
+      var badges = (c && c.sweet ? '<span class="sw">甜蜜點</span>' : "") + (wT != null && wT > CAP ? '<span class="chip vhot">超過上限</span>' : "")
+        + (c && c.score != null ? '<span class="chip">' + c.score.toFixed(0) + " " + esc(c.level) + "</span>" : "");
+      h += '<div class="pr prow' + (S.open[k] ? " on" : "") + '" data-k="' + esc(k) + '">'
+        + '<div class="pr1"><span class="prn"><b>' + esc(p.sym) + '</b> <span class="dim">' + esc(m.name || S.h.names[p.sym] || "") + "</span> " + badges + "</span>"
+        + '<span class="prv">' + money(mvC, dc) + " " + pct(r) + "</span></div>"
+        + '<div class="pr2"><span class="wb"><i style="width:' + (wA * 100).toFixed(1) + '%"></i></span><span class="dim">佔帳戶 ' + (wA * 100).toFixed(0) + "%・總資產 " + (wT == null ? "—" : (wT * 100).toFixed(1) + "%") + "</span>"
+        + (p.q ? '<span class="dim">今日 ' + pct(p.q.chg, 2) + "</span>" : '<span class="neg" style="font-size:12px">抓不到價格</span>') + "</div>";
+      if (S.open[k]) h += posDetail(p, k, conv, dc, total, m);
+      h += "</div>";
     });
     var cash = S.h.cash[id] || {};
     var cs = Object.keys(cash).filter(function (c) { return Number(cash[c]); });
-    h += "</table></div>";
-    if (cs.length || token()) h += '<div class="kv" style="margin-top:8px"><div>現金<b>' + (cs.length ? cs.map(function (c) { return money(Number(cash[c]), c) + (c === "USD" ? " 美元" : " 台幣"); }).join("、") : "未填") + "</b></div>"
+    if (cs.length || token()) h += '<div class="kv" style="margin-top:10px"><div>現金<b>' + (cs.length ? cs.map(function (c) { return money(Number(cash[c]), c) + (c === "USD" ? " 美元" : " 台幣"); }).join("、") : "未填") + "</b></div>"
       + (token() ? '<div><button class="lk" data-cash="' + esc(id) + '">修改現金</button></div>' : "") + "</div>";
     return h + "</div>";
   }
+
+  function posDetail(p, k, conv, dc, total, m) {
+    var c = m.cur;
+    var symLine = S.renaming === k
+      ? '<input id="hren" value="' + esc(p.sym) + '" size="7" autocapitalize="characters"> <button class="lk" data-ren-ok="' + esc(k) + '">確定</button><button class="lk" data-ren-no="1">取消</button>'
+      : (token() ? '<button class="lk" data-ren="' + esc(k) + '">✎ 修改代碼</button>' : "");
+    var priceTag = p.q ? (p.q.manual ? "手動" : p.q.est ? "估算" : String(p.q.date).slice(5).replace("-", "/")) : "";
+    var h = '<div class="pd">'
+      + '<div class="kv"><div>股數<b>' + num(p.qty, 4) + "</b></div><div>平均成本<b>" + num(p.avg, 2) + "</b></div>"
+      + "<div>現價<b>" + (p.q ? num(p.price, 2) + ' <span class="dim" style="font-size:12px">' + priceTag + "</span>" : "—") + "</b></div>"
+      + "<div>損益<b>" + signed(conv(p.pnl, p.ccy), dc) + "</b></div>"
+      + "<div>目標比重<b>" + targetCell(p.sym, null, total, p.mv != null ? toTWD(p.mv, p.ccy) : null) + "</b></div>"
+      + "<div>便宜度<b>" + (c && c.score != null ? c.score.toFixed(0) + " " + esc(c.level) : "資料不足") + "</b></div></div>";
+    if (p.avg && p.price) {   // 成本到現價的距離：一眼看出賺或賠多少
+      var lo = Math.min(p.avg, p.price), hi = Math.max(p.avg, p.price), pad = (hi - lo) * 0.25 || hi * 0.05;
+      var X = function (v) { return ((v - (lo - pad)) / (hi - lo + 2 * pad) * 100); };
+      h += '<div class="cp"><div class="cpb"><i class="' + (p.price >= p.avg ? "up" : "dn2") + '" style="left:' + X(lo).toFixed(1) + "%;width:" + (X(hi) - X(lo)).toFixed(1) + '%"></i>'
+        + '<u style="left:' + X(p.avg).toFixed(1) + '%"></u><u class="now" style="left:' + X(p.price).toFixed(1) + '%"></u></div>'
+        + '<div class="cpl"><span>成本 ' + num(p.avg, 2) + "</span><span>現價 " + num(p.price, 2) + "（" + pct(p.avg ? p.price / p.avg - 1 : null) + "）</span></div></div>";
+    }
+    h += '<div class="pd-act">' + symLine + (token() && (!p.q || p.q.manual || p.q.est) ? ' <button class="lk" data-man="' + esc(p.sym) + '">' + (p.q ? "改價格" : "輸入價格") + "</button>" : "") + "</div>";
+    if (S.manualEdit === p.sym) h += '<div style="margin-top:4px">現價 <input id="hman" inputmode="decimal" size="8" value="' + esc((S.h.manual[p.sym] || {}).price || "") + '"> <button class="lk" data-man-ok="' + esc(p.sym) + '">儲存</button><button class="lk" data-man-no="1">取消</button>' + (S.h.manual[p.sym] ? '<button class="lk" data-man-clear="' + esc(p.sym) + '">改回自動</button>' : "") + "</div>";
+    h += '<div class="lots2"><span class="dim" style="font-size:12px">買賣紀錄</span>' + p.lots.map(function (l) {
+      var del = S.confirmDel === l.id;
+      return '<div class="lot">' + (l.date ? "<span>" + esc(l.date) + "</span>" : "") + "<span>" + (l.qty < 0 ? "賣 " : "買 ") + num(Math.abs(l.qty), 4) + " 股</span><span>@ " + num(l.px, 4) + "</span>" + (l.note ? '<span class="dim">' + esc(l.note) + "</span>" : "")
+        + (token() ? '<button class="lk" data-edit="' + esc(l.id) + '">編輯</button><button class="lk' + (del ? " danger" : "") + '" data-del="' + esc(l.id) + '">' + (del ? "確定刪除？" : "刪除") + "</button>" : "") + "</div>";
+    }).join("") + "</div></div>";
+    return h;
+  }
+  function upDown() { return ls("cd_updn") === "us" ? "us" : "tw"; }
+  function applyUpDown() { document.documentElement.setAttribute("data-updn", upDown()); }
 
   // 目標比重：同一代碼跨帳戶共用一個目標（佔總資產 %），顯示到目標還差多少台幣
   function targetCell(sym, w, total, mvTWD) {
@@ -287,6 +478,11 @@
 
   function onClick(e) {
     var t = e.target, b;
+    if ((b = t.closest("#hchart button"))) { S.chart = b.dataset.ch; ls("cd_chart", S.chart); render(); return; }
+    if ((b = t.closest("#hpnl button"))) { S.pnlMode = b.dataset.pm; render(); return; }
+    if (t.closest("#hpnlall")) { S.pnlAll = !S.pnlAll; render(); return; }
+    if (t.closest("#hadvall")) { S.advAll = !S.advAll; render(); return; }
+    if (t.closest("#hupdn")) { ls("cd_updn", upDown() === "tw" ? "us" : "tw"); applyUpDown(); render(); return; }
     if ((b = t.closest("#hccy button"))) { S.ccy = b.dataset.c; ls("cd_ccy", S.ccy); render(); return; }
     if (t.closest("#hparse")) {
       var txt = document.getElementById("hin").value;
@@ -355,7 +551,7 @@
       return;
     }
     if (t.closest("#htokdel")) { ls("cd_gh_token", null); S.msg = "已從這台裝置移除權杖。"; render(); return; }
-    if (t.closest("input,select,textarea,button,a,.lots")) return;
+    if (t.closest("input,select,textarea,button,a,.lots,.pd")) return;
     if ((b = t.closest(".prow"))) { S.open[b.dataset.k] = !S.open[b.dataset.k]; S.confirmDel = null; render(); return; }
     if ((b = t.closest(".hrow"))) { if (t.closest(".det")) return; S.open[b.dataset.acct] = !S.open[b.dataset.acct]; render(); }
   }
@@ -373,6 +569,7 @@
   var started = false;
   function start() {
     if (started) return; started = true;
+    applyUpDown();
     var el = document.getElementById("holdings");
     el.addEventListener("click", onClick);
     el.addEventListener("input", onInput);

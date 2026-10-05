@@ -4,56 +4,64 @@
   "name": "那斯達克 100 ETF",
   "market": "US",
   "type": "etf",
-  "group": ""
+  "group": "",
+  "theme": "美股大盤"
  },
  {
   "symbol": "VOO",
   "name": "標普 500 ETF",
   "market": "US",
   "type": "etf",
-  "group": ""
+  "group": "",
+  "theme": "美股大盤"
  },
  {
   "symbol": "0050.TW",
   "name": "元大台灣50",
   "market": "TW",
   "type": "etf",
-  "group": ""
+  "group": "",
+  "theme": "台股大盤"
  },
  {
   "symbol": "SOXX",
   "name": "半導體 ETF",
   "market": "US",
   "type": "etf",
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "半導體"
  },
  {
   "symbol": "IBB",
   "name": "生技 ETF",
   "market": "US",
   "type": "etf",
-  "group": ""
+  "group": "",
+  "theme": "生技"
  },
  {
   "symbol": "SMCI",
   "name": "美超微",
   "market": "US",
   "type": "stock",
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "半導體"
  },
  {
   "symbol": "TSLA",
   "name": "特斯拉",
   "market": "US",
   "type": "stock",
-  "group": ""
+  "group": "",
+  "theme": "電動車"
  },
  {
   "symbol": "AMD",
   "name": "超微",
   "market": "US",
   "type": "stock",
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "半導體"
  },
  {
   "symbol": "SOXL",
@@ -62,7 +70,8 @@
   "type": "leveraged",
   "underlying": "SOXX",
   "x": 3,
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "半導體"
  },
  {
   "symbol": "USD",
@@ -71,7 +80,8 @@
   "type": "leveraged",
   "underlying": "SMH",
   "x": 2,
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "半導體"
  },
  {
   "symbol": "GGLL",
@@ -80,7 +90,8 @@
   "type": "leveraged",
   "underlying": "GOOGL",
   "x": 2,
-  "group": ""
+  "group": "",
+  "theme": "AI／軟體"
  },
  {
   "symbol": "00631L.TW",
@@ -89,7 +100,8 @@
   "type": "leveraged",
   "underlying": "0050.TW",
   "x": 2,
-  "group": ""
+  "group": "",
+  "theme": "台股大盤"
  },
  {
   "symbol": "00663L.TW",
@@ -98,7 +110,8 @@
   "type": "leveraged",
   "underlying": "0050.TW",
   "x": 2,
-  "group": ""
+  "group": "",
+  "theme": "台股大盤"
  },
  {
   "symbol": "00685L.TW",
@@ -107,98 +120,112 @@
   "type": "leveraged",
   "underlying": "0050.TW",
   "x": 2,
-  "group": ""
+  "group": "",
+  "theme": "台股大盤"
  },
  {
   "symbol": "0052.TW",
   "name": "富邦科技",
   "market": "TW",
   "type": "etf",
-  "group": ""
+  "group": "",
+  "theme": "半導體"
  },
  {
   "symbol": "00892.TW",
   "name": "富邦台灣半導體",
   "market": "TW",
   "type": "etf",
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "半導體"
  },
  {
   "symbol": "00947.TW",
   "name": "台新臺灣IC設計",
   "market": "TW",
   "type": "etf",
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "半導體"
  },
  {
   "symbol": "00830.TW",
   "name": "國泰費城半導體",
   "market": "TW",
   "type": "etf",
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "半導體"
  },
  {
   "symbol": "00941.TW",
   "name": "中信上游半導體",
   "market": "TW",
   "type": "etf",
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "半導體"
  },
  {
   "symbol": "00990A.TW",
   "name": "主動元大AI新經濟",
   "market": "TW",
   "type": "etf",
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "AI／軟體"
  },
  {
   "symbol": "00995A.TW",
   "name": "主動中信台灣卓越",
   "market": "TW",
   "type": "etf",
-  "group": ""
+  "group": "",
+  "theme": "台股大盤"
  },
  {
   "symbol": "009816.TW",
   "name": "凱基台灣TOP50",
   "market": "TW",
   "type": "etf",
-  "group": ""
+  "group": "",
+  "theme": "台股大盤"
  },
  {
   "symbol": "00662.TW",
   "name": "富邦NASDAQ",
   "market": "TW",
   "type": "etf",
-  "group": ""
+  "group": "",
+  "theme": "美股大盤"
  },
  {
   "symbol": "009800.TW",
   "name": "中信NASDAQ",
   "market": "TW",
   "type": "etf",
-  "group": ""
+  "group": "",
+  "theme": "美股大盤"
  },
  {
   "symbol": "009801.TW",
   "name": "中信美國創新科技",
   "market": "TW",
   "type": "etf",
-  "group": ""
+  "group": "",
+  "theme": "美股大盤"
  },
  {
   "symbol": "00757.TW",
   "name": "統一FANG+",
   "market": "TW",
   "type": "etf",
-  "group": ""
+  "group": "",
+  "theme": "美股大盤"
  },
  {
   "symbol": "6940.TW",
   "name": "格斯科技",
   "market": "TW",
   "type": "stock",
-  "group": ""
+  "group": "",
+  "theme": "其他"
  },
  {
   "symbol": "AU9901.TW",
@@ -206,21 +233,24 @@
   "market": "TW",
   "type": "etf",
   "proxy": "GC=F",
-  "group": ""
+  "group": "",
+  "theme": "黃金"
  },
  {
   "symbol": "GOOG",
   "name": "Alphabet",
   "market": "US",
   "type": "stock",
-  "group": ""
+  "group": "",
+  "theme": "AI／軟體"
  },
  {
   "symbol": "PLTR",
   "name": "Palantir",
   "market": "US",
   "type": "stock",
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "AI／軟體"
  },
  {
   "symbol": "AMDC",
@@ -229,7 +259,8 @@
   "type": "leveraged",
   "underlying": "AMD",
   "x": 2,
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "半導體"
  },
  {
   "symbol": "MUU",
@@ -238,7 +269,8 @@
   "type": "leveraged",
   "underlying": "MU",
   "x": 2,
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "記憶體"
  },
  {
   "symbol": "SKUU",
@@ -247,7 +279,8 @@
   "type": "leveraged",
   "underlying": "000660.KS",
   "x": 2,
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "記憶體"
  },
  {
   "symbol": "SNXX",
@@ -256,7 +289,8 @@
   "type": "leveraged",
   "underlying": "SNDK",
   "x": 2,
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "記憶體"
  },
  {
   "symbol": "MAGX",
@@ -265,35 +299,40 @@
   "type": "leveraged",
   "underlying": "MAGS",
   "x": 2,
-  "group": ""
+  "group": "",
+  "theme": "美股大盤"
  },
  {
   "symbol": "DRAM",
   "market": "US",
   "type": "etf",
   "group": "半導體/AI",
-  "name": "Roundhill Memory ETF"
+  "name": "Roundhill Memory ETF",
+  "theme": "記憶體"
  },
  {
   "symbol": "MU",
   "name": "美光",
   "market": "US",
   "type": "stock",
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "記憶體"
  },
  {
   "symbol": "SOXQ",
   "name": "Invesco 費城半導體 ETF",
   "market": "US",
   "type": "etf",
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "半導體"
  },
  {
   "symbol": "VT",
   "name": "全球股市 ETF",
   "market": "US",
   "type": "etf",
-  "group": ""
+  "group": "",
+  "theme": "全球"
  },
  {
   "symbol": "SOXL.L",
@@ -302,6 +341,7 @@
   "type": "leveraged",
   "underlying": "SOXX",
   "x": 4,
-  "group": "半導體/AI"
+  "group": "半導體/AI",
+  "theme": "半導體"
  }
 ]
