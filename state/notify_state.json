@@ -24,7 +24,7 @@
   },
   "0050.TW": {
    "state": "未進便宜區",
-   "heat": "",
+   "heat": "過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -120,17 +120,246 @@
     "80": true
    },
    "sweet": false
+  },
+  "00631L.TW": {
+   "state": "未進便宜區",
+   "heat": "過熱",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "00663L.TW": {
+   "state": "未進便宜區",
+   "heat": "過熱",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "00685L.TW": {
+   "state": "未進便宜區",
+   "heat": "過熱",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "0052.TW": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "00892.TW": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "00947.TW": {
+   "state": "",
+   "heat": "",
+   "trough": "",
+   "armed": {},
+   "sweet": false
+  },
+  "00830.TW": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "00941.TW": {
+   "state": "",
+   "heat": "",
+   "trough": "",
+   "armed": {},
+   "sweet": false
+  },
+  "00990A.TW": {
+   "state": "",
+   "heat": "",
+   "trough": "",
+   "armed": {},
+   "sweet": false
+  },
+  "00995A.TW": {
+   "state": "",
+   "heat": "",
+   "trough": "",
+   "armed": {},
+   "sweet": false
+  },
+  "009816.TW": {
+   "state": "",
+   "heat": "",
+   "trough": "",
+   "armed": {},
+   "sweet": false
+  },
+  "00662.TW": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "009800.TW": {
+   "state": "",
+   "heat": "",
+   "trough": "",
+   "armed": {},
+   "sweet": false
+  },
+  "009801.TW": {
+   "state": "",
+   "heat": "",
+   "trough": "",
+   "armed": {},
+   "sweet": false
+  },
+  "00757.TW": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "6940.TW": {
+   "state": "",
+   "heat": "",
+   "trough": "",
+   "armed": {},
+   "sweet": false
+  },
+  "AU9901.TW": {
+   "state": "轉折初現",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": false,
+    "50": false,
+    "80": false
+   },
+   "sweet": true
+  },
+  "GOOG": {
+   "state": "轉折確認",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": false,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "PLTR": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "AMDC": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "MUU": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "SKUU": {
+   "state": "轉折確認",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": false,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "SNXX": {
+   "state": "",
+   "heat": "",
+   "trough": "",
+   "armed": {},
+   "sweet": false
+  },
+  "MAGX": {
+   "state": "",
+   "heat": "",
+   "trough": "",
+   "armed": {},
+   "sweet": false
   }
  },
  "sent": {
   "TSLA|trough形成中": "2026-10-03",
   "GGLL|confirm": "2026-10-03",
   "TSLA|cross50": "2026-10-03",
-  "台股市場|market": "2026-10-03"
+  "台股市場|market": "2026-10-03",
+  "AU9901.TW|sweet": "2026-10-05",
+  "GOOG|confirm": "2026-10-05",
+  "SKUU|confirm": "2026-10-05"
  },
  "market": {
   "US": 0,
   "TW": 2
  },
- "groups": {}
+ "groups": {
+  "半導體/AI": 1
+ }
 }
