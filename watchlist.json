@@ -294,5 +294,14 @@
   "market": "US",
   "type": "etf",
   "group": ""
+ },
+ {
+  "symbol": "SOXL.L",
+  "name": "4倍半導體（倫敦）",
+  "market": "US",
+  "type": "leveraged",
+  "underlying": "SOXX",
+  "x": 4,
+  "group": "半導體/AI"
  }
 ]
