@@ -92,7 +92,16 @@ def load(symbol: str, refresh: bool = False) -> pd.DataFrame:
 
     try:
         if symbol.endswith(".TW"):
-            df = _load_tw(symbol[:-3])
+            try:
+                df = _load_tw(symbol[:-3])
+            except Exception as e:
+                # FinMind 免費額度用完（HTTP 402）或維護中：改用 Yahoo（已還原），上櫃再試 .TWO
+                print(f"[警告] {symbol} FinMind 失敗（{e}），改用 Yahoo")
+                df = _load_yahoo(symbol)
+                if df.empty:
+                    df = _load_yahoo(symbol[:-3] + ".TWO")
+                if df.empty:
+                    raise
             # FinMind 收盤後才更新，盤中用 Yahoo 的延遲報價補上今天這根
             # （還原是往回調整舊價格，最新價格本來就是原始價，可以直接接上）
             today = _load_yahoo_recent(symbol)

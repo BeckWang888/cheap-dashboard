@@ -43,6 +43,12 @@ jobs:
           python-version: "3.13"
           cache: pip
       - run: pip install -r requirements.txt
+      - name: 還原上次抓的資料（資料來源暫時失敗時當備份）
+        uses: actions/cache@v4
+        with:
+          path: data
+          key: data-${{ github.run_id }}
+          restore-keys: data-
       - name: 抓資料、計算、推播
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
