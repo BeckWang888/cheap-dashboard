@@ -59,7 +59,12 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add state/ watchlist.json
           git diff --cached --quiet || git commit -m "更新狀態 $(TZ=Asia/Taipei date '+%F %H:%M')"
-          git pull --rebase && git push
+          # 兩次更新幾乎同時完成時，state 檔可能衝突：以這次（較新）的內容為準，最多重試 3 次
+          for i in 1 2 3; do
+            git pull --rebase -X theirs && git push && break
+            git rebase --abort 2>/dev/null || true
+            sleep 5
+          done
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
