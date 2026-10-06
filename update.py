@@ -281,7 +281,7 @@ def main():
                  if (r['v']['full']['current']['score'] or -999) >= 20]
         msg = "推播設定成功，之後有新事件才會通知。\n目前在便宜區：" + ("、".join(cheap) if cheap else "沒有")
         if send:
-            notify.send("便宜度 dashboard 已啟動", msg, 3, click)
+            notify.send("量化左側交易 Dashboard 已啟動", msg, 3, click)
     else:
         events = notify.apply_cooldown(events, state, cfg, now_tw.date())
         if events and send:

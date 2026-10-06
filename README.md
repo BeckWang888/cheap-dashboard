@@ -1,4 +1,4 @@
-# 便宜度 Dashboard
+# 量化左側交易 Dashboard（原名便宜度 Dashboard）
 
 避免 FOMO、輔助左側分批進場的工具。規格見 [SPEC.md](SPEC.md)。不提供投資建議。
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>便宜度 Dashboard</title>
+<title>量化左側交易 Dashboard</title>
 <meta name="theme-color" content="#12805f">
 <style>
 :root{
@@ -22,9 +22,14 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","
 h1{font-size:22px;margin:0 0 2px;font-weight:700}
 .note{font-size:13px;color:var(--sub);margin:0 0 14px}
 .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
-.sum{display:flex;gap:20px;flex-wrap:wrap;margin:6px 0 16px}
+.sum{display:flex;gap:6px 8px;flex-wrap:wrap;margin:6px 0 16px}
+.sum button{font:inherit;text-align:left;border:1px solid transparent;background:none;color:var(--ink);border-radius:10px;padding:4px 8px;cursor:pointer}
+.sum button:hover{background:var(--chip)}
+.sum button[aria-pressed="true"]{background:var(--panel);border-color:var(--ink)}
+.sum button[disabled]{cursor:default;opacity:.55}.sum button[disabled]:hover{background:none}
 .sum b{font-size:28px;font-variant-numeric:tabular-nums;display:block;line-height:1.1}
 .sum span{font-size:13px;color:var(--sub)}
+.fbar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;margin:0 0 8px;border-radius:8px;background:var(--chip);font-size:14px}
 .bar{display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
 .tabs{display:inline-flex;background:var(--chip);border-radius:8px;padding:3px}
 .tabs button{border:0;background:none;color:var(--sub);font:inherit;font-size:14px;padding:6px 12px;border-radius:6px;cursor:pointer}
@@ -221,7 +226,7 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 <body>
 <div class="wrap">
   <div class="top">
-    <div><h1>便宜度 Dashboard</h1>
+    <div><h1>量化左側交易 Dashboard</h1>
     <p class="note" id="meta">載入中…</p></div>
     <div class="tabs" id="vt" title="百分位基準"><button data-v="full" aria-pressed="true">全部歷史</button><button data-v="5y" aria-pressed="false">近 5 年</button></div>
   </div>
@@ -245,6 +250,7 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
   <div class="legend m"><span>很貴</span><span>合理</span><span>很便宜</span></div>
   <div class="legend d"><span>標的</span><span><span>很貴</span><span>中貴</span><span>合理</span><span>便宜（白色刻度＝通知門檻）</span><span>很便宜</span></span><span style="text-align:right">分數</span></div>
   <div id="wl" hidden></div>
+  <div id="fbar"></div>
   <div class="list" id="list"><div class="empty">載入中…</div></div>
   </div>
   <div id="holdings" hidden></div>
@@ -262,7 +268,7 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 <script src="settings.js"></script>
 <script>
 try{document.documentElement.setAttribute("data-updn",localStorage.getItem("cd_updn")==="us"?"us":"tw")}catch(e){}
-var D=null,st={m:"all",only:false,cand:false,open:null,v:"full",sort:"custom",dir:-1};
+var D=null,st={m:"all",only:false,cand:false,open:null,v:"full",sort:"custom",dir:-1,sum:null};
 try{var ss=localStorage.getItem("cd_sort");if(/^(score|chg|wr)$/.test(ss))st.sort=ss;if(localStorage.getItem("cd_dir")==="1")st.dir=1}catch(e){}
 // 釘選：存在這台裝置的瀏覽器裡，釘選的標的永遠排在最上面
 var PINS=[];try{PINS=JSON.parse(localStorage.getItem("cd_pins")||"[]")||[]}catch(e){}
@@ -281,19 +287,26 @@ function stt(r){var c=C(r),n=c.sigs.filter(Boolean).length;if(c.score==null)retu
  if(c.state==="強勢谷底")return["強勢谷底"+(c.trough?"":"（形成中）"),"strong"];
  if(c.state==="未進便宜區")return["未進便宜區","off"];if(c.state==="轉折確認")return["轉折確認","go"];
  if(c.state==="重點觀察")return["重點觀察"+(c.trough?"":"（形成中）"),"boss"];if(c.state==="轉折初現")return["轉折初現（"+n+" 顆）","mid"];return["觀察中","wait"]}
+var SUMF=[
+ ["sweet","甜蜜點","--gold",function(r){return !!C(r).sweet}],
+ ["go","候選進場","--accent",function(r){return stt(r)[1]==="go"}],
+ ["strong","強勢谷底","--c1",function(r){return stt(r)[1]==="strong"}],
+ ["boss","重點觀察","--warm",function(r){return stt(r)[1]==="boss"}],
+ ["cheap","進入便宜區","",function(r){return C(r).score>=20}],
+ ["pricey","中貴以上","--hot",function(r){return C(r).score!=null&&C(r).score<=-33}],
+ ["heat","乖離過熱","--warm",function(r){return !!C(r).heat}]];
+function setSum(k){st.sum=st.sum===k?null:k;render();if(st.sum)document.getElementById("fbar").scrollIntoView({block:"nearest",behavior:"smooth"})}
+document.getElementById("sum").addEventListener("click",function(e){var b=e.target.closest("button");if(b&&!b.disabled)setSum(b.dataset.f)});
+document.getElementById("fbar").addEventListener("click",function(e){if(e.target.closest("#fclr"))setSum(st.sum)});
 function rank(r){var k=stt(r)[1];return C(r).sweet?3:k==="strong"||k==="go"?2:k==="boss"?1:0}
 function isLev(r){return r.type==="leveraged"}
 function render(){
  var items=D.items,cnt=function(f){return items.filter(f).length};
- document.getElementById("sum").innerHTML=
-  '<div><b style="color:var(--gold)">'+cnt(function(r){return !!C(r).sweet})+'</b><span>甜蜜點</span></div>'+
-  '<div><b style="color:var(--accent)">'+cnt(function(r){return stt(r)[1]==="go"})+'</b><span>候選進場</span></div>'+
-  '<div><b style="color:var(--c1)">'+cnt(function(r){return stt(r)[1]==="strong"})+'</b><span>強勢谷底</span></div>'+
-  '<div><b style="color:var(--warm)">'+cnt(function(r){return stt(r)[1]==="boss"})+'</b><span>重點觀察</span></div>'+
-  '<div><b>'+cnt(function(r){return C(r).score>=20})+'</b><span>進入便宜區</span></div>'+
-  '<div><b style="color:var(--hot)">'+cnt(function(r){return C(r).score!=null&&C(r).score<=-33})+'</b><span>中貴以上</span></div>'+
-  '<div><b style="color:var(--warm)">'+cnt(function(r){return !!C(r).heat})+'</b><span>乖離過熱</span></div>';
- var rows=items.filter(function(r){var c=C(r);return(st.m==="all"||(st.m==="LEV"?isLev(r):r.market===st.m))&&(!st.only||c.score>=20)&&(!st.cand||rank(r)>0)})
+ // 上方統計可以點：只顯示那幾檔，再點一次（或按「顯示全部」）取消
+ document.getElementById("sum").innerHTML=SUMF.map(function(f){var n=cnt(f[3]);
+  return '<button data-f="'+f[0]+'" aria-pressed="'+(st.sum===f[0])+'"'+(n||st.sum===f[0]?'':' disabled')+'><b'+(f[2]?' style="color:var('+f[2]+')"':'')+'>'+n+'</b><span>'+f[1]+'</span></button>'}).join("");
+ var sf=st.sum&&SUMF.filter(function(f){return f[0]===st.sum})[0];
+ var rows=items.filter(function(r){var c=C(r);return(st.m==="all"||(st.m==="LEV"?isLev(r):r.market===st.m))&&(!st.only||c.score>=20)&&(!st.cand||rank(r)>0)&&(!sf||sf[3](r))})
   .map(function(r,i){return[r,i]}).sort(function(x,y){var a=x[0],b=y[0],pa=pinned(a.symbol),pb=pinned(b.symbol);
    if(pa!==pb)return pa?-1:1;
    var d=0;
@@ -317,6 +330,7 @@ function render(){
    +'<div class="th">'+(D.thresholds||[20,50,80]).map(function(t){return'<i style="left:'+((t+100)/2)+'%"></i>'}).join("")+'<u style="left:'+p+'%"></u></div>'
    +(st.open===r.symbol?detail(r):'<div class="det"></div>')+'</div>';
  });
+ document.getElementById("fbar").innerHTML=sf?'<div class="fbar"><span>只顯示：<b>'+sf[1]+'</b>（'+rows.length+' 檔）</span><button class="lk" id="fclr">顯示全部 ✕</button></div>':'';
  document.getElementById("list").innerHTML=h||'<div class="empty">沒有符合條件的標的。</div>';
  setupDrag();
  var kc=document.querySelector('.row.open .kc');
@@ -417,7 +431,7 @@ window.onWatchlistSaved=function(list){if(!D)return;var idx={};list.forEach(func
  setSort("custom");document.getElementById("alerts").insertAdjacentHTML("afterbegin",'<div class="alert">清單已儲存'+(added?'，新增的 '+added+' 檔約 2 分鐘後出現（重新整理頁面）':'')+'。</div>')};
 // 主畫面直接拖曳排序：只有「自訂順序」且沒有篩選時才能拖，放開後存回 watchlist.json
 var listSortable=null;
-function canDrag(){return st.sort==="custom"&&st.m==="all"&&!st.only&&!st.cand&&!!window.Sortable}
+function canDrag(){return st.sort==="custom"&&st.m==="all"&&!st.only&&!st.cand&&!st.sum&&!!window.Sortable}
 function setupDrag(){
  if(listSortable){listSortable.destroy();listSortable=null}
  if(!canDrag())return;
