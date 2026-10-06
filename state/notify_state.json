@@ -45,11 +45,11 @@
    "sweet": false
   },
   "IBB": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -79,7 +79,7 @@
   },
   "AMD": {
    "state": "未進便宜區",
-   "heat": "",
+   "heat": "過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -300,7 +300,7 @@
   },
   "AMDC": {
    "state": "未進便宜區",
-   "heat": "",
+   "heat": "過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -502,7 +502,8 @@
   "台股市場|market": "2026-10-03",
   "AU9901.TW|sweet": "2026-10-05",
   "GOOG|confirm": "2026-10-05",
-  "SKUU|confirm": "2026-10-05"
+  "SKUU|confirm": "2026-10-05",
+  "IBB|cross20": "2026-10-07"
  },
  "market": {
   "US": 0,
