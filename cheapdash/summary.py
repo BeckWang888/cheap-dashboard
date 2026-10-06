@@ -56,4 +56,5 @@ def lev_info(real: pd.Series, under: pd.Series, x: float, underlying: str) -> di
 
 def lev_target(close: pd.Series, x: float) -> pd.Series:
     """用一倍標的的日報酬模擬槓桿 ETF（不含費用與融資成本）。"""
-    return (1 + x * close.pct_change().fillna(0)).cumprod()
+    # 單日虧損最多 100%（資料錯誤造成的極端跳動不會讓模擬價格變負數）
+    return (1 + (x * close.pct_change().fillna(0)).clip(lower=-0.99)).cumprod()

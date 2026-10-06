@@ -59,10 +59,13 @@ def analyze(item: dict) -> dict:
         res = backtest.run(m, target)
         out["v"][name] = {"current": current(m), "bt": bt_summary(res)}
         out["chart"]["s_" + name] = [num(v, 1) for v in m["score"].loc[tail]]
+        if name == "full":
+            # 月K 圖上標月線 MACD 谷底（已確認）與當時分數
+            out["_tr"] = [[d.strftime("%Y-%m-%d"), num(m["score"].loc[d], 0)] for d in m.index[m["trough_event"]]]
         st = winrate.states(m)
-        out.setdefault("_wr", {})[name] = (st, winrate.wins(target, m.index))
+        out.setdefault("_wr", {})[name] = (st, winrate.outcomes(target, m.index))
         if not lev:
-            out.setdefault("_pool", {})[name] = (st, winrate.wins(close, m.index))
+            out.setdefault("_pool", {})[name] = (st, winrate.outcomes(close, m.index))
     out["thin"] = out["v"]["full"]["bt"]["years"] < THIN_YEARS
     out["lev"] = None
     if lev:
@@ -75,9 +78,18 @@ def analyze(item: dict) -> dict:
         out["quote"] = own or out["quote"]
     out["price"] = out["quote"]["price"]
     # K 線圖用實際買進的那檔（槓桿 ETF 用本身價格）；proxy 標的只有代理標的的歷史
-    out["_k"] = (real_ohlc if lev else ohlc).iloc[-K_DAYS:]
+    kdf = real_ohlc if lev else ohlc
+    out["_k"] = kdf.iloc[-K_DAYS:]
+    out["_mo"] = monthly(kdf)
     out["k_sym"] = item["symbol"] if lev or not item.get("proxy") else base
     return out
+
+
+def monthly(df: pd.DataFrame) -> pd.DataFrame:
+    """完整歷史合成月K，日期用該月最後一個交易日。"""
+    g = df.groupby(df.index.to_period("M"))
+    return pd.DataFrame({"Open": g["Open"].first(), "High": g["High"].max(), "Low": g["Low"].min(),
+                         "Close": g["Close"].last()}).set_axis(pd.DatetimeIndex(g.apply(lambda x: x.index[-1])))
 
 
 def write_charts(results: list):
@@ -90,6 +102,11 @@ def write_charts(results: list):
         j = {"sym": r["k_sym"], "d": [d.strftime("%Y-%m-%d") for d in df.index]}
         for c, k in (("Open", "o"), ("High", "h"), ("Low", "l"), ("Close", "c")):
             j[k] = [num(v, 4) for v in df[c]]
+        mo = r.pop("_mo")
+        j["m"] = {"d": [d.strftime("%Y-%m-%d") for d in mo.index]}
+        for c, k in (("Open", "o"), ("High", "h"), ("Low", "l"), ("Close", "c")):
+            j["m"][k] = [num(v, 4) for v in mo[c]]
+        j["tr"] = r.pop("_tr", [])
         s = intr.get(r["k_sym"])
         if s is not None and not s.empty:
             # 時間存成「交易所當地時間當作 UTC」的秒數，圖上直接顯示當地時間
@@ -108,12 +125,12 @@ def add_winrates(results: list) -> dict:
                 pool.append(r["_pool"][name])
         tables[name] = winrate.lifts(pool)
         for r in results:
-            st, w = r["_wr"][name]
-            r["v"][name]["wr"] = winrate.estimate(st, w, tables[name])
+            st, o = r["_wr"][name]
+            r["v"][name]["wr"] = winrate.estimate(st, o, tables[name])
     for r in results:
         r.pop("_wr", None)
         r.pop("_pool", None)
-    return {n: {k: round(100 * v["lift"], 1) for k, v in t.items()} for n, t in tables.items()}
+    return {n: {k: {c: round(100 * x, 1) for c, x in v.items() if c != "syms"} for k, v in t.items()} for n, t in tables.items()}
 
 
 def quote(s: pd.Series) -> dict:

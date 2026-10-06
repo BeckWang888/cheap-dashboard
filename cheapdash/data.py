@@ -82,13 +82,19 @@ def _load_yahoo_recent(symbol: str, period: str = "5d", auto_adjust: bool = Fals
     return df
 
 
+def _clean(df: pd.DataFrame) -> pd.DataFrame:
+    """Yahoo 的還原價在很早期偶爾變成負數（例如 000660.KS 2002 年以前）：只保留最後一個非正價格之後的資料。"""
+    bad = df.index[df["Close"] <= 0]
+    return df[df.index > bad[-1]] if len(bad) else df
+
+
 def load(symbol: str, refresh: bool = False) -> pd.DataFrame:
     """回傳還原後的日線 OHLCV（index 為日期）。當天抓過就直接用快取。
     台股（.TW）走 FinMind，其餘走 Yahoo。"""
     CACHE.mkdir(exist_ok=True)
     path = CACHE / f"{symbol}.csv"
     if path.exists() and not refresh and date.fromtimestamp(path.stat().st_mtime) == date.today():
-        return pd.read_csv(path, index_col=0, parse_dates=True)
+        return _clean(pd.read_csv(path, index_col=0, parse_dates=True))
 
     try:
         if symbol.endswith(".TW"):
@@ -125,7 +131,7 @@ def load(symbol: str, refresh: bool = False) -> pd.DataFrame:
             print(f"[警告] {symbol} 下載失敗，改用舊快取")
             return pd.read_csv(path, index_col=0, parse_dates=True)
         raise RuntimeError(f"{symbol} 抓不到資料")
-    df = df[["Open", "High", "Low", "Close", "Volume"]].dropna(subset=["Close"])
+    df = _clean(df[["Open", "High", "Low", "Close", "Volume"]].dropna(subset=["Close"]))
     df = df[~df.index.duplicated(keep="last")]
 
     jumps = df["Close"].pct_change().abs() if not symbol.startswith("^") else pd.Series(dtype=float)  # 指數（如 VIX）大幅波動是正常的

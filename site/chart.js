@@ -2,7 +2,7 @@
    用 TradingView Lightweight Charts（Apache-2.0）。資料在 k/<代碼>.json，展開時才下載。 */
 var KChart = (function () {
   var LC = window.LightweightCharts, cache = {}, cur = null;
-  var MODES = [["i1", "當日"], ["i5", "五日"], ["d", "日K"], ["w", "週K"]];
+  var MODES = [["i1", "當日"], ["i5", "五日"], ["d", "日K"], ["w", "週K"], ["m", "月K"]];
   var mode = "d";
   try { var sm = localStorage.getItem("cd_kmode"); if (MODES.some(function (m) { return m[0] === sm; })) mode = sm; } catch (e) {}
 
@@ -178,10 +178,12 @@ var KChart = (function () {
   }
 
   function drawK(box, lg, note, j, opt) {
-    var w = mode === "w", k = w ? weekly(j) : j, n = k.d.length;
+    var mo = mode === "m", w = mode === "w" || mo, k = mo ? j.m : mode === "w" ? weekly(j) : j;
+    if (!k || !k.d || !k.d.length) { box.innerHTML = '<div class="dim" style="padding:20px 0">月K 資料還沒產生（下次排程更新後就有）。</div>'; lg.innerHTML = ""; return; }
+    var n = k.d.length, unit = mo ? " 月" : mode === "w" ? " 週" : " 日";
     var up = css("--up"), dn = css("--down"), ink = css("--ink"), sub = css("--sub"), gold = css("--gold");
     var m = macd(k.c), r = rsi(k.c, 14);
-    var ma = w ? [[10, css("--c1")], [40, css("--c7")]] : [[20, css("--c1")], [60, css("--c5")], [200, css("--c7")]];
+    var ma = mo ? [[12, css("--c1")], [60, css("--c7")]] : w ? [[10, css("--c1")], [40, css("--c7")]] : [[20, css("--c1")], [60, css("--c5")], [200, css("--c7")]];
     var mav = ma.map(function (x) { return sma(k.c, x[0]); });
     var hasScore = !w && opt.score && opt.score.d && opt.score.d.length;
     var chart = base(box, hasScore ? 440 : 400, {});
@@ -200,6 +202,16 @@ var KChart = (function () {
       zone.setData(k.d.map(function (d, i) { return r[i] != null && r[i] < 50 && m.hist[i] != null && m.hist[i] < 0 ? { time: d, value: 1 } : { time: d }; }));
       var dp = dips(k.c, r, m.hist, mav[2]);
       LC.createSeriesMarkers(cs, dp.map(function (i) { return { time: k.d[i], position: "belowBar", color: gold, shape: "arrowUp", size: 1 }; }));
+    }
+    var trs = [];
+    if (mo && j.tr && j.tr.length) {
+      // 月線 MACD 谷底（已確認）：當時分數 ≥ 20（便宜區）＝甜蜜點，金色；其他灰色
+      var byMonth = {}; k.d.forEach(function (d) { byMonth[d.slice(0, 7)] = d; });
+      j.tr.forEach(function (t) { var d = byMonth[t[0].slice(0, 7)]; if (d) trs.push({ d: d, s: t[1] }); });
+      LC.createSeriesMarkers(cs, trs.map(function (t) {
+        var good = t.s != null && t.s >= 20;
+        return { time: t.d, position: "belowBar", color: good ? gold : alpha(sub, 0.8), shape: "arrowUp", size: good ? 1.4 : 0.8, text: good ? "谷底" : "" };
+      }));
     }
     // MACD
     var hs = chart.addSeries(LC.HistogramSeries, { priceLineVisible: false, lastValueVisible: false, priceFormat: { type: "price", precision: 2, minMove: 0.01 } }, 1);
@@ -232,7 +244,7 @@ var KChart = (function () {
     panes[1].setStretchFactor(85);
     panes[2].setStretchFactor(75);
     if (panes[3]) panes[3].setStretchFactor(22);
-    var show0 = Math.min(n, w ? 104 : 130);
+    var show0 = Math.min(n, mo ? 120 : w ? 104 : 130);
     chart.timeScale().setVisibleLogicalRange({ from: n - show0, to: n + 1 });
 
     var idx = {}; k.d.forEach(function (d, i) { idx[d] = i; });
@@ -249,10 +261,11 @@ var KChart = (function () {
       var i = p && p.time != null ? idx[typeof p.time === "string" ? p.time : (p.time.year + "-" + String(p.time.month).padStart(2, "0") + "-" + String(p.time.day).padStart(2, "0"))] : null;
       show(i == null ? n - 1 : i);
     });
-    var lines = ma.map(function (x) { return '<i class="kl" style="background:' + x[1] + '"></i>' + (w ? x[0] + " 週" : x[0] + " 日") + "均線"; }).join("　");
-    note.innerHTML = lines + (w ? "" : '　<span class="kz"></span>拉回區（RSI&lt;50 且綠柱）　<b style="color:var(--gold)">▲</b> 定投點')
+    var lines = ma.map(function (x) { return '<i class="kl" style="background:' + x[1] + '"></i>' + x[0] + unit + "均線"; }).join("　");
+    note.innerHTML = lines + (mo ? '　<b style="color:var(--gold)">▲</b> 月線谷底＋便宜區　<b class="dim">▲</b> 谷底但不在便宜區' : w ? "" : '　<span class="kz"></span>拉回區（RSI&lt;50 且綠柱）　<b style="color:var(--gold)">▲</b> 定投點')
       + "<br>MACD：深色線 DIF、橘線 DEA，柱子變淡＝比前一根短。RSI 虛線 30／70、實線 50。"
       + (hasScore ? "最下方色帶是便宜度分數（綠＝便宜、紅＝貴）。" : "")
+      + (mo ? "<br>月線 MACD 谷底：柱子在零軸下、上個月最深、這個月開始縮短，要等月收盤才確認。谷底發生時分數 ≥ 20 就是甜蜜點，回測勝率最高。" + (trs.length ? "" : "這段期間沒有出現過。") : "")
       + (w ? "" : "<br>定投點＝RSI&lt;50、綠柱開始縮短、價格在 200 日均線上。回測只比任意日好一點點，當作「不是在追高」的參考，不是買進訊號。")
       + (opt.title ? "<br>" + opt.title : "");
   }

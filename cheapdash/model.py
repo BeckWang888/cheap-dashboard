@@ -11,8 +11,8 @@ SIGNAL_NAMES = ["日線 MACD 綠柱縮短", "週線 MACD 綠柱縮短", "RSI 回
 WARMUP = 756  # 每個指標至少累積 3 年歷史才開始算百分位
 # 個股過熱：相對 MA200 的乖離落在自身歷史前 5%（或 RSI ≥ 80）＝過熱；前 1% ＝嚴重過熱
 HOT_PCT, VERY_HOT_PCT, HOT_RSI = 0.95, 0.99, 80
-# 甜蜜點（回測勝率較高的情境）：分數 ≥ 80，或月線 MACD 谷底已確認且分數 ≥ 50
-SWEET_SCORE, SWEET_TROUGH_SCORE = 80, 50
+# 甜蜜點（回測勝率較高的情境）：分數 ≥ 80，或月線 MACD 谷底已確認且分數 ≥ 20（2026-10 由 50 放寬：便宜區＋谷底勝率最高）
+SWEET_SCORE, SWEET_TROUGH_SCORE = 80, 20
 
 
 def level(score: float) -> str:

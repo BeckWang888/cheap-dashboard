@@ -89,9 +89,11 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 .pin{border:0;background:none;font:inherit;font-size:17px;line-height:1;color:var(--sub);cursor:pointer;padding:2px 6px 2px 0;vertical-align:0}
 .pin[aria-pressed="true"]{color:var(--gold)}
 .sc .wr{font-size:12px;font-weight:400;color:var(--sub);white-space:nowrap}
-.wrb{position:relative;height:10px;background:var(--chip);border-radius:5px;margin:8px 0 4px}
-.wrb i{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:var(--accent)}
-.wrb u{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+.sc .wr.ok{color:var(--accent);font-weight:600}
+.wrt td:nth-child(n+2),.wrt th:nth-child(n+2){text-align:right}
+.wrt .wg{color:var(--accent);font-weight:600}.wrt .wb{color:var(--warm);font-weight:600}
+.wrv{font-size:13px;margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--chip);border-left:4px solid var(--cnull)}
+.wrv.ok{border-left-color:var(--accent)}.wrv.mid{border-left-color:var(--warm)}
 .nav{display:flex;gap:4px;margin:4px 0 14px;border-bottom:1px solid var(--line)}
 .nav a{padding:8px 14px;font-size:15px;color:var(--sub);text-decoration:none;border-bottom:2px solid transparent;margin-bottom:-1px}
 .nav a[aria-current="page"]{color:var(--ink);font-weight:600;border-bottom-color:var(--accent)}
@@ -305,7 +307,7 @@ function render(){
    +pxLine(r)
    +(L?'<div class="lv">'+L.x+' 倍・對應 '+esc(L.underlying)+'</div>':'')+(r.thin?'<div class="lv warn">資料不足，分數僅供參考</div>':'')
    +'<div class="sig"><span>'+dots+'</span><em class="'+s[1]+'">'+s[0]+'</em>'+(c.sweet?'<span class="sw">甜蜜點</span>':'')+'</div></div>'
-   +'<div class="sc"><b>'+(c.score==null?'—':c.score.toFixed(0))+'</b><span style="color:var('+(l?l[2]:'--sub')+')">'+(l?l[1]:'')+'</span>'+(WR(r)?'<span class="wr" title="回測勝率：歷史上同樣狀態買進，6 個月後上漲的機率">勝率 '+WR(r).p.toFixed(0)+'%</span>':'')+'</div>'
+   +'<div class="sc"><b>'+(c.score==null?'—':c.score.toFixed(0))+'</b><span style="color:var('+(l?l[2]:'--sub')+')">'+(l?l[1]:'')+'</span>'+(WR(r)?'<span class="wr'+(wrOk(WR(r))?' ok':'')+'" title="回測勝率：歷史上同樣狀態買進，6 個月後上漲的機率；✓＝在便宜區，且 3 個月、6 個月、1 年都高於這檔平常">勝率 '+WR(r).p.toFixed(0)+'%'+(wrOk(WR(r))?' ✓':'')+'</span>':'')+'</div>'
    +'<div class="th">'+(D.thresholds||[20,50,80]).map(function(t){return'<i style="left:'+((t+100)/2)+'%"></i>'}).join("")+'<u style="left:'+p+'%"></u></div>'
    +(st.open===r.symbol?detail(r):'<div class="det"></div>')+'</div>';
  });
@@ -344,16 +346,29 @@ function detail(r){
 }
 function bandColor(v){for(var k=0;k<BAND.length;k++)if(v>=BAND[k][0])break;var c=getComputedStyle(document.documentElement).getPropertyValue(BAND[k][1]).trim(),m=/^#([0-9a-f]{6})$/i.exec(c);
  if(!m)return c;var n=parseInt(m[1],16);return"rgba("+(n>>16)+","+(n>>8&255)+","+(n&255)+","+BAND[k][2]+")"}
+var CHEAP_ST={sweet:1,cheap2:1,cheap:1};
+// 打勾＝在便宜區（分數 ≥ 20）且 3 個月、6 個月、1 年勝率都高於這檔平常
+function wrOk(w){return !!(w&&CHEAP_ST[w.state]&&w.n_h>0&&w.better===w.n_h)}
 function wrBox(r){
  var w=WR(r);if(!w)return'<h4>回測勝率</h4><div class="kv"><div>歷史還不夠長（有分數後還要約 1 年半），暫不估計。</div></div>';
- var lf=D.wr_lifts&&D.wr_lifts[st.v]&&D.wr_lifts[st.v][w.state]!=null?D.wr_lifts[st.v][w.state]:w.lift,sg=function(x){return(x>0?"+":"")+x.toFixed(1)};
- return'<h4>回測勝率（歷史上同樣狀態買進，6 個月後上漲的機率）</h4>'
-  +'<div class="kv"><div>綜合估計<b>'+w.p.toFixed(0)+'%</b></div><div>這檔任意一天買<b>'+w.base.toFixed(0)+'%</b></div><div>目前狀態<b>'+esc(w.label)+'</b></div></div>'
-  +'<div class="wrb" aria-hidden="true"><i style="width:'+w.p+'%"></i><u style="left:'+w.base+'%"></u></div>'
-  +'<div class="dim" style="font-size:12px">直線刻度是這檔任意一天買的勝率。'
-  +'所有標的在「'+esc(w.label)+'」時，平均比各自基準 '+sg(lf)+' 個百分點；'
-  +(w.own==null?'這檔自己沒出現過這種狀態。':'這檔自己在這種狀態的歷史勝率 '+w.own.toFixed(0)+'%（約 '+w.own_n.toFixed(0)+' 個獨立樣本，占綜合估計的 '+(w.own_k*100).toFixed(0)+'%）。')
-  +'<br>這個數字主要反映這檔的長期趨勢，狀態造成的差異通常只有幾個百分點。過熱時勝率偏高是因為強勢常延續，加上清單裡多是存活下來的強勢股，不代表該追高。'+(r.lev?'槓桿 ETF 用模擬的 '+r.lev.x+' 倍報酬計算。':'')+'</div>';
+ var sg=function(x){return(x>0?"+":"")+x.toFixed(1)},H=[["3m","3 個月"],["6m","6 個月"],["1y","1 年"]];
+ var t='<div class="scroll"><table class="wrt"><tr><th>買進後</th><th>這種狀態</th><th>這檔平常</th><th>差</th></tr>';
+ H.forEach(function(x){var v=w[x[0]];if(!v)return;var d=v.p-v.base;
+  t+='<tr><td>'+x[1]+'上漲機率</td><td><b>'+v.p.toFixed(0)+'%</b></td><td>'+v.base.toFixed(0)+'%</td><td class="'+(d>1?"wg":d<-1?"wb":"dim")+'">'+sg(d)+'</td></tr>'});
+ var m=w.mae;
+ if(m){var dm=m.p-m.base;t+='<tr><td>6 個月內通常再跌</td><td><b>'+m.p.toFixed(1)+'%</b></td><td>'+m.base.toFixed(1)+'%</td><td class="'+(dm>1?"wg":dm<-1?"wb":"dim")+'">'+sg(dm)+'</td></tr>'}
+ t+='</table></div>';
+ var n=w.n_h,v;
+ if(w.better===n&&!CHEAP_ST[w.state])v=['mid',n+' 個期間勝率都高於平常，但目前不在便宜區（'+esc(w.label)+'），多半是強勢延續；不算便宜買點，追高要有心理準備。'];
+ else if(w.better===n&&w.calm)v=['ok','✓ '+n+' 個期間都高於平常，買進後的再跌也不比平常深：歷史上相對安穩、勝率高的買點。'];
+ else if(w.better===n)v=['ok','✓ '+n+' 個期間都高於平常，但買進後通常會比平常再多跌一些（'+m.p.toFixed(0)+'%）：勝率高但要忍波動，適合分批、別一次買滿。'];
+ else if(w.better>0)v=['mid','只有 '+w.better+'／'+n+' 個期間高於平常，訊號不一致，參考就好。'];
+ else v=['no',n+' 個期間都沒有高於平常，歷史上不是特別好的買點。'];
+ return'<h4>回測勝率（目前狀態：'+esc(w.label)+'）</h4>'+t
+  +'<div class="wrv '+v[0]+'">'+v[1]+'</div>'
+  +'<div class="dim" style="font-size:12px;margin-top:4px">「這種狀態」＝歷史上同樣狀態買進的結果，綜合所有標的的共通規律與這檔自己的歷史'
+  +(w.own_n?'（這檔自己約 '+w.own_n.toFixed(0)+' 個獨立樣本，占 '+(w.own_k*100).toFixed(0)+'%）':'（這檔自己沒出現過這種狀態）')+'。'
+  +'勝率主要反映這檔的長期趨勢，所以看「差」比看絕對數字重要。過熱時勝率偏高是強勢延續＋清單多是存活下來的強勢股，不代表該追高。'+(r.lev?'槓桿 ETF 用模擬的 '+r.lev.x+' 倍報酬計算。':'')+'</div>';
 }
 function marketCard(){
  var M=D.market,box=document.getElementById("mkt");if(!M||!M.indicators||!M.indicators.length){box.hidden=true;return}
