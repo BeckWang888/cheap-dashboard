@@ -26,7 +26,7 @@ K_DAYS = 1260     # K 線圖的日線資料（約 5 年；週 K 由網頁自行�
 
 
 def bt_summary(res: dict) -> dict:
-    keep = ["任意日買進（基準）", "進入甜蜜點", "分數跨上 20", "分數跨上 50", "分數跨上 80", "狀態變成「轉折確認」"]
+    keep = ["任意日買進（基準）", "進入甜蜜點", "強勢谷底（谷底時站上 MA200）", "分數跨上 20", "分數跨上 50", "分數跨上 80", "狀態變成「轉折確認」"]
     rows = [{k: e[k] for k in ("label", "n", "r126", "win126", "mae_med", "mae_p10")} for e in res["events"] if e["label"] in keep]
     rows.sort(key=lambda r: keep.index(r["label"]))
     z = res["zones"]
@@ -61,7 +61,8 @@ def analyze(item: dict) -> dict:
         out["chart"]["s_" + name] = [num(v, 1) for v in m["score"].loc[tail]]
         if name == "full":
             # 月K 圖上標月線 MACD 谷底（已確認）與當時分數
-            out["_tr"] = [[d.strftime("%Y-%m-%d"), num(m["score"].loc[d], 0)] for d in m.index[m["trough_event"]]]
+            out["_tr"] = [[d.strftime("%Y-%m-%d"), num(m["score"].loc[d], 0), bool(m["above200"].loc[d])]
+                          for d in m.index[m["trough_event"]]]
         st = winrate.states(m)
         out.setdefault("_wr", {})[name] = (st, winrate.outcomes(target, m.index))
         if not lev:

@@ -205,12 +205,14 @@ var KChart = (function () {
     }
     var trs = [];
     if (mo && j.tr && j.tr.length) {
-      // 月線 MACD 谷底（已確認）：當時分數 ≥ 20（便宜區）＝甜蜜點，金色；其他灰色
+      // 月線 MACD 谷底（已確認）：金＝分數 ≥ 20（甜蜜點）；藍＝站上年線（強勢谷底）；灰＝跌破年線（弱勢）
       var byMonth = {}; k.d.forEach(function (d) { byMonth[d.slice(0, 7)] = d; });
-      j.tr.forEach(function (t) { var d = byMonth[t[0].slice(0, 7)]; if (d) trs.push({ d: d, s: t[1] }); });
+      j.tr.forEach(function (t) { var d = byMonth[t[0].slice(0, 7)]; if (d) trs.push({ d: d, s: t[1], up: t[2] }); });
+      var blue = css("--c1");
       LC.createSeriesMarkers(cs, trs.map(function (t) {
-        var good = t.s != null && t.s >= 20;
-        return { time: t.d, position: "belowBar", color: good ? gold : alpha(sub, 0.8), shape: "arrowUp", size: good ? 1.4 : 0.8, text: good ? "谷底" : "" };
+        var sw = t.s != null && t.s >= 20, up = t.up;
+        return { time: t.d, position: "belowBar", shape: "arrowUp", size: sw || up ? 1.6 : 1,
+          color: sw ? gold : up ? blue : alpha(sub, 0.9), text: sw ? "甜蜜" : up ? "強勢" : "弱" };
       }));
     }
     // MACD
@@ -262,10 +264,10 @@ var KChart = (function () {
       show(i == null ? n - 1 : i);
     });
     var lines = ma.map(function (x) { return '<i class="kl" style="background:' + x[1] + '"></i>' + x[0] + unit + "均線"; }).join("　");
-    note.innerHTML = lines + (mo ? '　<b style="color:var(--gold)">▲</b> 月線谷底＋便宜區　<b class="dim">▲</b> 谷底但不在便宜區' : w ? "" : '　<span class="kz"></span>拉回區（RSI&lt;50 且綠柱）　<b style="color:var(--gold)">▲</b> 定投點')
+    note.innerHTML = lines + (mo ? '<br>月線 MACD 谷底：<b style="color:var(--gold)">▲甜蜜</b> 分數 ≥ 20　<b style="color:var(--c1)">▲強勢</b> 站上年線　<b class="dim">▲弱</b> 跌破年線' : w ? "" : '　<span class="kz"></span>拉回區（RSI&lt;50 且綠柱）　<b style="color:var(--gold)">▲</b> 定投點')
       + "<br>MACD：深色線 DIF、橘線 DEA，柱子變淡＝比前一根短。RSI 虛線 30／70、實線 50。"
       + (hasScore ? "最下方色帶是便宜度分數（綠＝便宜、紅＝貴）。" : "")
-      + (mo ? "<br>月線 MACD 谷底：柱子在零軸下、上個月最深、這個月開始縮短，要等月收盤才確認。谷底發生時分數 ≥ 20 就是甜蜜點，回測勝率最高。" + (trs.length ? "" : "這段期間沒有出現過。") : "")
+      + (mo ? "<br>谷底＝月線綠柱上個月最深、這個月開始縮短（月收盤才確認）。甜蜜、強勢兩種回測都優於平常；弱勢（跌破年線）沒有優勢、之後常再深跌。綠柱「剛出現」不是買點，要等它開始縮短。" + (trs.length ? "" : "這段期間沒有出現過。") : "")
       + (w ? "" : "<br>定投點＝RSI&lt;50、綠柱開始縮短、價格在 200 日均線上。回測只比任意日好一點點，當作「不是在追高」的參考，不是買進訊號。")
       + (opt.title ? "<br>" + opt.title : "");
   }

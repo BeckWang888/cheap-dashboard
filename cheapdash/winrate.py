@@ -19,6 +19,7 @@ MIN_HIST = 252         # 有結果的歷史至少 1 年才估計
 
 STATES = {
     "sweet": "甜蜜點",
+    "trough_up": "強勢谷底（谷底＋站上年線）",
     "hot": "過熱",
     "cheap2": "很便宜（50～80）",
     "cheap": "便宜（20～50）",
@@ -31,8 +32,8 @@ STATES = {
 def states(m: pd.DataFrame) -> pd.Series:
     s = m["score"]
     key = np.select(
-        [s.isna(), m["sweet"], m["heat"] != "", s >= 50, s >= 20, s >= -10, s >= -66],
-        ["", "sweet", "hot", "cheap2", "cheap", "fair", "pricey"], "vexp")
+        [s.isna(), m["sweet"], m["trough_up"], m["heat"] != "", s >= 50, s >= 20, s >= -10, s >= -66],
+        ["", "sweet", "trough_up", "hot", "cheap2", "cheap", "fair", "pricey"], "vexp")
     return pd.Series(key, index=m.index)
 
 

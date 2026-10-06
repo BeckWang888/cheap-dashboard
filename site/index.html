@@ -197,6 +197,10 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 .pr1{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
 .prn{min-width:0}.prv{font-variant-numeric:tabular-nums;white-space:nowrap}
 .pr .chip{margin-left:4px}.pr .sw{margin-left:4px}
+.sw.up{background:var(--c1)}
+.row.strong{box-shadow:inset 0 0 0 2px var(--c1);background:color-mix(in srgb,var(--c1) 9%,var(--panel))}
+.sig em.strong{color:var(--c1)}
+.swbox.up{border-color:var(--c1);background:color-mix(in srgb,var(--c1) 9%,var(--panel))}.swbox.up b.t{color:var(--c1)}
 .pr2{display:flex;gap:8px 14px;align-items:center;flex-wrap:wrap;margin-top:5px;font-size:12px}
 .wb{flex:0 0 120px;height:8px;background:var(--chip);border-radius:4px;overflow:hidden}
 .wb i{display:block;height:100%;background:var(--c1)}
@@ -274,15 +278,17 @@ function pc(x,d){if(x==null)return'—';if(Math.abs(x)<5e-4)x=0;var v=(x*100).to
 function pp(x){return x==null?'—':(x*100).toFixed(0)+'%'}
 function C(r){return r.v[st.v].current}
 function stt(r){var c=C(r),n=c.sigs.filter(Boolean).length;if(c.score==null)return["資料不足","off"];
+ if(c.state==="強勢谷底")return["強勢谷底"+(c.trough?"":"（形成中）"),"strong"];
  if(c.state==="未進便宜區")return["未進便宜區","off"];if(c.state==="轉折確認")return["轉折確認","go"];
  if(c.state==="重點觀察")return["重點觀察"+(c.trough?"":"（形成中）"),"boss"];if(c.state==="轉折初現")return["轉折初現（"+n+" 顆）","mid"];return["觀察中","wait"]}
-function rank(r){var k=stt(r)[1];return C(r).sweet?3:k==="go"?2:k==="boss"?1:0}
+function rank(r){var k=stt(r)[1];return C(r).sweet?3:k==="strong"||k==="go"?2:k==="boss"?1:0}
 function isLev(r){return r.type==="leveraged"}
 function render(){
  var items=D.items,cnt=function(f){return items.filter(f).length};
  document.getElementById("sum").innerHTML=
   '<div><b style="color:var(--gold)">'+cnt(function(r){return !!C(r).sweet})+'</b><span>甜蜜點</span></div>'+
   '<div><b style="color:var(--accent)">'+cnt(function(r){return stt(r)[1]==="go"})+'</b><span>候選進場</span></div>'+
+  '<div><b style="color:var(--c1)">'+cnt(function(r){return stt(r)[1]==="strong"})+'</b><span>強勢谷底</span></div>'+
   '<div><b style="color:var(--warm)">'+cnt(function(r){return stt(r)[1]==="boss"})+'</b><span>重點觀察</span></div>'+
   '<div><b>'+cnt(function(r){return C(r).score>=20})+'</b><span>進入便宜區</span></div>'+
   '<div><b style="color:var(--hot)">'+cnt(function(r){return C(r).score!=null&&C(r).score<=-33})+'</b><span>中貴以上</span></div>'+
@@ -302,7 +308,7 @@ function render(){
   var dots="";c.sigs.forEach(function(v){dots+='<i class="dt'+(v?" on":"")+'"></i>'});
   dots+='<i class="dt bs'+(c.trough?" on":c.trough_forming?" half":"")+'" title="月線 MACD 谷底"></i>';
   var heat=c.heat?'<span class="hot'+(c.heat==="嚴重過熱"?" vh":"")+'">'+c.heat+'</span>':'';
-  h+='<div class="row'+(c.sweet?" sweet":s[1]==="go"?" go":s[1]==="boss"?" boss":"")+(st.open===r.symbol?" open":"")+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
+  h+='<div class="row'+(c.sweet?" sweet":s[1]==="strong"?" strong":s[1]==="go"?" go":s[1]==="boss"?" boss":"")+(st.open===r.symbol?" open":"")+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
    +'<div class="id">'+(canDrag()&&!pinned(r.symbol)?'<span class="dh" title="拖曳排序" aria-label="拖曳排序">☰</span>':'')+'<button class="pin" data-pin="'+esc(r.symbol)+'" aria-pressed="'+pinned(r.symbol)+'" title="'+(pinned(r.symbol)?'取消釘選':'釘選到最上面')+'" aria-label="釘選">'+(pinned(r.symbol)?'★':'☆')+'</button><b>'+esc(r.symbol.replace(".TW",""))+'</b>'+heat+(r.intraday?'<span class="live">盤中</span>':'')+'<span class="nm">'+esc(r.name)+'</span>'
    +pxLine(r)
    +(L?'<div class="lv">'+L.x+' 倍・對應 '+esc(L.underlying)+'</div>':'')+(r.thin?'<div class="lv warn">資料不足，分數僅供參考</div>':'')
@@ -332,6 +338,11 @@ function detail(r){
  if(c.heat)h+='<h4>過熱</h4><div class="kv"><div>'+c.heat+'：相對 MA200 的乖離已在自身歷史前 '+(c.heat==="嚴重過熱"?"1":"5")+'%（或 RSI ≥ 80）。回測顯示過熱後未必會跌，這是「別追高」的提醒，不是賣出訊號。</div></div>';
  h+=wrBox(r);
  h+='<h4>走勢圖</h4><div class="kc"></div>';
+ if(stt(r)[1]==="strong"){var su=b.rows.filter(function(e){return e.label.indexOf("強勢谷底")===0})[0],b0=b.rows[0];
+  h+='<div class="swbox up"><b class="t">強勢谷底'+(c.trough?'':'（形成中，月底收盤才確認）')+'：月線 MACD 谷底，價格仍在 200 日均線（年線）之上</b><br>'
+   +'不在便宜區，代表這檔仍在多頭；回檔讓月線動能觸底、開始回升。所有標的回測（谷底確認當天買進）：6 個月上漲機率中位數比平常高約 8 個百分點，約 2/3 的標的優於平常，再跌也比跌破年線的谷底淺；但各檔差異大（例如 TSLA 反而較差），優勢也不如甜蜜點（便宜區＋谷底，約 +18）。'
+   +(su&&su.n?'<br>這檔過去出現 '+su.n+' 次，之後 6 個月中位數 '+pc(su.r126)+'（任意日 '+pc(b0.r126)+'），上漲機率 '+pp(su.win126)+'（任意日 '+pp(b0.win126)+'）；期間通常再跌 '+pc(su.mae_med)+'。'+(su.n<5?' <b>樣本少於 5 次，參考就好。</b>':''):'')
+   +'<br><span class="dim">不是不敗：月線谷底後 6 個月仍約有 3 成會下跌（例如 2008 年）。跌破年線的谷底沒有優勢。照分批規則進場。</span></div>'}
  if(c.sweet){var sw=b.rows.filter(function(e){return e.label==="進入甜蜜點"})[0],bs=b.rows[0];
   h+='<div class="swbox"><b class="t">甜蜜點：'+esc(c.sweet_why)+'</b><br>'
    +(sw&&sw.n?'這檔過去進入甜蜜點 '+sw.n+' 次，之後 6 個月中位數 '+pc(sw.r126)+'（任意日 '+pc(bs.r126)+'），上漲機率 '+pp(sw.win126)+'（任意日 '+pp(bs.win126)+'）；期間通常還會再跌 '+pc(sw.mae_med)+'，最糟 1 成再跌 '+pc(sw.mae_p10)+'。':'這檔過去樣本不足，參考整體回測：所有標的平均比任意日多約 6～9 個百分點。')
@@ -346,8 +357,8 @@ function detail(r){
 }
 function bandColor(v){for(var k=0;k<BAND.length;k++)if(v>=BAND[k][0])break;var c=getComputedStyle(document.documentElement).getPropertyValue(BAND[k][1]).trim(),m=/^#([0-9a-f]{6})$/i.exec(c);
  if(!m)return c;var n=parseInt(m[1],16);return"rgba("+(n>>16)+","+(n>>8&255)+","+(n&255)+","+BAND[k][2]+")"}
-var CHEAP_ST={sweet:1,cheap2:1,cheap:1};
-// 打勾＝在便宜區（分數 ≥ 20）且 3 個月、6 個月、1 年勝率都高於這檔平常
+var CHEAP_ST={sweet:1,trough_up:1,cheap2:1,cheap:1};
+// 打勾＝在便宜區（分數 ≥ 20）或強勢谷底，且 3 個月、6 個月、1 年勝率都高於這檔平常
 function wrOk(w){return !!(w&&CHEAP_ST[w.state]&&w.n_h>0&&w.better===w.n_h)}
 function wrBox(r){
  var w=WR(r);if(!w)return'<h4>回測勝率</h4><div class="kv"><div>歷史還不夠長（有分數後還要約 1 年半），暫不估計。</div></div>';
@@ -359,7 +370,7 @@ function wrBox(r){
  if(m){var dm=m.p-m.base;t+='<tr><td>6 個月內通常再跌</td><td><b>'+m.p.toFixed(1)+'%</b></td><td>'+m.base.toFixed(1)+'%</td><td class="'+(dm>1?"wg":dm<-1?"wb":"dim")+'">'+sg(dm)+'</td></tr>'}
  t+='</table></div>';
  var n=w.n_h,v;
- if(w.better===n&&!CHEAP_ST[w.state])v=['mid',n+' 個期間勝率都高於平常，但目前不在便宜區（'+esc(w.label)+'），多半是強勢延續；不算便宜買點，追高要有心理準備。'];
+ if(w.better===n&&!CHEAP_ST[w.state])v=['mid',n+' 個期間勝率都高於平常，但目前不在便宜區也不是強勢谷底（'+esc(w.label)+'），多半是強勢延續；不算買點，追高要有心理準備。'];
  else if(w.better===n&&w.calm)v=['ok','✓ '+n+' 個期間都高於平常，買進後的再跌也不比平常深：歷史上相對安穩、勝率高的買點。'];
  else if(w.better===n)v=['ok','✓ '+n+' 個期間都高於平常，但買進後通常會比平常再多跌一些（'+m.p.toFixed(0)+'%）：勝率高但要忍波動，適合分批、別一次買滿。'];
  else if(w.better>0)v=['mid','只有 '+w.better+'／'+n+' 個期間高於平常，訊號不一致，參考就好。'];

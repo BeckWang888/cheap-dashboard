@@ -39,7 +39,9 @@ def find_events(items: list, prev: dict, cfg: dict) -> tuple[list, dict]:
         if on["confirm"] and c["state"] == "轉折確認" and p.get("state") != "轉折確認":
             events.append((sym, "confirm", "轉折確認"))
         if on["trough"] and cur["trough"] and cur["trough"] != p.get("trough"):
-            events.append((sym, "trough" + cur["trough"], f"重點觀察：月線谷底（{cur['trough']}）"))
+            kind = ("甜蜜點" if c.get("sweet") else "強勢谷底・站上年線" if c.get("above200")
+                    else "跌破年線，弱勢谷底小心")
+            events.append((sym, "trough" + cur["trough"], f"月線 MACD 谷底（{cur['trough']}，{kind}）"))
         rank = {"": 0, "過熱": 1, "嚴重過熱": 2}
         if on["heat"] and rank[c["heat"]] > rank[p.get("heat", "")]:
             events.append((sym, "heat" + c["heat"], f"{c['heat']}（追高提醒）"))

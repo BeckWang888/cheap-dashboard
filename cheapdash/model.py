@@ -111,17 +111,23 @@ def compute(close: pd.Series, window: int | None = None, now=None, closed_today:
                     np.where((above >= HOT_PCT) | (df["rsi"] >= HOT_RSI), "過熱", ""))
     df["heat"] = np.where(df["score"].isna(), "", heat)
 
+    # 強勢谷底：月線 MACD 谷底時價格仍在 200 日均線之上（多頭裡的回檔）。
+    # 回測（谷底確認當天買進）：6 個月勝率各標的中位數約比平常 +8 個百分點、2/3 標的優於平常；跌破均線時的谷底沒有優勢。
+    up = df["close"] > sma(close, 200)
+    df["above200"] = up
     state = np.select(
-        [df["score"] < 20,
+        [(df["score"] < 20) & (df["trough"] | forming) & up,
+         df["score"] < 20,
          (df["n_sig"] >= 3) & (df["s1"] | df["s2"]),
          df["trough"] | forming,
          df["n_sig"] >= 1],
-        ["未進便宜區", "轉折確認", "重點觀察", "轉折初現"],
+        ["強勢谷底", "未進便宜區", "轉折確認", "重點觀察", "轉折初現"],
         default="觀察中",
     )
     df["state"] = np.where(df["score"].isna(), "", state)
     sweet_hi = df["score"] >= SWEET_SCORE
     sweet_tr = df["trough"] & (df["score"] >= SWEET_TROUGH_SCORE)
     df["sweet"] = sweet_hi | sweet_tr
+    df["trough_up"] = df["trough"] & up & ~df["sweet"]
     df["sweet_why"] = np.where(sweet_hi, f"分數 ≥ {SWEET_SCORE}", np.where(sweet_tr, f"月線谷底確認且分數 ≥ {SWEET_TROUGH_SCORE}", ""))
     return df
