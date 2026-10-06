@@ -6,3 +6,5 @@ report.html
 site/data.json
 site/prices.json
 calibration.csv
+site/k/
+dip_backtest.csv

@@ -343,5 +343,85 @@
   "x": 4,
   "group": "半導體/AI",
   "theme": "半導體"
+ },
+ {
+  "symbol": "NVDA",
+  "name": "輝達",
+  "market": "US",
+  "type": "stock",
+  "group": "半導體/AI",
+  "theme": "半導體"
+ },
+ {
+  "symbol": "META",
+  "name": "Meta",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "AI／軟體"
+ },
+ {
+  "symbol": "LITE",
+  "name": "Lumentum",
+  "market": "US",
+  "type": "stock",
+  "group": "半導體/AI",
+  "theme": "光通訊"
+ },
+ {
+  "symbol": "AAOI",
+  "name": "應用光電",
+  "market": "US",
+  "type": "stock",
+  "group": "半導體/AI",
+  "theme": "光通訊"
+ },
+ {
+  "symbol": "SPCX",
+  "name": "SpaceX",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "太空"
+ },
+ {
+  "symbol": "MAGS",
+  "name": "七巨頭 ETF",
+  "market": "US",
+  "type": "etf",
+  "group": "",
+  "theme": "美股大盤"
+ },
+ {
+  "symbol": "AMZN",
+  "name": "亞馬遜",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "AI／軟體"
+ },
+ {
+  "symbol": "INTC",
+  "name": "英特爾",
+  "market": "US",
+  "type": "stock",
+  "group": "半導體/AI",
+  "theme": "半導體"
+ },
+ {
+  "symbol": "TSM",
+  "name": "台積電 ADR",
+  "market": "US",
+  "type": "stock",
+  "group": "半導體/AI",
+  "theme": "半導體"
+ },
+ {
+  "symbol": "ANTW",
+  "name": "Anthropic AI 生態系 ETF",
+  "market": "US",
+  "type": "etf",
+  "group": "",
+  "theme": "AI／軟體"
  }
 ]

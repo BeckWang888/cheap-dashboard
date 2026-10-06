@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
-from cheapdash import backtest, data, market, meta, notify
+from cheapdash import backtest, data, market, meta, notify, winrate
 from cheapdash.model import SIGNAL_NAMES, compute
 from cheapdash.summary import current, lev_info, lev_target, num
 
@@ -21,7 +21,8 @@ MARKETS = {
     "TW": (ZoneInfo("Asia/Taipei"), time(13, 35)),
     "US": (ZoneInfo("America/New_York"), time(16, 5)),
 }
-CHART_DAYS = 520  # 展開後的小圖顯示最近約 2 年
+CHART_DAYS = 520  # 展開後的分數色帶顯示最近約 2 年
+K_DAYS = 1260     # K 線圖的日線資料（約 5 年；週 K 由網頁自行合成）
 
 
 def bt_summary(res: dict) -> dict:
@@ -39,7 +40,8 @@ def analyze(item: dict) -> dict:
     lev = item["type"] == "leveraged"
     # proxy：本身沒有歷史價格的標的（例如黃金現貨 AU9901）改用代理標的算分數
     base = item["underlying"] if lev else item.get("proxy") or item["symbol"]
-    close = data.load(base, refresh=True)["Close"]
+    ohlc = data.load(base, refresh=True)
+    close = ohlc["Close"]
     last_day = close.index[-1].date()
     closed_today = last_day < now.date() or now.time() >= close_t
     target = lev_target(close, item["x"]) if lev else close
@@ -57,17 +59,61 @@ def analyze(item: dict) -> dict:
         res = backtest.run(m, target)
         out["v"][name] = {"current": current(m), "bt": bt_summary(res)}
         out["chart"]["s_" + name] = [num(v, 1) for v in m["score"].loc[tail]]
+        st = winrate.states(m)
+        out.setdefault("_wr", {})[name] = (st, winrate.wins(target, m.index))
+        if not lev:
+            out.setdefault("_pool", {})[name] = (st, winrate.wins(close, m.index))
     out["thin"] = out["v"]["full"]["bt"]["years"] < THIN_YEARS
     out["lev"] = None
     if lev:
-        real = data.load(item["symbol"], refresh=True)["Close"]
+        real_ohlc = data.load(item["symbol"], refresh=True)
+        real = real_ohlc["Close"]
         out["lev"] = lev_info(real, close, item["x"], base)
         out["quote"] = quote(real)
     if item.get("proxy"):
         own = data.tpex_gold().get(item["symbol"].replace(".TW", "")) if item["symbol"].startswith("AU") else None
         out["quote"] = own or out["quote"]
     out["price"] = out["quote"]["price"]
+    # K 線圖用實際買進的那檔（槓桿 ETF 用本身價格）；proxy 標的只有代理標的的歷史
+    out["_k"] = (real_ohlc if lev else ohlc).iloc[-K_DAYS:]
+    out["k_sym"] = item["symbol"] if lev or not item.get("proxy") else base
     return out
+
+
+def write_charts(results: list):
+    """每檔一個 site/k/<代碼>.json：日線 OHLC（約 5 年）＋近 5 日 5 分鐘走勢。網頁展開時才下載。"""
+    kdir = SITE / "k"
+    kdir.mkdir(exist_ok=True)
+    intr = data.intraday([r["k_sym"] for r in results if not r["k_sym"].startswith("GC=")])
+    for r in results:
+        df = r.pop("_k")
+        j = {"sym": r["k_sym"], "d": [d.strftime("%Y-%m-%d") for d in df.index]}
+        for c, k in (("Open", "o"), ("High", "h"), ("Low", "l"), ("Close", "c")):
+            j[k] = [num(v, 4) for v in df[c]]
+        s = intr.get(r["k_sym"])
+        if s is not None and not s.empty:
+            # 時間存成「交易所當地時間當作 UTC」的秒數，圖上直接顯示當地時間
+            j["i"] = {"t": [int(t.timestamp()) for t in s.index], "c": [num(v, 4) for v in s]}
+        (kdir / (r["symbol"] + ".json")).write_text(json.dumps(j, separators=(",", ":")), encoding="utf-8")
+
+
+def add_winrates(results: list) -> dict:
+    """先用所有一倍標的算「各狀態比自身基準多幾個百分點」，再替每檔估目前狀態的回測勝率。"""
+    tables = {}
+    for name in VARIANTS:
+        seen, pool = set(), []
+        for r in results:
+            if "_pool" in r and r["base"] not in seen:
+                seen.add(r["base"])
+                pool.append(r["_pool"][name])
+        tables[name] = winrate.lifts(pool)
+        for r in results:
+            st, w = r["_wr"][name]
+            r["v"][name]["wr"] = winrate.estimate(st, w, tables[name])
+    for r in results:
+        r.pop("_wr", None)
+        r.pop("_pool", None)
+    return {n: {k: round(100 * v["lift"], 1) for k, v in t.items()} for n, t in tables.items()}
 
 
 def quote(s: pd.Series) -> dict:
@@ -168,6 +214,8 @@ def main():
             print(f"[錯誤] {it['symbol']}：{e}")
             failed.append(it["symbol"])
 
+    wr_lifts = add_winrates(results)
+    write_charts(results)
     groups = {}
     for r in results:
         c = r["v"]["full"]["current"]
@@ -180,7 +228,8 @@ def main():
     payload = {"generated": now_tw.strftime("%Y-%m-%d %H:%M"), "signal_names": SIGNAL_NAMES,
                "thresholds": cfg.get("thresholds", [20, 50, 80]), "group_alert_min": cfg.get("group_alert_min", 3),
                "position_cap": cfg.get("position_cap", 0.10),
-               "groups": groups, "failed": failed, "items": results}
+               "groups": groups, "failed": failed, "items": results,
+               "wr_lifts": wr_lifts, "wr_states": winrate.STATES}
     try:
         payload["market"] = market.build()
     except Exception as e:

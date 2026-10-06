@@ -16,10 +16,10 @@
 
 ## 主要檔案
 - `cheapdash/data.py` 資料層：美股 Yahoo（完整歷史＋近 5 天補最新日）；台股 FinMind 原始價＋除權息／分割自行還原，盤中用 Yahoo 補當天（上櫃 .TWO）；FinMind 失敗（402 額度）改用 Yahoo；`tpex_gold()` 櫃買黃金報價。
-- `cheapdash/model.py` 分數與訊號；`backtest.py`；`market.py` 市場溫度；`meta.py` 新標的自動判斷（名稱、類型、槓桿對應與倍數）；`notify.py`；`summary.py`。
-- `update.py` 排程主程式；`run_backtest.py` → `report.html`（本機回測報告）；`calibrate.py` 權重校準。
-- `site/index.html`（便宜度頁）、`holdings.js`（持倉頁）、`parser.js`（語音句型解析）、`watchlist.js`（清單編輯、拖曳）、`settings.js`、`gh.js`。
-- 資料：`watchlist.json`（40 檔，欄位 symbol/name/market/type/group/theme，槓桿有 underlying/x，AU9901 有 proxy）、`holdings.json`（lots、cash、names、targets、manual）、`config.json`（門檻、通知開關、冷卻、族群門檻、position_cap）。
+- `cheapdash/model.py` 分數與訊號；`backtest.py`；`market.py` 市場溫度；`meta.py` 新標的自動判斷（名稱、類型、槓桿對應與倍數）；`notify.py`；`summary.py`；`winrate.py` 回測勝率。
+- `update.py` 排程主程式（也產生 `site/k/<代碼>.json` 給 K 線圖：約 5 年日線 OHLC＋近 5 日 5 分鐘走勢）；`dip_backtest.py` 定投點回測；`run_backtest.py` → `report.html`（本機回測報告）；`calibrate.py` 權重校準。
+- `site/index.html`（便宜度頁）、`chart.js`（走勢圖，TradingView Lightweight Charts v5，jsdelivr 載入）、`holdings.js`（持倉頁）、`parser.js`（語音句型解析）、`watchlist.js`（清單編輯、拖曳）、`settings.js`、`gh.js`。
+- 資料：`watchlist.json`（50 檔，欄位 symbol/name/market/type/group/theme，槓桿有 underlying/x，AU9901 有 proxy）、`holdings.json`（lots、cash、names、targets、manual）、`config.json`（門檻、通知開關、冷卻、族群門檻、position_cap）。
 - 測試：`python -m pytest -q tests`、`node --test tests/parser.test.js`。
 
 ## 已定的設計決策
@@ -33,6 +33,11 @@
 - 持倉成本：第一金用「投資成本÷股數」（含手續費），華南金用畫面「成本均」。賣出用平均成本法；尚無已實現損益。
 - 漲跌色預設**紅漲綠跌**（可切換）。持倉頁有環圈圖（資產配置／風險類別／產業主題／帳戶）、持股排行、損益條圖、提醒與建議。
 - 產業主題（theme）是 Claude 先分類的，使用者可能要調整。
+- **回測勝率**（0～100）＝歷史上同樣狀態買進、6 個月後上漲的機率：這檔任意日基準＋各狀態共通差異（所有一倍標的等權平均），再和這檔自身同狀態歷史加權（每 21 天算 1 個樣本，10 個樣本時各半）。數字主要反映長期趨勢；過熱時偏高是強勢延續＋存活者偏差，不代表該追高。
+- 2026-10 回測結論：勝率較高的徵兆是 極便宜／甜蜜點（約 +5～7 個百分點）、便宜區＋月線谷底（約 +7～11）；便宜區內訊號多寡、週線綠柱縮短幾乎沒差。
+- **定投點**（使用者提的「RSI<50＋MACD 綠柱」改良）：RSI<50、綠柱開始縮短、站上 200 日均線。回測只比任意日好約 0.5～1 個百分點；「等訊號才買」輸給每月定額（約 95% 標的）。所以只在日K 標箭頭當「不是在追高」參考，週K 不標（加過濾後 5 年才 1 次且表現差），不推播。
+- 釘選存在各裝置瀏覽器 localStorage（`cd_pins`），手機和電腦各自獨立。排序：自訂／分數／漲跌幅（再按一次反向）／勝率。
+- 當日／五日走勢只在排程時抓（Yahoo 5 分鐘線），不是即時；瀏覽器不能直接抓 Yahoo（CORS）。6940 格斯在 Yahoo 沒有資料。
 
 ## 帳戶（holdings.json 的 acct）
 `hn-tw` 華南金台股、`hn-us` 華南金美股、`fb-tw` 第一金台股、`fb-us` 第一金美股、`moomoo`、`etoro`。2026-10-05 已依截圖登打全部 6 個帳戶的持股與現金。新增持股時也要加進 watchlist（使用者要求：有持倉就一定要觀察）。
@@ -48,4 +53,6 @@ Claude 的建議優先順序：6 每日總結推播、2 資產走勢圖。
 - Git 在 Windows 會轉 CRLF；已設 `core.autocrlf false`。用 python 改檔時寫入 `newline="\n"`；bash heredoc 遇長中文內容容易壞，改用 Write 工具寫暫存檔。
 - 本機跑 `update.py` 會改到 `state/`，提交前 `git checkout -- state/`。本機頻繁執行會用光 FinMind 免費額度。
 - 只改 workflow 檔不會觸發部署；需要時 `gh workflow run update.yml`。
+- Lightweight Charts 陷阱：多格圖表用 `setStretchFactor` 分高度（`setHeight` 在 autoSize 第一次畫之前無效）；某一格唯一的價格軸設 `visible:false` 或 RSI 設 `autoScale:false` 會整張圖畫不出來（Value is null）。
+- 瀏覽器窗格被遮住時 requestAnimationFrame 不跑，圖表量不到高度；要截圖才會真的畫。
 - Moomoo 顯示夜盤即時價，和網站收盤價會有落差。

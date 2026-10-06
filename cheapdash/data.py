@@ -146,6 +146,48 @@ def recent_close(symbol: str) -> tuple[str, pd.Series]:
     return "", pd.Series(dtype=float)
 
 
+def _tz(symbol: str) -> str:
+    for suf, tz in ((".TW", "Asia/Taipei"), (".TWO", "Asia/Taipei"), (".KS", "Asia/Seoul"), (".L", "Europe/London")):
+        if symbol.endswith(suf):
+            return tz
+    return "America/New_York"
+
+
+def intraday(symbols: list) -> dict:
+    """近 5 個交易日的 5 分鐘收盤價（不還原）。回傳 {代碼: Series}，index 為交易所當地時間（不帶時區）。
+    一次批次下載；台股 .TW 抓不到的再試上櫃 .TWO。"""
+    _fix_ca_bundle()
+    import yfinance as yf
+
+    def grab(syms):
+        if not syms:
+            return {}
+        try:
+            df = yf.download(syms, period="5d", interval="5m", group_by="ticker", auto_adjust=False,
+                             progress=False, threads=True)
+        except Exception as e:
+            print(f"[警告] 盤中走勢下載失敗：{e}")
+            return {}
+        out = {}
+        for s in syms:
+            try:
+                c = (df[s] if len(syms) > 1 else df)["Close"].dropna()
+            except KeyError:
+                continue
+            if not c.empty:
+                c.index = c.index.tz_convert(_tz(s)).tz_localize(None)
+                out[s] = c
+        return out
+
+    res = grab(list(symbols))
+    miss = [s for s in symbols if s not in res and s.endswith(".TW")]
+    alt = grab([s[:-3] + ".TWO" for s in miss])
+    for s in miss:
+        if s[:-3] + ".TWO" in alt:
+            res[s] = alt[s[:-3] + ".TWO"]
+    return res
+
+
 def tpex_gold() -> dict:
     """櫃買中心黃金現貨最新報價（免 key）。回傳 {代碼: {price, date, prev, chg, ys, ccy}}，價格單位是台幣／台錢。"""
     import certifi
