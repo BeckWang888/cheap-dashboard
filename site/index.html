@@ -29,6 +29,8 @@ h1{font-size:22px;margin:0 0 2px;font-weight:700}
 .sum button[disabled]{cursor:default;opacity:.55}.sum button[disabled]:hover{background:none}
 .sum b{font-size:28px;font-variant-numeric:tabular-nums;display:block;line-height:1.1}
 .sum span{font-size:13px;color:var(--sub)}
+.rfw{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:-6px 0 12px;font-size:13px}
+.rfw .btn{padding:6px 12px;font-size:13px}.rferr{color:var(--hot)}
 .fbar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;margin:0 0 8px;border-radius:8px;background:var(--chip);font-size:14px}
 .bar{display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
 .tabs{display:inline-flex;background:var(--chip);border-radius:8px;padding:3px}
@@ -232,7 +234,8 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 <div class="wrap">
   <div class="top">
     <div><h1>量化左側交易 Dashboard</h1>
-    <p class="note" id="meta">載入中…</p></div>
+    <p class="note" id="meta">載入中…</p>
+    <div class="rfw"><button class="btn ghost" id="rf">⟳ 立即更新價格</button><span class="dim" id="rfmsg"></span></div></div>
     <div class="tabs" id="vt" title="百分位基準"><button data-v="full" aria-pressed="true">全部歷史</button><button data-v="5y" aria-pressed="false">近 5 年</button></div>
   </div>
   <nav class="nav"><a href="#" data-view="cheap" aria-current="page">便宜度</a><a href="#holdings" data-view="holdings">持倉</a><a href="#settings" data-view="settings">設定</a></nav>
@@ -463,6 +466,37 @@ function route(){var h=location.hash==="#holdings"?"holdings":location.hash==="#
  if(h==="holdings")Holdings.start();if(h==="settings")Settings.start()}
 window.addEventListener("hashchange",route);route();
 setSort(st.sort);
+// 立即更新：寫入 repo 的 refresh.json（用持倉存檔的同一把權杖），GitHub Actions 偵測到就重新抓價格，
+// 約 2～3 分鐘後網站更新；網頁每 20 秒檢查一次，好了就自動重新載入。5 分鐘內（所有裝置合計）只觸發一次。
+var RF={busy:false,timer:null};
+function rfMsg(t,err){var m=document.getElementById("rfmsg");m.textContent=t;m.className=err?"rferr":"dim"}
+function rfWait(since,t0){
+ RF.busy=true;document.getElementById("rf").disabled=true;
+ var tick=function(){var sec=Math.round((Date.now()-t0)/1000);
+  if(sec>600){RF.busy=false;document.getElementById("rf").disabled=false;rfMsg("超過 10 分鐘還沒好（GitHub 可能在排隊），稍後重新整理看看。",true);return}
+  rfMsg("更新中…已等 "+Math.floor(sec/60)+" 分 "+(sec%60)+" 秒（約需 2～3 分鐘，可以先做別的事）");
+  fetch("data.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){
+   if(j.generated!==since){rfMsg("已更新到 "+j.generated+"，重新載入中…");try{localStorage.removeItem("cd_rf")}catch(e){}setTimeout(function(){location.reload()},800)}
+   else RF.timer=setTimeout(tick,20000)}).catch(function(){RF.timer=setTimeout(tick,20000)})};
+ tick();
+}
+document.getElementById("rf").addEventListener("click",function(){
+ if(RF.busy||!D)return;
+ if(!GH.token()){rfMsg("這台裝置還沒設定 GitHub 權杖：到「持倉」頁最下方的「存檔設定」貼上權杖後就能用。",true);return}
+ var since=D.generated,t0=Date.now();rfMsg("送出中…");this.disabled=true;var btn=this;
+ GH.get("refresh.json").then(function(r){
+  var last=Date.parse(r.data.at||0);
+  if(Date.now()-last<5*60*1000){   // 5 分鐘內有人按過：已經更新好就告訴他，不然等那次的結果
+   var gen=Date.parse(since.replace(" ","T")+":00+08:00");
+   if(gen>=last-60000){btn.disabled=false;rfMsg("剛剛已更新過（"+since+"），5 分鐘後才能再按。");return}
+   rfWait(since,last);return}
+  return GH.put("refresh.json",{at:new Date().toISOString(),note:r.data.note||""},r.sha,"手動更新價格").then(function(){
+   try{localStorage.setItem("cd_rf",JSON.stringify({since:since,t0:t0}))}catch(e){}
+   rfWait(since,t0)});
+ }).catch(function(e){btn.disabled=false;rfMsg(e.message,true)});
+});
+// 重新整理頁面後，如果剛按過更新，接著等
+try{var rfs=JSON.parse(localStorage.getItem("cd_rf")||"null");if(rfs&&Date.now()-rfs.t0<600000)setTimeout(function(){if(D&&D.generated===rfs.since)rfWait(rfs.since,rfs.t0);else localStorage.removeItem("cd_rf")},1500)}catch(e){}
 fetch("data.json?t="+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(j){
  D=j;document.getElementById("meta").textContent="更新時間 "+j.generated+"（台灣時間）・台股盤中與收盤後、美股盤中與收盤後自動更新";
  alerts();marketCard();setV(st.v);
