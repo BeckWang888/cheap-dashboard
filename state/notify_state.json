@@ -111,7 +111,7 @@
    "sweet": false
   },
   "GGLL": {
-   "state": "轉折確認",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -266,7 +266,7 @@
    "sweet": false
   },
   "AU9901.TW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -277,7 +277,7 @@
    "sweet": true
   },
   "GOOG": {
-   "state": "轉折確認",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -495,7 +495,7 @@
    "sweet": false
   },
   "00708L.TW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
