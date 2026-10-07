@@ -495,15 +495,15 @@
    "sweet": false
   },
   "00708L.TW": {
-   "state": "未進便宜區",
-   "heat": "過熱",
+   "state": "轉折初現",
+   "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
-    "50": true,
-    "80": true
+    "20": false,
+    "50": false,
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   }
  },
  "sent": {
@@ -515,7 +515,11 @@
   "GOOG|confirm": "2026-10-05",
   "SKUU|confirm": "2026-10-05",
   "IBB|cross20": "2026-10-07",
-  "SKUU|cross50": "2026-10-07"
+  "SKUU|cross50": "2026-10-07",
+  "00708L.TW|cross20": "2026-10-07",
+  "00708L.TW|cross50": "2026-10-07",
+  "00708L.TW|cross80": "2026-10-07",
+  "00708L.TW|sweet": "2026-10-07"
  },
  "market": {
   "US": 0,
