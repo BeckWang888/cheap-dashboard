@@ -326,7 +326,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -503,7 +503,8 @@
   "AU9901.TW|sweet": "2026-10-05",
   "GOOG|confirm": "2026-10-05",
   "SKUU|confirm": "2026-10-05",
-  "IBB|cross20": "2026-10-07"
+  "IBB|cross20": "2026-10-07",
+  "SKUU|cross50": "2026-10-07"
  },
  "market": {
   "US": 0,
