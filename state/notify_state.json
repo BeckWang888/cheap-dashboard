@@ -493,6 +493,17 @@
    "trough": "",
    "armed": {},
    "sweet": false
+  },
+  "00708L.TW": {
+   "state": "未進便宜區",
+   "heat": "過熱",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
   }
  },
  "sent": {

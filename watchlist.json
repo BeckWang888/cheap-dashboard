@@ -427,7 +427,10 @@
  {
   "symbol": "00708L.TW",
   "market": "TW",
-  "type": "auto",
-  "group": ""
+  "type": "leveraged",
+  "group": "",
+  "name": "期元大S&P黃金正2",
+  "underlying": "0050.TW",
+  "x": 2
  }
 ]
