@@ -6,7 +6,23 @@ var Scan = (function () {
 
   function ls(k, v) { return GH.ls(k, v); }
   function key() { return ls(KEY) || ""; }
-  var VER = "1007d";   // 畫面上顯示，用來確認手機載入的是不是新版
+  // 診斷記錄：每個步驟都寫一行（含秒數），顯示在畫面上，卡住時一眼看出卡在哪
+  S.log = []; S.t0 = null;
+  function log(msg) {
+    if (S.t0 == null) S.t0 = Date.now();
+    S.log.push("[" + ((Date.now() - S.t0) / 1000).toFixed(1) + "s] " + msg);
+    if (S.log.length > 40) S.log.shift();
+    var el = document.getElementById && document.getElementById("sclog");
+    if (el) el.textContent = S.log.join("\n");
+  }
+  function resetLog() { S.log = []; S.t0 = Date.now(); }
+  function withTimeout(p, ms, msg) {
+    return new Promise(function (ok, fail) {
+      var t = setTimeout(function () { fail(new Error(msg)); }, ms);
+      p.then(function (v) { clearTimeout(t); ok(v); }, function (e) { clearTimeout(t); fail(e); });
+    });
+  }
+  var VER = "1007e";   // 畫面上顯示，用來確認手機載入的是不是新版
   // App 內建瀏覽器（Android WebView 的 UA 會有「; wv)」）通常不支援選檔
   function inApp() { var u = navigator.userAgent || ""; return /; wv\)/.test(u) || /FBAN|FBAV|Instagram|Line\//.test(u); }
   function env() {
@@ -34,7 +50,9 @@ var Scan = (function () {
         : '<label class="dim" style="font-size:13px" for="scfile">① 選擇截圖（選完自動辨識）</label><input type="file" id="scfile" class="fin" accept="image/png,image/jpeg,image/webp,image/heic,image/*" multiple>')
       + '<div id="scpaste" class="scpaste" contenteditable="true" inputmode="none" aria-label="貼上截圖">② 或長按這裡 →「貼上」剛複製的截圖</div>'
       + (S.files.length && !S.busy ? '<button class="btn ghost" id="scgo">用剛才的 ' + S.files.length + " 張重新辨識</button>" : "") + "</div>"
+      + '<div class="bar" style="margin-top:6px"><button class="btn ghost" id="scping"' + (S.busy ? " disabled" : "") + '>🔌 測試連線</button><span class="dim" style="font-size:12px">只送一句話確認金鑰、模型、網路都通</span></div>'
       + '<p class="note" id="scmsg" style="margin:8px 0 0' + (S.err ? ";color:var(--hot)" : "") + (S.msg ? "" : ";display:none") + '">' + S.msg + "</p>"
+      + '<details class="sclogw"' + (S.log.length ? " open" : "") + '><summary class="dim" style="font-size:12px;cursor:pointer">診斷記錄（卡住時把這裡截圖給 Claude）</summary><pre id="sclog" class="sclog">' + esc(S.log.join("\n")) + "</pre></details>"
       + '<p class="dim" style="font-size:12px;margin:8px 0 0">使用 ' + esc(model()) + '（Google 免費額度）・' + esc(env()) + '・版本 ' + VER + ' <button class="lk" id="scset">變更金鑰或模型</button></p>';
     return h + "</div>";
   }
@@ -51,19 +69,46 @@ var Scan = (function () {
   }
 
   // ---------- 圖片：縮小成 JPEG（長邊最多 3072 像素）再轉 base64 ----------
-  function toJpeg(file) {
+  // 選到檔案後第一時間把內容讀進記憶體（有些手機瀏覽器在畫面重畫後會讀不到原檔）
+  function readFile(f) {
     return new Promise(function (ok, fail) {
-      var img = new Image(), url = URL.createObjectURL(file);
-      img.onload = function () {
-        var max = 2048, s = Math.min(1, max / Math.max(img.width, img.height));
-        var c = document.createElement("canvas");
-        c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
-        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-        URL.revokeObjectURL(url);
-        ok(c.toDataURL("image/jpeg", 0.85).split(",")[1]);
-      };
-      img.onerror = function () { URL.revokeObjectURL(url); fail(new Error("讀不到圖片：" + file.name)); };
-      img.src = url;
+      var fr = new FileReader();
+      fr.onload = function () { ok({ name: f.name || "圖片", type: f.type || "image/jpeg", size: f.size, buf: fr.result }); };
+      fr.onerror = function () { fail(new Error("讀不到檔案「" + (f.name || "") + "」（" + (fr.error && fr.error.name) + "）")); };
+      fr.readAsArrayBuffer(f);
+    });
+  }
+  function b64(buf) {
+    var u = new Uint8Array(buf), s = "", i, n = 0x8000;
+    for (i = 0; i < u.length; i += n) s += String.fromCharCode.apply(null, u.subarray(i, i + n));
+    return btoa(s);
+  }
+  function decode(f) {
+    var blob = new Blob([f.buf], { type: f.type });
+    function viaImage() {
+      return new Promise(function (ok, fail) {
+        var img = new Image(), url = URL.createObjectURL(blob);
+        img.onload = function () { URL.revokeObjectURL(url); ok({ src: img, w: img.naturalWidth, h: img.naturalHeight }); };
+        img.onerror = function () { URL.revokeObjectURL(url); fail(new Error("瀏覽器無法解碼這張圖（" + f.type + "）")); };
+        img.src = url;
+      });
+    }
+    if (!window.createImageBitmap) return viaImage();
+    return createImageBitmap(blob).then(function (b) { return { src: b, w: b.width, h: b.height }; }, viaImage);
+  }
+  function toJpeg(f) {
+    return withTimeout(decode(f), 15000, "解碼圖片超過 15 秒").then(function (d) {
+      var max = 2048, s = Math.min(1, max / Math.max(d.w, d.h)), c = document.createElement("canvas");
+      c.width = Math.round(d.w * s); c.height = Math.round(d.h * s);
+      c.getContext("2d").drawImage(d.src, 0, 0, c.width, c.height);
+      if (d.src.close) d.src.close();
+      var data = c.toDataURL("image/jpeg", 0.85).split(",")[1];
+      log("縮圖完成：" + d.w + "×" + d.h + " → " + c.width + "×" + c.height + "，約 " + Math.round(data.length * 0.75 / 1024) + " KB");
+      return { mime: "image/jpeg", data: data };
+    }).catch(function (e) {
+      log("縮圖失敗（" + e.message + "），改直接送原圖");
+      if (f.size > 8 * 1024 * 1024) throw new Error("這張圖無法縮小、檔案又太大（" + Math.round(f.size / 1048576) + " MB），請換一張或先裁小。");
+      return { mime: /^image\//.test(f.type) ? f.type : "image/jpeg", data: b64(f.buf) };
     });
   }
 
@@ -120,17 +165,22 @@ var Scan = (function () {
     // 讀表格不需要深度思考：請模型少想一點，速度快很多；模型不支援這個設定就自動拿掉重試
     if (!noThink && !ls("cd_gemini_nothink")) gc.thinkingConfig = { thinkingLevel: "low" };
     var ctl = window.AbortController ? new AbortController() : null, timer = ctl && setTimeout(function () { ctl.abort(); }, TIMEOUT);
+    var bodyStr = JSON.stringify({ contents: [{ role: "user", parts: parts }], generationConfig: gc }), tSend = Date.now();
+    log("送出請求 → " + model() + "，" + Math.round(bodyStr.length / 1024) + " KB，思考設定：" + (gc.thinkingConfig ? gc.thinkingConfig.thinkingLevel : "預設"));
     return fetch(url, {
       method: "POST", signal: ctl ? ctl.signal : undefined,
       headers: { "Content-Type": "application/json", "x-goog-api-key": key() },
-      body: JSON.stringify({ contents: [{ role: "user", parts: parts }], generationConfig: gc })
+      body: bodyStr
     }).catch(function (e) {
+      log("請求失敗：" + (e && e.name) + " " + (e && e.message));
       if (e && e.name === "AbortError") throw new Error("Gemini 超過 2 分鐘沒有回應（可能免費額度忙碌），請稍後按「重新辨識」，或換成較小的截圖。");
       throw new Error("連不到 Gemini（" + (e && e.message || e) + "），請確認網路後重試。");
     }).then(function (r) {
       if (timer) clearTimeout(timer);
+      log("Gemini 回應 HTTP " + r.status + "，耗時 " + ((Date.now() - tSend) / 1000).toFixed(1) + " 秒");
       return r.json().catch(function () { return {}; }).then(function (j) {
         if (r.ok) return j;
+        log("錯誤內容：" + String((j.error && j.error.message) || "").slice(0, 200));
         var m = (j.error && j.error.message) || "";
         if (r.status === 400 && gc.thinkingConfig && /thinking/i.test(m)) { ls("cd_gemini_nothink", "1"); return { retry: true }; }
         if (r.status === 429) throw new Error("Gemini 免費額度暫時用完（每分鐘或每天有上限），等一下再試。");
@@ -237,14 +287,15 @@ var Scan = (function () {
   }
   function run() {
     if (!S.files.length || S.busy) return;
-    S.busy = true; S.err = false; S.msg = "讀取圖片中…"; Holdings.refresh();
+    S.busy = true; S.err = false; S.msg = "處理圖片中…"; Holdings.refresh();
     var known = Holdings.knownNames();
     Promise.all(S.files.map(toJpeg)).then(function (imgs) {
       S.msg = "AI 辨識中…"; Holdings.refresh(); tick("AI 辨識中", "通常 10～40 秒，最多等 2 分鐘");
-      var parts = imgs.map(function (d) { return { inline_data: { mime_type: "image/jpeg", data: d } }; });
+      var parts = imgs.map(function (d) { return { inline_data: { mime_type: d.mime, data: d.data } }; });
       parts.push({ text: prompt(known) });
       return call(parts);
     }).then(function (res) {
+      log("解析結果：讀到 " + ((res && res.rows) || []).length + " 檔");
       var acct = S.acct || guessAcct(res);
       if (!acct) throw new Error("看不出是哪個帳戶（AI 讀到：" + (res.broker || "未知") + "、" + res.market + "）。請在「帳戶」選好再按一次「開始辨識」。");
       var out = toRows(res, acct), name = (accts().filter(function (x) { return x.id === acct; })[0] || {}).name;
@@ -253,7 +304,17 @@ var Scan = (function () {
       var body = out.rows.length ? "有 " + out.rows.length + " 筆變動放進下面表格，<b>黃色是 AI 提醒要核對的地方</b>，確認或修改後按「確認存入」。" : "和帳上比對沒有變動。";
       S.msg = head + body + (out.notes.length ? "<br>" + out.notes.join("<br>") : "");
       Holdings.addRows(out.rows);
-    }).catch(function (e) { S.busy = false; S.err = true; S.msg = esc(e.message); Holdings.refresh(); });
+    }).catch(function (e) { log("失敗：" + e.message); S.busy = false; S.err = true; S.msg = esc(e.message); Holdings.refresh(); });
+  }
+
+  // 測試連線：只送一句話，確認金鑰、模型、網路
+  function ping() {
+    if (S.busy) return;
+    resetLog(); S.busy = true; S.err = false; S.msg = "測試連線中…"; Holdings.refresh(); tick("測試連線中", "最多等 2 分鐘");
+    call([{ text: "只回覆 OK 兩個字。" }], { type: "OBJECT", properties: { reply: { type: "STRING" } }, required: ["reply"] }).then(function (res) {
+      S.busy = false; S.err = false; S.msg = "✅ 連線正常，模型有回應（" + esc(String(res.reply || "").slice(0, 20)) + "）。金鑰、模型、網路都沒問題。";
+      log("測試成功"); Holdings.refresh();
+    }).catch(function (e) { log("測試失敗：" + e.message); S.busy = false; S.err = true; S.msg = esc(e.message); Holdings.refresh(); });
   }
 
   // ---------- 念的或打字的內容 → AI 整理成表格 ----------
@@ -312,7 +373,8 @@ var Scan = (function () {
 
   // ---------- 事件（由持倉頁轉交） ----------
   function onClick(t) {
-    if (t.closest("#scgo")) { run(); return true; }
+    if (t.closest("#scgo")) { resetLog(); run(); return true; }
+    if (t.closest("#scping")) { ping(); return true; }
     if (t.closest("#scset")) { S.setup = true; S.msg = ""; Holdings.refresh(); return true; }
     if (t.closest("#sckeyno")) { S.setup = false; S.msg = ""; Holdings.refresh(); return true; }
     if (t.closest("#sckeydel")) { ls(KEY, null); S.setup = false; S.msg = "已移除 Gemini 金鑰。"; Holdings.refresh(); return true; }
@@ -338,13 +400,19 @@ var Scan = (function () {
     var items = (e.clipboardData && e.clipboardData.items) || [], fs = [];
     for (var i = 0; i < items.length; i++) if (items[i].kind === "file" && /^image\//.test(items[i].type)) fs.push(items[i].getAsFile());
     if (!fs.length) { S.err = true; S.msg = "剪貼簿裡沒有圖片。先在相簿打開截圖 → 分享或「複製」，再回來貼上。"; Holdings.refresh(); return true; }
-    if (!S.busy) { S.files = fs; S.msg = ""; run(); }
+    if (!S.busy) { resetLog(); log("收到貼上的圖片 " + fs.length + " 張"); Promise.all(fs.map(readFile)).then(function (list) { S.files = list; run(); }).catch(function (e) { S.err = true; S.msg = esc(e.message); Holdings.refresh(); }); }
     return true;
   }
   function onChange(t) {
     if (t.id === "scfile") {   // 選完圖就直接開始辨識（input 與 change 兩個事件都會進來，run() 會擋掉重複）
       var fs = [].slice.call(t.files || []);
-      if (fs.length && !S.busy) { S.files = fs; S.msg = ""; run(); }
+      if (S.picking || S.busy) return true;
+      resetLog(); log("收到選檔事件：" + fs.length + " 個檔案（" + env() + "）");
+      if (!fs.length) return true;
+      S.picking = true; S.msg = "讀取檔案中…"; S.err = false;
+      Promise.all(fs.map(function (f) { log("檔案：" + (f.name || "?") + "，" + Math.round(f.size / 1024) + " KB，" + (f.type || "未知類型")); return withTimeout(readFile(f), 20000, "讀取檔案超過 20 秒"); })).then(function (list) {
+        S.picking = false; S.files = list; log("已讀入記憶體，開始處理"); run();
+      }).catch(function (e) { S.picking = false; log("失敗：" + e.message); S.err = true; S.msg = esc(e.message); Holdings.refresh(); });
       return true;
     }
     if (t.id === "scacct") { S.acct = t.value; return true; }
@@ -353,5 +421,9 @@ var Scan = (function () {
   }
 
   document.addEventListener("paste", onPaste);
+  document.addEventListener("click", function (e) { if (e.target && e.target.id === "scfile") { resetLog(); log("已點「選擇檔案」，等待選照片…（沒出現選照片畫面＝瀏覽器擋住了）"); var el = document.getElementById("sclog"); if (el) el.parentNode.open = true; } }, true);
+  document.addEventListener("cancel", function (e) { if (e.target && e.target.id === "scfile") log("選檔視窗被取消（沒有選任何檔案）"); }, true);
+  window.addEventListener("error", function (e) { if (S.busy || S.picking) log("頁面錯誤：" + e.message); });
+  window.addEventListener("unhandledrejection", function (e) { if (S.busy || S.picking) log("未處理的錯誤：" + (e.reason && e.reason.message || e.reason)); });
   return { ui: ui, onClick: onClick, onChange: onChange, parseText: parseText, hasKey: function () { return !!key(); }, _toRows: toRows, _guessAcct: guessAcct };
 })();

@@ -7,9 +7,9 @@ const path = require("path");
 function load(pos, fetchFn) {
   const g = {
     GH: { ls: (k) => (k === "cd_gemini_key" ? "test-key" : null) },
-    window: { HoldParse: { ACCOUNTS: [{ id: "moomoo", name: "Moomoo", market: "US", ccy: "USD" }, { id: "hn-tw", name: "華南金 台股", market: "TW", ccy: "TWD" }] } },
+    window: { addEventListener() {}, HoldParse: { ACCOUNTS: [{ id: "moomoo", name: "Moomoo", market: "US", ccy: "USD" }, { id: "hn-tw", name: "華南金 台股", market: "TW", ccy: "TWD" }] } },
     Holdings: { positions: () => pos, knownNames: () => "00708L=期元大S&P黃金正2" },
-    document: { addEventListener() {} }, URL: {}, fetch: fetchFn || (() => {}),
+    document: { addEventListener() {}, getElementById: () => null }, URL: {}, navigator: { userAgent: "test" }, fetch: fetchFn || (() => {}),
   };
   const src = fs.readFileSync(path.join(__dirname, "../site/scan.js"), "utf8");
   return new Function(...Object.keys(g), src + "\nreturn Scan;")(...Object.values(g));
