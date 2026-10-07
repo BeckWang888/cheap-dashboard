@@ -18,9 +18,9 @@
 - `cheapdash/data.py` 資料層：美股 Yahoo（完整歷史＋近 5 天補最新日）；台股 FinMind 原始價＋除權息／分割自行還原，盤中用 Yahoo 補當天（上櫃 .TWO）；FinMind 失敗（402 額度）改用 Yahoo；`tpex_gold()` 櫃買黃金報價。
 - `cheapdash/model.py` 分數與訊號；`backtest.py`；`market.py` 市場溫度；`meta.py` 新標的自動判斷（名稱、類型、槓桿對應與倍數）；`notify.py`；`summary.py`；`winrate.py` 回測勝率。
 - `update.py` 排程主程式（也產生 `site/k/<代碼>.json` 給 K 線圖：約 5 年日線 OHLC＋近 5 日 5 分鐘走勢）；`dip_backtest.py` 定投點回測；`run_backtest.py` → `report.html`（本機回測報告）；`calibrate.py` 權重校準。
-- `site/index.html`（便宜度頁）、`chart.js`（走勢圖，TradingView Lightweight Charts v5，jsdelivr 載入）、`holdings.js`（持倉頁）、`parser.js`（語音句型解析）、`watchlist.js`（清單編輯、拖曳）、`settings.js`、`gh.js`。
+- `site/index.html`（便宜度頁）、`chart.js`（走勢圖，TradingView Lightweight Charts v5，jsdelivr 載入）、`holdings.js`（持倉頁）、`parser.js`（語音句型解析）、`watchlist.js`（清單編輯、拖曳）、`scan.js`（截圖辨識）、`settings.js`、`gh.js`。
 - 資料：`watchlist.json`（50 檔，欄位 symbol/name/market/type/group/theme，槓桿有 underlying/x，AU9901 有 proxy）、`holdings.json`（lots、cash、names、targets、manual）、`config.json`（門檻、通知開關、冷卻、族群門檻、position_cap）。
-- 測試：`python -m pytest -q tests`、`node --test tests/parser.test.js`。
+- 測試：`python -m pytest -q tests`、`node --test tests/parser.test.js tests/scan.test.js`。
 
 ## 已定的設計決策
 - 便宜度分數 −100～100：各指標換成「相對自身歷史百分位」。**權重 回撤 50%／MA200 0%／RSI 50%**（calibrate.py 校準結果；權重 0 的指標不參與）。級距 ≥80 極便宜、≥50 很便宜、≥20 便宜、−10~20 合理、−33~−10 小貴、−66~−33 中貴、≤−66 很貴。百分位基準可切「全部歷史／近 5 年」。
@@ -43,6 +43,7 @@
 - 走勢圖分當日／五日／日K／週K／月K；月K 用完整歷史合成，標月線 MACD 谷底。
 - **立即更新價格**按鈕（頁首）：用存檔權杖改寫 `refresh.json` → push 觸發 update.yml（不需 Actions 權限）→ 約 2～3 分鐘後網頁自動重新載入。5 分鐘內（跨裝置）只觸發一次。FinMind 免費每小時約 300 次、每次更新用 60～80 次，所以不能狂按。不花 Claude token。
 - 排程實測（2026-10-06）：常延遲 1～5 小時、偶爾跳過；要準時需 cron-job.org。
+- **截圖辨識持倉**（2026-10-07）：持倉頁「新增／修改持倉」上方上傳券商截圖 → 瀏覽器直接呼叫 **Gemini 免費 API**（使用者選的；預設 `gemini-3.8-flash`，可改，金鑰存 localStorage `cd_gemini_key`）→ 持股畫面與帳上比對算出買賣差額（新買價＝(新總成本−舊總成本)÷新增股數；賣出價先填現價）、成交回報逐筆加入 → 放進既有表格，黃色列是 AI 提醒，**使用者確認才存**。帳上有但截圖沒有的只提醒、不自動賣出。存檔後新代碼自動加入 watchlist（type auto）。免費版 Google 可能用內容訓練／人工審閱。
 - 當日／五日走勢只在排程時抓（Yahoo 5 分鐘線），不是即時；瀏覽器不能直接抓 Yahoo（CORS）。6940 格斯在 Yahoo 沒有資料。
 
 ## 帳戶（holdings.json 的 acct）
@@ -51,7 +52,7 @@
 ## 後續可做（2026-10-05 列給使用者，尚未決定；使用者問「後續可以做什麼」時列出這份）
 持倉：1 已實現損益與交易紀錄　2 資產走勢圖（每日記總資產畫曲線）　3 配息追蹤與除息提醒　4 持倉頁拖曳排序　5 調整產業分類與提醒門檻
 便宜度：6 每日總結推播　7 用 state/signal_log.csv 驗證訊號準確度　8 估值參考（本益比，只當參考欄）　9 新聞標題與財報日
-穩定與方便：10 cron-job.org 讓排程準時（需使用者註冊）　11 加到手機主畫面（PWA）　12 網頁直接上傳截圖用 AI 辨識（需 Anthropic API）
+穩定與方便：10 cron-job.org 讓排程準時（需使用者註冊）　11 加到手機主畫面（PWA）　~~12 網頁直接上傳截圖用 AI 辨識~~（已完成，改用 Gemini 免費 API）
 Claude 的建議優先順序：6 每日總結推播、2 資產走勢圖。
 
 ## 已知陷阱

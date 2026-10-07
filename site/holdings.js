@@ -411,7 +411,8 @@
 
   function inputCard() {
     if (!token()) return '<div class="card"><h3>新增持倉</h3><p class="note">要先在下方「存檔設定」貼上 GitHub 存取權杖，才能新增或修改。</p></div>';
-    var h = '<div class="card"><h3>新增／修改持倉</h3>'
+    var h = '<div class="card"><h3>新增／修改持倉</h3>' + (window.Scan ? Scan.ui() : "")
+      + '<h4 style="margin:14px 0 6px">🎤 用念的或打字</h4>'
       + '<p class="note">按手機鍵盤上的麥克風一路念下去，念完按「整理成表格」。每一檔念「代碼、幾股或幾張、成本」就好，日期可以不念；想加備註就說「備註」再接內容。說「總成本」會自動除以股數換成每股成本。換券商時先念券商和台股／美股。<br>例：「華南台股。0050，3000 股，成本 150，備註長期持有。0052，2 張，成本 210。Moomoo。SNXX，50 股，價格 32.5。Moomoo 美元現金 3200。」賣出就說「賣」。</p>'
       + '<textarea id="hin" rows="5" placeholder="在這裡念或打字…">' + esc(ls("cd_draft") || "") + "</textarea>"
       + '<div class="bar" style="margin-top:8px"><button class="btn" id="hparse">整理成表格</button><button class="btn ghost" id="hadd">手動加一列</button></div>';
@@ -434,6 +435,7 @@
         }
         h += '<td><button class="lk" data-rm="' + i + '">移除</button></td></tr>';
         if (bad) h += '<tr class="warn"><td colspan="8" class="neg" style="font-size:12px">' + r.warn.map(esc).join("、") + "，請補上</td></tr>";
+        if (r.ai && r.ai.length) h += '<tr class="ai"><td colspan="8"><span>⚠ ' + r.ai.map(esc).join("；") + "</span></td></tr>";
       });
       h += '</table></div><div class="bar" style="margin-top:8px"><button class="btn" id="hsave"' + (S.busy ? " disabled" : "") + ">" + (S.busy ? "存檔中…" : "確認存入（" + S.rows.length + " 筆）") + '</button><button class="btn ghost" id="hclear">清除表格</button></div>';
     }
@@ -486,13 +488,32 @@
       if (sc && !h.names[lot.sym]) h.names[lot.sym] = sc.name;
     });
     S.busy = true; S.msg = ""; render();
+    var newSyms = S.rows.filter(function (r) { return r.kind === "buy" && r.sym; }).map(function (r) { return String(r.sym).toUpperCase().trim(); });
     saveHoldings(h, "更新持倉（" + S.rows.length + " 筆）").then(function () {
       S.rows = []; ls("cd_draft", null); S.busy = false;
       S.msg = "已存檔。新代碼的價格約 2 分鐘後出現，屆時重新整理頁面。";
       render();
+      return addToWatchlist(newSyms).then(function (added) {
+        if (added.length) { S.msg += "已把 " + added.join("、") + " 加進觀察清單。"; render(); }
+      }, function () {});
     }).catch(function (e) {
       S.busy = false; S.msg = e.message;
       if (e.conflict) loadHoldings().then(render, render); else render();
+    });
+  }
+  // 有持倉就要觀察：新買進、不在觀察清單的代碼加進 watchlist.json（類型讓排程自動判斷）
+  function addToWatchlist(syms) {
+    var have = {};
+    (S.data ? S.data.items : []).forEach(function (r) { have[r.symbol.replace(/\.TW$/, "")] = 1; });
+    var miss = syms.filter(function (s, i) { return s && syms.indexOf(s) === i && !have[s] && s !== "AU9902"; });
+    if (!miss.length) return Promise.resolve([]);
+    return GH.get("watchlist.json").then(function (r) {
+      var list = r.data, inList = {};
+      list.forEach(function (it) { inList[it.symbol.replace(/\.TW$/, "")] = 1; });
+      var add = miss.filter(function (s) { return !inList[s]; });
+      if (!add.length) return [];
+      add.forEach(function (s) { var tw = isTW(s); list.push({ symbol: tw ? s + ".TW" : s, market: tw ? "TW" : "US", type: "auto", group: "" }); });
+      return GH.put("watchlist.json", list, r.sha, "持倉新增，加入觀察：" + add.join(" ")).then(function () { return add; });
     });
   }
   function renameSym(k) {
@@ -527,6 +548,7 @@
 
   function onClick(e) {
     var t = e.target, b;
+    if (window.Scan && Scan.onClick(t)) return;
     if ((b = t.closest("#hchart button"))) { S.chart = b.dataset.ch; ls("cd_chart", S.chart); render(); return; }
     if ((b = t.closest("[data-goto]"))) { goTo(b.dataset.goto); return; }
     if ((b = t.closest("[data-top]")) && !t.closest(".tbd")) { S.topOpen = S.topOpen === b.dataset.top ? null : b.dataset.top; render(); return; }
@@ -608,6 +630,7 @@
   }
   function onInput(e) {
     var t = e.target;
+    if (window.Scan && Scan.onChange(t)) return;
     if (t.id === "hin") { ls("cd_draft", t.value); return; }
     if (t.dataset && t.dataset.i != null) {
       var r = S.rows[+t.dataset.i]; if (!r) return;
@@ -639,5 +662,16 @@
       fetch("data.json?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.data = j; if (j && j.position_cap) CAP = j.position_cap; }, function () {})
     ]).then(render, function (e) { S.msg = e.message; render(); });
   }
-  window.Holdings = { start: start };
+  window.Holdings = {
+    start: start, refresh: function () { render(); }, positions: function () { return S.h ? positions() : []; },
+    // 截圖辨識的結果放進表格（不直接存檔）
+    addRows: function (rows) { rows.forEach(validate); S.rows = S.rows.concat(rows); render(); var tb = document.querySelector("#holdings .ht.edit"); if (tb) tb.scrollIntoView({ behavior: "smooth", block: "start" }); },
+    // 給 AI 的「代碼＝名稱」對照：觀察清單＋持倉
+    knownNames: function () {
+      var m = {};
+      (S.data ? S.data.items : []).forEach(function (r) { m[r.symbol.replace(/\.TW$/, "")] = r.name; });
+      Object.keys((S.h && S.h.names) || {}).forEach(function (k) { if (!m[k]) m[k] = S.h.names[k]; });
+      return Object.keys(m).map(function (k) { return k + "=" + m[k]; }).join("、");
+    }
+  };
 })();
