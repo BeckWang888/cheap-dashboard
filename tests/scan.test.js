@@ -4,12 +4,12 @@ const assert = require("node:assert");
 const fs = require("fs");
 const path = require("path");
 
-function load(pos) {
+function load(pos, fetchFn) {
   const g = {
-    GH: { ls: () => null },
+    GH: { ls: (k) => (k === "cd_gemini_key" ? "test-key" : null) },
     window: { HoldParse: { ACCOUNTS: [{ id: "moomoo", name: "Moomoo", market: "US", ccy: "USD" }, { id: "hn-tw", name: "華南金 台股", market: "TW", ccy: "TWD" }] } },
-    Holdings: { positions: () => pos },
-    document: {}, URL: {}, fetch: () => {},
+    Holdings: { positions: () => pos, knownNames: () => "00708L=期元大S&P黃金正2" },
+    document: { addEventListener() {} }, URL: {}, fetch: fetchFn || (() => {}),
   };
   const src = fs.readFileSync(path.join(__dirname, "../site/scan.js"), "utf8");
   return new Function(...Object.keys(g), src + "\nreturn Scan;")(...Object.values(g));
@@ -64,4 +64,19 @@ test("由券商名稱與市場猜帳戶", () => {
   assert.strictEqual(Scan._guessAcct({ broker: "第一金", market: "unknown", currency: "USD" }), "fb-us");
   assert.strictEqual(Scan._guessAcct({ broker: "moomoo" }), "moomoo");
   assert.strictEqual(Scan._guessAcct({ broker: "unknown", market: "TW" }), "");
+});
+
+test("AI 整理文字：總成本換成每股價格、送出時帶少思考設定", async () => {
+  let body;
+  const reply = { rows: [
+    { kind: "buy", acct: "hn-tw", symbol: "00708L", qty: 1000, price: null, total: 70850, date: null, note: "", confidence: "high", warn: "" },
+    { kind: "cash", acct: "hn-tw", symbol: "", currency: "TWD", amount: 2000000, confidence: "medium", warn: "金額沒聽清楚" },
+  ] };
+  const fetchFn = (url, opt) => { body = JSON.parse(opt.body); return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ candidates: [{ content: { parts: [{ text: JSON.stringify(reply) }] } }] }) }); };
+  const Scan = load([], fetchFn);
+  const rows = await Scan.parseText("華南台股買黃金正二一張總共七萬零八百五十，現金兩百萬");
+  assert.strictEqual(body.generationConfig.thinkingConfig.thinkingLevel, "low");
+  assert.deepStrictEqual([rows[0].kind, rows[0].acct, rows[0].sym, rows[0].qty, rows[0].px], ["buy", "hn-tw", "00708L", 1000, 70.85]);
+  assert.strictEqual(rows[1].kind, "cash");
+  assert.ok(rows[1].ai.some(x => /不太確定/.test(x)));
 });

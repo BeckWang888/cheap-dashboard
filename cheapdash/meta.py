@@ -11,12 +11,25 @@ CANDIDATES = ["SPY", "QQQ", "SOXX", "SMH", "IWM", "XLK", "XLF", "XLE", "TLT", "G
 LEV_WORDS = re.compile(r"(\d(?:\.\d+)?)\s*[xX]\b|ultrapro|ultra\b|leveraged|daily .*bull|bull .*daily", re.I)
 
 
+# 台股槓桿 ETF 名稱關鍵字 → 一倍對應標的（依序比對）
+TW_LEV_MAP = [("黃金", "GC=F"), ("原油", "CL=F"), ("白銀", "SI=F"), ("費城半導體", "SOXX"), ("半導體", "SOXX"),
+              ("NASDAQ", "QQQ"), ("那斯達克", "QQQ"), ("S&P500", "SPY"), ("標普500", "SPY"), ("美債", "TLT")]
+
+
+def _tw_lev_underlying(name: str) -> str:
+    n = (name or "").upper().replace(" ", "")
+    for kw, sym in TW_LEV_MAP:
+        if kw.upper().replace(" ", "") in n:
+            return sym
+    return "0050.TW"
+
+
 def _tw(code: str) -> dict:
     rows = data._finmind("TaiwanStockInfo", code)
     name = rows[-1]["stock_name"] if rows else code
     cat = rows[-1].get("industry_category", "") if rows else ""
-    if code.endswith("L"):          # 台股槓桿 ETF（例如 00631L 正2）大多追蹤台灣 50／加權指數
-        return {"name": name, "type": "leveraged", "underlying": "0050.TW", "x": 2}
+    if code.endswith("L"):          # 台股槓桿 ETF：依名稱找對應標的，找不到才當台灣 50／加權指數
+        return {"name": name, "type": "leveraged", "underlying": _tw_lev_underlying(name), "x": 2}
     is_etf = "ETF" in cat.upper() or "基金" in cat or code.startswith("00")
     return {"name": name, "type": "etf" if is_etf else "stock"}
 

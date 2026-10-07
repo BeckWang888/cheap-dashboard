@@ -6,7 +6,7 @@ var Scan = (function () {
 
   function ls(k, v) { return GH.ls(k, v); }
   function key() { return ls(KEY) || ""; }
-  var VER = "1007c";   // 畫面上顯示，用來確認手機載入的是不是新版
+  var VER = "1007d";   // 畫面上顯示，用來確認手機載入的是不是新版
   // App 內建瀏覽器（Android WebView 的 UA 會有「; wv)」）通常不支援選檔
   function inApp() { var u = navigator.userAgent || ""; return /; wv\)/.test(u) || /FBAN|FBAV|Instagram|Line\//.test(u); }
   function env() {
@@ -34,7 +34,7 @@ var Scan = (function () {
         : '<label class="dim" style="font-size:13px" for="scfile">① 選擇截圖（選完自動辨識）</label><input type="file" id="scfile" class="fin" accept="image/png,image/jpeg,image/webp,image/heic,image/*" multiple>')
       + '<div id="scpaste" class="scpaste" contenteditable="true" inputmode="none" aria-label="貼上截圖">② 或長按這裡 →「貼上」剛複製的截圖</div>'
       + (S.files.length && !S.busy ? '<button class="btn ghost" id="scgo">用剛才的 ' + S.files.length + " 張重新辨識</button>" : "") + "</div>"
-      + (S.msg ? '<p class="note" style="margin:8px 0 0' + (S.err ? ";color:var(--hot)" : "") + '">' + S.msg + "</p>" : "")
+      + '<p class="note" id="scmsg" style="margin:8px 0 0' + (S.err ? ";color:var(--hot)" : "") + (S.msg ? "" : ";display:none") + '">' + S.msg + "</p>"
       + '<p class="dim" style="font-size:12px;margin:8px 0 0">使用 ' + esc(model()) + '（Google 免費額度）・' + esc(env()) + '・版本 ' + VER + ' <button class="lk" id="scset">變更金鑰或模型</button></p>';
     return h + "</div>";
   }
@@ -55,12 +55,12 @@ var Scan = (function () {
     return new Promise(function (ok, fail) {
       var img = new Image(), url = URL.createObjectURL(file);
       img.onload = function () {
-        var max = 3072, s = Math.min(1, max / Math.max(img.width, img.height));
+        var max = 2048, s = Math.min(1, max / Math.max(img.width, img.height));
         var c = document.createElement("canvas");
         c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
         c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
         URL.revokeObjectURL(url);
-        ok(c.toDataURL("image/jpeg", 0.88).split(",")[1]);
+        ok(c.toDataURL("image/jpeg", 0.85).split(",")[1]);
       };
       img.onerror = function () { URL.revokeObjectURL(url); fail(new Error("讀不到圖片：" + file.name)); };
       img.src = url;
@@ -113,16 +113,26 @@ var Scan = (function () {
       + "已知代碼與名稱對照：" + known;
   }
 
-  function call(parts) {
+  var TIMEOUT = 120000;   // 2 分鐘還沒回來就放棄，不會一直卡在「辨識中」
+  function call(parts, schema, noThink) {
     var url = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model()) + ":generateContent";
+    var gc = { responseMimeType: "application/json", responseSchema: schema || SCHEMA, temperature: 0 };
+    // 讀表格不需要深度思考：請模型少想一點，速度快很多；模型不支援這個設定就自動拿掉重試
+    if (!noThink && !ls("cd_gemini_nothink")) gc.thinkingConfig = { thinkingLevel: "low" };
+    var ctl = window.AbortController ? new AbortController() : null, timer = ctl && setTimeout(function () { ctl.abort(); }, TIMEOUT);
     return fetch(url, {
-      method: "POST",
+      method: "POST", signal: ctl ? ctl.signal : undefined,
       headers: { "Content-Type": "application/json", "x-goog-api-key": key() },
-      body: JSON.stringify({ contents: [{ role: "user", parts: parts }], generationConfig: { responseMimeType: "application/json", responseSchema: SCHEMA, temperature: 0 } })
+      body: JSON.stringify({ contents: [{ role: "user", parts: parts }], generationConfig: gc })
+    }).catch(function (e) {
+      if (e && e.name === "AbortError") throw new Error("Gemini 超過 2 分鐘沒有回應（可能免費額度忙碌），請稍後按「重新辨識」，或換成較小的截圖。");
+      throw new Error("連不到 Gemini（" + (e && e.message || e) + "），請確認網路後重試。");
     }).then(function (r) {
+      if (timer) clearTimeout(timer);
       return r.json().catch(function () { return {}; }).then(function (j) {
         if (r.ok) return j;
         var m = (j.error && j.error.message) || "";
+        if (r.status === 400 && gc.thinkingConfig && /thinking/i.test(m)) { ls("cd_gemini_nothink", "1"); return { retry: true }; }
         if (r.status === 429) throw new Error("Gemini 免費額度暫時用完（每分鐘或每天有上限），等一下再試。");
         if (r.status === 400 && /API key/i.test(m)) throw new Error("Gemini 金鑰無效，請按「變更金鑰或模型」重新貼上。");
         if (r.status === 404) throw new Error("找不到模型「" + model() + "」，請按「變更金鑰或模型」→「列出可用模型」換一個。");
@@ -130,6 +140,7 @@ var Scan = (function () {
         throw new Error("Gemini 回應錯誤 " + r.status + "：" + m);
       });
     }).then(function (j) {
+      if (j.retry) return call(parts, schema, true);
       var c = j.candidates && j.candidates[0];
       var txt = c && c.content && (c.content.parts || []).filter(function (p) { return p.text && !p.thought; }).map(function (p) { return p.text; }).join("");
       if (!txt) throw new Error("Gemini 沒有回傳結果" + (c && c.finishReason ? "（" + c.finishReason + "）" : "") + "，請換張清楚一點的截圖再試。");
@@ -213,12 +224,23 @@ var Scan = (function () {
     return { rows: rows, notes: notes, kind: kind };
   }
 
+  // 每秒更新「已等幾秒」，讓使用者知道還在跑
+  var tk = null;
+  function tick(label, hint) {
+    var t0 = Date.now(); if (tk) clearInterval(tk);
+    tk = setInterval(function () {
+      if (!S.busy) { clearInterval(tk); tk = null; return; }
+      var el = document.getElementById("scmsg"), s = Math.round((Date.now() - t0) / 1000);
+      S.msg = label + "… 已 " + s + " 秒（" + hint + "）";
+      if (el) { el.style.display = ""; el.textContent = S.msg; }
+    }, 1000);
+  }
   function run() {
     if (!S.files.length || S.busy) return;
     S.busy = true; S.err = false; S.msg = "讀取圖片中…"; Holdings.refresh();
     var known = Holdings.knownNames();
     Promise.all(S.files.map(toJpeg)).then(function (imgs) {
-      S.msg = "AI 辨識中（約 10～30 秒）…"; Holdings.refresh();
+      S.msg = "AI 辨識中…"; Holdings.refresh(); tick("AI 辨識中", "通常 10～40 秒，最多等 2 分鐘");
       var parts = imgs.map(function (d) { return { inline_data: { mime_type: "image/jpeg", data: d } }; });
       parts.push({ text: prompt(known) });
       return call(parts);
@@ -232,6 +254,60 @@ var Scan = (function () {
       S.msg = head + body + (out.notes.length ? "<br>" + out.notes.join("<br>") : "");
       Holdings.addRows(out.rows);
     }).catch(function (e) { S.busy = false; S.err = true; S.msg = esc(e.message); Holdings.refresh(); });
+  }
+
+  // ---------- 念的或打字的內容 → AI 整理成表格 ----------
+  function textSchema() {
+    return {
+      type: "OBJECT",
+      properties: {
+        rows: {
+          type: "ARRAY",
+          items: {
+            type: "OBJECT",
+            properties: {
+              kind: { type: "STRING", enum: ["buy", "sell", "cash"], description: "buy 買進、sell 賣出、cash 設定帳戶現金餘額" },
+              acct: { type: "STRING", enum: accts().map(function (a) { return a.id; }) },
+              symbol: { type: "STRING", description: "代碼（cash 留空）。台股用數字代碼，美股用大寫代碼" },
+              qty: { type: "NUMBER", nullable: true, description: "股數（1 張＝1000 股）" },
+              price: { type: "NUMBER", nullable: true, description: "每股價格（含手續費的成本或賣出實收）" },
+              total: { type: "NUMBER", nullable: true, description: "使用者說的總金額／總成本（沒有就 null）" },
+              date: { type: "STRING", nullable: true, description: "YYYY-MM-DD，沒說就 null" },
+              note: { type: "STRING" },
+              currency: { type: "STRING", enum: ["TWD", "USD"], nullable: true, description: "cash 的幣別" },
+              amount: { type: "NUMBER", nullable: true, description: "cash 的餘額" },
+              confidence: { type: "STRING", enum: ["high", "medium", "low"] },
+              warn: { type: "STRING", description: "不確定的地方，沒有就空字串" }
+            },
+            required: ["kind", "acct", "confidence"]
+          }
+        }
+      },
+      required: ["rows"]
+    };
+  }
+  function parseText(text) {
+    if (!key()) return Promise.reject(new Error("還沒設定 Gemini 金鑰（在上方「上傳截圖辨識」設定）。"));
+    var today = new Date().toISOString().slice(0, 10);
+    var p = "把台灣投資人用口語念或打的持倉異動，整理成指定的 JSON。今天是 " + today + "。\n"
+      + "帳戶（acct 只能用這些 id）：" + accts().map(function (a) { return a.id + "＝" + a.name + "（" + (a.market === "TW" ? "台股，台幣" : "美股，美元") + "）"; }).join("；") + "。\n"
+      + "規則：\n- 「華南」「第一」要配合台股／美股判斷帳戶；只說券商沒說台美股時，看代碼：數字代碼是台股、英文代碼是美股。\n"
+      + "- 1 張＝1000 股；「零股」就是股數。\n- 價格是每股；只說總成本／總金額時填 total。\n"
+      + "- 「買」「加碼」→ buy；「賣」「出清」「減碼」→ sell。\n"
+      + "- 只有使用者明確說「現金／餘額是多少」才輸出 cash（買賣造成的現金增減，網站會自動計算，不要另外輸出 cash）。\n"
+      + "- 中文名稱請對照代碼表換成代碼；對不到就保留名稱並把 confidence 設為 low。\n"
+      + "- 不確定的地方不要猜，confidence 設 low 並在 warn 說明。\n"
+      + "代碼對照：" + Holdings.knownNames() + "\n\n使用者的內容：\n" + text;
+    return call([{ text: p }], textSchema()).then(function (res) {
+      return (res.rows || []).map(function (x) {
+        var a = accts().filter(function (y) { return y.id === x.acct; })[0], f = [];
+        if (x.confidence !== "high") f.push("AI 不太確定" + (x.warn ? "：" + x.warn : "") + "，請核對");
+        else if (x.warn) f.push(x.warn);
+        if (x.kind === "cash") return { kind: "cash", acct: x.acct, ccy: x.currency || (a ? a.ccy : "TWD"), amount: x.amount, warn: [], ai: f };
+        var qty = Number(x.qty) || null, px = x.price > 0 ? x.price : (x.total > 0 && qty ? x.total / qty : null);
+        return { kind: x.kind, acct: x.acct, sym: normSym(x.symbol), date: x.date || "", qty: qty, px: r2(px), note: x.note || "", warn: [], ai: f };
+      });
+    });
   }
 
   // ---------- 事件（由持倉頁轉交） ----------
@@ -277,5 +353,5 @@ var Scan = (function () {
   }
 
   document.addEventListener("paste", onPaste);
-  return { ui: ui, onClick: onClick, onChange: onChange, _toRows: toRows, _guessAcct: guessAcct };
+  return { ui: ui, onClick: onClick, onChange: onChange, parseText: parseText, hasKey: function () { return !!key(); }, _toRows: toRows, _guessAcct: guessAcct };
 })();

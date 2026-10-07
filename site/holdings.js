@@ -6,7 +6,7 @@
   var ACCTS = P.ACCOUNTS;
   var REPO = GH.REPO, ls = GH.ls, token = GH.token;
 
-  var S = { h: null, sha: null, prices: null, data: null, ccy: "USD", open: {}, rows: [], msg: "", busy: false, confirmDel: null, renaming: null };
+  var S = { h: null, sha: null, prices: null, data: null, ccy: "USD", open: {}, rows: [], msg: "", busy: false, confirmDel: null, renaming: null, cashAdj: true };
   S.ccy = ls("cd_ccy") === "TWD" ? "TWD" : "USD";
   S.chart = ls("cd_chart") || "alloc";
 
@@ -83,8 +83,8 @@
     return { name: S.h.names[sym] || sym, type: "stock", theme: "其他", group: "", cur: q && q["s_" + v] ? q["s_" + v] : null };
   }
   function riskOf(m, sym) {
-    if (sym === "AU9901" || m.theme === "黃金") return "黃金";
     if (m.type === "leveraged") return "槓桿 ETF";
+    if (sym === "AU9901" || m.theme === "黃金") return "黃金";
     if (m.type === "stock") return "個股";
     return /大盤|全球/.test(m.theme) ? "大盤 ETF" : "產業／主題 ETF";
   }
@@ -415,7 +415,8 @@
       + '<h4 style="margin:14px 0 6px">🎤 用念的或打字</h4>'
       + '<p class="note">按手機鍵盤上的麥克風一路念下去，念完按「整理成表格」。每一檔念「代碼、幾股或幾張、成本」就好，日期可以不念；想加備註就說「備註」再接內容。說「總成本」會自動除以股數換成每股成本。換券商時先念券商和台股／美股。<br>例：「華南台股。0050，3000 股，成本 150，備註長期持有。0052，2 張，成本 210。Moomoo。SNXX，50 股，價格 32.5。Moomoo 美元現金 3200。」賣出就說「賣」。</p>'
       + '<textarea id="hin" rows="5" placeholder="在這裡念或打字…">' + esc(ls("cd_draft") || "") + "</textarea>"
-      + '<div class="bar" style="margin-top:8px"><button class="btn" id="hparse">整理成表格</button><button class="btn ghost" id="hadd">手動加一列</button></div>';
+      + '<div class="bar" style="margin-top:8px">' + (window.Scan && Scan.hasKey() ? '<button class="btn" id="haiparse"' + (S.aiBusy ? " disabled" : "") + ">" + (S.aiBusy ? "AI 整理中…" : "🤖 AI 整理") + '</button><button class="btn ghost" id="hparse">一般整理</button>' : '<button class="btn" id="hparse">整理成表格</button>') + '<button class="btn ghost" id="hadd">手動加一列</button></div>'
+      + (window.Scan && Scan.hasKey() ? '<p class="dim" style="font-size:12px;margin:6px 0 0">「AI 整理」用 Gemini 理解口語（例：「華南台股今天買了黃金正二一張，七十點八五」），通常幾秒；「一般整理」不用網路，但要照固定說法。</p>' : "");
     if (S.rows.length) {
       h += '<div class="scroll"><table class="ht edit"><tr><th>類型</th><th>帳戶</th><th>代碼</th><th>股數</th><th>價格／金額</th><th>日期（選填）</th><th>備註（選填）</th><th></th></tr>';
       S.rows.forEach(function (r, i) {
@@ -437,7 +438,16 @@
         if (bad) h += '<tr class="warn"><td colspan="8" class="neg" style="font-size:12px">' + r.warn.map(esc).join("、") + "，請補上</td></tr>";
         if (r.ai && r.ai.length) h += '<tr class="ai"><td colspan="8"><span>⚠ ' + r.ai.map(esc).join("；") + "</span></td></tr>";
       });
-      h += '</table></div><div class="bar" style="margin-top:8px"><button class="btn" id="hsave"' + (S.busy ? " disabled" : "") + ">" + (S.busy ? "存檔中…" : "確認存入（" + S.rows.length + " 筆）") + '</button><button class="btn ghost" id="hclear">清除表格</button></div>';
+      var cd = cashDelta(S.rows), cdk = Object.keys(cd);
+      h += '</table></div>';
+      if (cdk.length || S.rows.some(function (r) { return r.kind === "buy" || r.kind === "sell"; })) {
+        h += '<label class="t" style="margin-top:8px"><input type="checkbox" id="hcashadj"' + (S.cashAdj ? " checked" : "") + '> 買賣時同時調整帳戶現金（價格請填含手續費的成本／賣出實收）</label>';
+        if (S.cashAdj && cdk.length) h += '<div class="note" style="margin:4px 0 0">' + cdk.map(function (k) {
+          var p = k.split("|"), cur = Number((S.h.cash[p[0]] || {})[p[1]]) || 0;
+          return esc(acctName(p[0])) + " 現金 " + signed(cd[k], p[1]) + "（" + money(cur, p[1]) + " → " + money(cur + cd[k], p[1]) + "）";
+        }).join("<br>") + "</div>";
+      }
+      h += '<div class="bar" style="margin-top:8px"><button class="btn" id="hsave"' + (S.busy ? " disabled" : "") + ">" + (S.busy ? "存檔中…" : "確認存入（" + S.rows.length + " 筆）") + '</button><button class="btn ghost" id="hclear">清除表格</button></div>';
     }
     if (S.msg) h += '<p class="note" style="margin-top:8px">' + esc(S.msg) + "</p>";
     return h + "</div>";
@@ -473,6 +483,7 @@
     var ok = S.rows.map(validate).every(Boolean);
     if (!ok) { S.msg = "有欄位沒填完整（紅色列），補上後再存。"; render(); return; }
     var h = JSON.parse(JSON.stringify(S.h));
+    var cd = S.cashAdj ? cashDelta(S.rows) : {};
     S.rows.forEach(function (r) {
       if (r.kind === "cash") {
         h.cash[r.acct] = h.cash[r.acct] || {};
@@ -480,12 +491,19 @@
         return;
       }
       var lot = { id: r.id || "l" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), acct: r.acct, sym: String(r.sym).toUpperCase().trim(),
-        date: r.date || "", qty: (r.kind === "sell" ? -1 : 1) * Number(r.qty), px: Number(r.px) };
+        date: normDate(r.date), qty: (r.kind === "sell" ? -1 : 1) * Number(r.qty), px: Number(r.px) };
       if (r.note && String(r.note).trim()) lot.note = String(r.note).trim();
+      var old = r.id ? S.h.lots.filter(function (l) { return l.id === r.id; })[0] : null;
+      if (S.cashAdj ? (!old || old.cashAdj) : (old && old.cashAdj)) lot.cashAdj = true;   // 這筆有跟著調整現金，刪除或修改時才會反向調整
       var at = h.lots.findIndex(function (l) { return l.id === lot.id; });
       if (at >= 0) h.lots[at] = lot; else h.lots.push(lot);
       var sc = S.data && S.data.items.filter(function (it) { return it.symbol.replace(/\.TW$/, "") === lot.sym; })[0];
       if (sc && !h.names[lot.sym]) h.names[lot.sym] = sc.name;
+    });
+    Object.keys(cd).forEach(function (k) {
+      var p = k.split("|");
+      h.cash[p[0]] = h.cash[p[0]] || {};
+      h.cash[p[0]][p[1]] = Math.round(((Number(h.cash[p[0]][p[1]]) || 0) + cd[k]) * 100) / 100;
     });
     S.busy = true; S.msg = ""; render();
     var newSyms = S.rows.filter(function (r) { return r.kind === "buy" && r.sym; }).map(function (r) { return String(r.sym).toUpperCase().trim(); });
@@ -500,6 +518,34 @@
       S.busy = false; S.msg = e.message;
       if (e.conflict) loadHoldings().then(render, render); else render();
     });
+  }
+  // 買賣對現金的影響（帳戶|幣別 → 金額）：新買進扣、賣出加；修改有調整過現金的紀錄只算差額；
+  // 同一批有明確填寫該帳戶現金餘額時，以填寫的為準，不再自動調整。
+  // 日期整理成 YYYY-MM-DD：「10.7」「10/7」「10月7日」「2026.10.7」都可以；沒寫年份用今年（未來日期算去年）
+  function normDate(v) {
+    v = String(v || "").trim(); if (!v) return "";
+    var m = v.match(/^(\d{4})\s*[.\/\-年]\s*(\d{1,2})\s*[.\/\-月]\s*(\d{1,2})/), p2 = function (n) { return (n < 10 ? "0" : "") + n; };
+    if (m) return m[1] + "-" + p2(+m[2]) + "-" + p2(+m[3]);
+    m = v.match(/^(\d{1,2})\s*[.\/\-月]\s*(\d{1,2})/);
+    if (m) { var t = new Date(), y = t.getFullYear(); if (new Date(y, +m[1] - 1, +m[2]) > t) y--; return y + "-" + p2(+m[1]) + "-" + p2(+m[2]); }
+    return v;
+  }
+  function lotCcy(l) { var a = ACCTS.filter(function (x) { return x.id === l.acct; })[0]; return a && a.market === "TW" ? "TWD" : isTW(l.sym) ? "TWD" : "USD"; }
+  function cashDelta(rows) {
+    var d = {}, fixed = {};
+    rows.forEach(function (r) { if (r.kind === "cash" && r.acct) fixed[r.acct + "|" + r.ccy] = 1; });
+    rows.forEach(function (r) {
+      if ((r.kind !== "buy" && r.kind !== "sell") || !r.acct || !(Number(r.qty) > 0) || !(Number(r.px) > 0)) return;
+      var ccy = lotCcy({ acct: r.acct, sym: String(r.sym || "") }), k = r.acct + "|" + ccy;
+      if (fixed[k]) return;
+      if ((S.h.cash[r.acct] || {})[ccy] == null) return;   // 沒記錄現金的帳戶（例如 Moomoo）不自動調整
+      var v = -(r.kind === "sell" ? -1 : 1) * Number(r.qty) * Number(r.px);
+      var old = r.id ? S.h.lots.filter(function (l) { return l.id === r.id; })[0] : null;
+      if (old) { if (!old.cashAdj) return; v += old.qty * old.px; if (old.acct !== r.acct) return; }
+      if (Math.abs(v) > 1e-9) d[k] = (d[k] || 0) + v;
+    });
+    Object.keys(d).forEach(function (k) { if (Math.abs(d[k]) < 0.005) delete d[k]; });
+    return d;
   }
   // 有持倉就要觀察：新買進、不在觀察清單的代碼加進 watchlist.json（類型讓排程自動判斷）
   function addToWatchlist(syms) {
@@ -529,10 +575,16 @@
     }).catch(function (e) { S.msg = e.message; if (e.conflict) loadHoldings().then(render, render); else render(); });
   }
   function deleteLot(id) {
-    var h = JSON.parse(JSON.stringify(S.h));
-    h.lots = h.lots.filter(function (l) { return l.id !== id; });
+    var h = JSON.parse(JSON.stringify(S.h)), l = h.lots.filter(function (x) { return x.id === id; })[0], back = "";
+    h.lots = h.lots.filter(function (x) { return x.id !== id; });
+    if (l && l.cashAdj) {
+      var ccy = lotCcy(l), v = l.qty * l.px;   // 買進 qty>0：退回現金；賣出 qty<0：扣回
+      h.cash[l.acct] = h.cash[l.acct] || {};
+      h.cash[l.acct][ccy] = Math.round(((Number(h.cash[l.acct][ccy]) || 0) + v) * 100) / 100;
+      back = "，" + acctName(l.acct) + " 現金 " + (v > 0 ? "+" : "") + money(v, ccy);
+    }
     S.confirmDel = null;
-    saveHoldings(h, "刪除一筆持倉").then(function () { S.msg = "已刪除。"; render(); }).catch(function (e) { S.msg = e.message; render(); });
+    saveHoldings(h, "刪除一筆持倉").then(function () { S.msg = "已刪除" + back + "。"; render(); }).catch(function (e) { S.msg = e.message; render(); });
   }
 
   // 從持倉跳到便宜度頁並展開那一檔（清掉篩選，確保看得到）
@@ -563,6 +615,17 @@
       S.rows = S.rows.concat(got);
       S.msg = got.length ? "整理出 " + got.length + " 筆，檢查後按「確認存入」。" : "沒有認出任何代碼。每一檔要先念代碼或名稱，例如「0050」「台積電」「TSLA」。";
       render(); return;
+    }
+    if (t.closest("#haiparse")) {
+      var txt2 = document.getElementById("hin").value.trim();
+      if (!txt2 || S.aiBusy) return;
+      S.aiBusy = true; S.msg = "AI 整理中…"; render();
+      Scan.parseText(txt2).then(function (rows) {
+        S.aiBusy = false; rows.forEach(validate); S.rows = S.rows.concat(rows);
+        S.msg = rows.length ? "AI 整理出 " + rows.length + " 筆，黃色是要核對的地方；確認後按「確認存入」（買賣會同時調整現金）。" : "AI 沒有整理出任何異動，換個說法再試，或用「一般整理」。";
+        render();
+      }).catch(function (e) { S.aiBusy = false; S.msg = e.message; render(); });
+      return;
     }
     if (t.closest("#hadd")) { S.rows.push({ kind: "buy", acct: "", sym: "", date: "", qty: null, px: null, note: "", warn: [] }); render(); return; }
     if (t.closest("#hclear")) { S.rows = []; S.msg = ""; render(); return; }
@@ -632,11 +695,13 @@
     var t = e.target;
     if (window.Scan && Scan.onChange(t)) return;
     if (t.id === "hin") { ls("cd_draft", t.value); return; }
+    if (t.id === "hcashadj") { S.cashAdj = t.checked; render(); return; }
     if (t.dataset && t.dataset.i != null) {
       var r = S.rows[+t.dataset.i]; if (!r) return;
       var f = t.dataset.f;
       r[f] = (f === "qty" || f === "px" || f === "amount") ? (t.value === "" ? null : Number(t.value)) : t.value;
       if (f === "kind" || f === "acct" || f === "ccy") { validate(r); render(); }
+      else if (e.type === "change" && (f === "qty" || f === "px")) render();
     }
   }
 

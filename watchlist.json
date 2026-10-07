@@ -430,7 +430,8 @@
   "type": "leveraged",
   "group": "",
   "name": "期元大S&P黃金正2",
-  "underlying": "0050.TW",
-  "x": 2
+  "underlying": "GC=F",
+  "x": 2,
+  "theme": "黃金"
  }
 ]
