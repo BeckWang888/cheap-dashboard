@@ -662,7 +662,32 @@
       fetch("data.json?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.data = j; if (j && j.position_cap) CAP = j.position_cap; }, function () {})
     ]).then(render, function (e) { S.msg = e.message; render(); });
   }
+  // 便宜度頁用：先在背景載入持倉與現價（不畫持倉頁）
+  function preload() {
+    var ps = [];
+    if (!S.h) ps.push(loadHoldings());
+    if (!S.prices) ps.push(fetch("prices.json?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.prices = j; }));
+    return Promise.all(ps);
+  }
+  // 某代碼跨帳戶合計（原幣別）＋各帳戶明細；沒有持有回傳 null
+  var memo = { key: null, sm: null };
+  function held(sym) {
+    if (!S.h) return null;
+    var ps = positions().filter(function (p) { return p.sym === sym; });
+    if (!ps.length) return null;
+    if (memo.key !== S.h || memo.p !== S.prices) { memo = { key: S.h, p: S.prices, sm: summarize() }; }
+    var qty = 0, cost = 0, mv = 0, hasPx = true;
+    ps.forEach(function (p) { qty += p.qty; cost += p.cost; if (p.mv == null) hasPx = false; else mv += p.mv; });
+    var price = ps[0].price, mvT = ps[0].mv != null ? toTWD(mv, ps[0].ccy) : null;
+    return { sym: sym, ccy: ps[0].ccy, qty: qty, avg: qty ? cost / qty : null, cost: cost, price: price,
+      mv: hasPx ? mv : null, pnl: hasPx ? mv - cost : null, ret: hasPx && cost ? mv / cost - 1 : null,
+      share: mvT != null && memo.sm.total ? mvT / memo.sm.total : null,
+      accts: ps.sort(function (a, b) { return b.qty - a.qty; }).map(function (p) { return { name: acctName(p.acct), qty: p.qty, avg: p.avg, ret: p.cost && p.mv != null ? p.mv / p.cost - 1 : null }; }) };
+  }
+
   window.Holdings = {
+    preload: preload, held: held,
+    openTop: function (sym) { S.chart = "top"; ls("cd_chart", "top"); S.topOpen = sym; },
     start: start, refresh: function () { render(); }, positions: function () { return S.h ? positions() : []; },
     // 截圖辨識的結果放進表格（不直接存檔）
     addRows: function (rows) { rows.forEach(validate); S.rows = S.rows.concat(rows); render(); var tb = document.querySelector("#holdings .ht.edit"); if (tb) tb.scrollIntoView({ behavior: "smooth", block: "start" }); },

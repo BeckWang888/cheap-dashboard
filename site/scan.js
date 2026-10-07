@@ -17,9 +17,10 @@ var Scan = (function () {
     h += '<p class="note" style="margin:0 0 8px">上傳券商的<b>庫存／持股畫面</b>或<b>成交回報</b>截圖（可一次選多張，同一個帳戶）。AI 讀完會和帳上比對，把「新買、賣出、股數或成本變動」放進下面的表格，<b>檢查、修改後才會存</b>。</p>'
       + '<div class="scanr"><label>帳戶<select id="scacct"><option value="">讓 AI 判斷</option>' + accts().map(function (a) { return '<option value="' + a.id + '"' + (a.id === S.acct ? " selected" : "") + ">" + esc(a.name) + "</option>"; }).join("") + "</select></label>"
       + '<label>截圖內容<select id="scmode">' + [["auto", "讓 AI 判斷"], ["holdings", "庫存／持股畫面"], ["trades", "成交回報／交易明細"]].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === S.mode ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select></label></div>"
-      + '<div class="bar" style="margin-top:8px"><label class="btn ghost" style="cursor:pointer">選擇截圖<input type="file" id="scfile" accept="image/*" multiple hidden></label>'
-      + '<span class="dim" style="font-size:13px">' + (S.files.length ? "已選 " + S.files.length + " 張" : "還沒選") + "</span>"
-      + '<button class="btn" id="scgo"' + (S.busy || !S.files.length ? " disabled" : "") + ">" + (S.busy ? "辨識中…" : "開始辨識") + "</button></div>"
+      // 上傳欄位直接蓋在按鈕上（透明），點到的就是真正的檔案欄位：有些手機瀏覽器不支援用 label 打開隱藏的欄位
+      + '<div class="bar" style="margin-top:8px"><span class="btn upl' + (S.busy ? " dis" : "") + '">' + (S.busy ? "辨識中…" : "📷 選擇截圖並辨識")
+      + (S.busy ? "" : '<input type="file" id="scfile" accept="image/*" multiple aria-label="選擇截圖">') + "</span>"
+      + (S.files.length && !S.busy ? '<button class="btn ghost" id="scgo">用剛才的 ' + S.files.length + " 張重新辨識</button>" : "") + "</div>"
       + (S.msg ? '<p class="note" style="margin:8px 0 0' + (S.err ? ";color:var(--hot)" : "") + '">' + S.msg + "</p>" : "")
       + '<p class="dim" style="font-size:12px;margin:8px 0 0">使用 ' + esc(model()) + '（Google 免費額度）。<button class="lk" id="scset">變更金鑰或模型</button></p>';
     return h + "</div>";
@@ -243,7 +244,11 @@ var Scan = (function () {
     return false;
   }
   function onChange(t) {
-    if (t.id === "scfile") { S.files = [].slice.call(t.files || []); S.msg = ""; Holdings.refresh(); return true; }
+    if (t.id === "scfile") {   // 選完圖就直接開始辨識（input 與 change 兩個事件都會進來，run() 會擋掉重複）
+      var fs = [].slice.call(t.files || []);
+      if (fs.length && !S.busy) { S.files = fs; S.msg = ""; run(); }
+      return true;
+    }
     if (t.id === "scacct") { S.acct = t.value; return true; }
     if (t.id === "scmode") { S.mode = t.value; return true; }
     return false;
