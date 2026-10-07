@@ -170,11 +170,12 @@
     if (kind === "top") {
       var list = sm.syms.slice().sort(function (a, b) { return b.mv - a.mv; });
       var max = list.length ? list[0].mv : 1;
-      h += '<p class="note" style="margin:10px 0 6px">每檔佔總資產的比例（同一檔在不同券商合併計算）。紅線是單一持股上限 ' + Math.round(CAP * 100) + "%。</p><div class='topb'>";
+      h += '<p class="note" style="margin:10px 0 6px">每檔佔總資產的比例（同一檔在不同券商合併計算）。紅線是單一持股上限 ' + Math.round(CAP * 100) + "%。<b>點一檔看它在哪些帳戶、股數、成本與損益。</b></p><div class='topb'>";
       list.forEach(function (s) {
-        var w = s.mv / sm.total, over = w > CAP;
-        h += '<div class="tb"><span class="tbn"><b>' + esc(s.sym) + '</b> <span class="dim">' + esc(s.m.name || "") + '</span></span><span class="tbbar"><i style="width:' + (s.mv / max * 100).toFixed(1) + "%;background:" + (over ? "var(--hot)" : "var(--c1)") + '"></i>'
+        var w = s.mv / sm.total, over = w > CAP, on = S.topOpen === s.sym;
+        h += '<div class="tb tbc' + (on ? " on" : "") + '" data-top="' + esc(s.sym) + '" tabindex="0" role="button" aria-expanded="' + on + '"><span class="tbn"><b>' + esc(s.sym) + '</b> <span class="dim">' + esc(s.m.name || "") + '</span></span><span class="tbbar"><i style="width:' + (s.mv / max * 100).toFixed(1) + "%;background:" + (over ? "var(--hot)" : "var(--c1)") + '"></i>'
           + '<u style="left:' + Math.min(100, CAP * sm.total / max * 100).toFixed(1) + '%"></u></span><span class="tbv' + (over ? " neg" : "") + '">' + (w * 100).toFixed(1) + "%" + (over ? " ⚠" : "") + "</span></div>";
+        if (on) h += topDetail(s, sm);
       });
       return h + "</div></div>";
     }
@@ -182,6 +183,43 @@
     var center = kind === "theme" ? ["股票部位", compact(sm.stock)] : ["總資產", compact(sm.total)];
     var notes = { alloc: "台股、美股與現金的比例。", risk: "由穩到積極：大盤 ETF、產業 ETF、個股、槓桿 ETF；現金與黃金是緩衝。", theme: "只算股票部位，依產業或主題分類。", acct: "每個帳戶的總值（含現金）。" };
     return h + '<div class="dnw">' + donut(sl, center[0], center[1]) + legend(sl) + "</div><p class='note' style='margin:4px 0 0'>" + notes[kind] + "</p></div>";
+  }
+
+  // 持股排行展開：這檔在各帳戶的合計與明細（股數、成本、市值、損益）
+  function topDetail(s, sm) {
+    var ps = sm.pos.filter(function (p) { return p.sym === s.sym; }).sort(function (a, b) { return (b.mv || 0) - (a.mv || 0); });
+    if (!ps.length) return "";
+    var ccy = ps[0].ccy, qty = 0, cost = 0, mv = 0, today = 0;
+    ps.forEach(function (p) { qty += p.qty; cost += p.cost; mv += p.mv || 0; today += p.today || 0; });
+    var avg = qty ? cost / qty : null, price = s.q ? s.q.price : null, c = s.m.cur, w = s.mv / (sm.total || 1);
+    var twd = ccy === "USD" ? '<span class="dim" style="font-size:12px"> ≈ ' + compact(s.mv) + "</span>" : "";
+    var h = '<div class="tbd">'
+      + '<div class="kv"><div>帳戶<b>' + ps.length + " 個</b></div><div>合計股數<b>" + num(qty, 4) + "</b></div>"
+      + "<div>平均成本<b>" + num(avg, 2) + "</b></div><div>現價<b>" + (price == null ? "—" : num(price, 2)) + "</b></div>"
+      + "<div>漲幅（相對成本）<b>" + pct(avg && price ? price / avg - 1 : null) + "</b></div>"
+      + "<div>今日<b>" + pct(s.q ? s.q.chg : null, 2) + "</b></div>"
+      + "<div>市值<b>" + money(mv, ccy) + twd + "</b></div><div>損益<b>" + signed(mv - cost, ccy) + "</b></div>"
+      + "<div>今日損益<b>" + signed(today, ccy) + "</b></div><div>佔總資產<b>" + (w * 100).toFixed(1) + "%</b></div>"
+      + "<div>目標比重<b>" + targetCell(s.sym, null, sm.total, s.mv) + "</b></div>"
+      + "<div>便宜度<b>" + (c && c.score != null ? c.score.toFixed(0) + " " + esc(c.level) : "資料不足") + "</b></div></div>";
+    if (avg && price) {
+      var lo = Math.min(avg, price), hi = Math.max(avg, price), pad = (hi - lo) * 0.25 || hi * 0.05;
+      var X = function (v) { return ((v - (lo - pad)) / (hi - lo + 2 * pad) * 100); };
+      h += '<div class="cp"><div class="cpb"><i class="' + (price >= avg ? "up" : "dn2") + '" style="left:' + X(lo).toFixed(1) + "%;width:" + (X(hi) - X(lo)).toFixed(1) + '%"></i>'
+        + '<u style="left:' + X(avg).toFixed(1) + '%"></u><u class="now" style="left:' + X(price).toFixed(1) + '%"></u></div>'
+        + '<div class="cpl"><span>平均成本 ' + num(avg, 2) + "</span><span>現價 " + num(price, 2) + "</span></div></div>";
+    }
+    h += '<div class="tac"><span class="dim" style="font-size:12px">各帳戶明細</span>';
+    ps.forEach(function (p) {
+      h += '<div class="ta"><div class="ta1"><span><i class="sw2" style="background:' + (ACCT_COLOR[p.acct] || "var(--cnull)") + '"></i><b>' + esc(acctName(p.acct)) + "</b></span><b>" + pct(p.cost && p.pnl != null ? p.pnl / p.cost : null) + "</b></div>"
+        + '<div class="ta2">' + num(p.qty, 4) + " 股・均價 " + num(p.avg, 2) + "・市值 " + (p.mv == null ? "—" : money(p.mv, ccy)) + "・損益 " + signed(p.pnl, ccy)
+        + (qty ? "・佔這檔 " + (p.qty / qty * 100).toFixed(0) + "%" : "") + "</div></div>";
+    });
+    h += "</div>";
+    var inWl = S.data && S.data.items.some(function (r) { return r.symbol.replace(/\.TW$/, "") === s.sym; });
+    h += '<div class="pd-act">' + (inWl ? '<button class="lk" data-goto="' + esc(s.sym) + '">看走勢圖與買點訊號 →</button>' : "")
+      + '<span class="dim" style="font-size:12px">' + (ccy === "USD" ? "金額為美元，" : "") + "買賣紀錄與修改請到下方「各帳戶」展開。</span></div>";
+    return h + "</div>";
   }
 
   // ---------- 損益與漲跌 ----------
@@ -476,9 +514,22 @@
     saveHoldings(h, "刪除一筆持倉").then(function () { S.msg = "已刪除。"; render(); }).catch(function (e) { S.msg = e.message; render(); });
   }
 
+  // 從持倉跳到便宜度頁並展開那一檔（清掉篩選，確保看得到）
+  function goTo(sym) {
+    var it = window.D && window.D.items.filter(function (r) { return r.symbol.replace(/\.TW$/, "") === sym; })[0];
+    if (!it || !window.st) return;
+    st.m = "all"; st.only = false; st.cand = false; st.sum = null; st.open = it.symbol;
+    ["only", "cand"].forEach(function (id) { var x = document.getElementById(id); if (x) x.checked = false; });
+    [].forEach.call(document.querySelectorAll("#tabs button"), function (x) { x.setAttribute("aria-pressed", x.dataset.m === "all"); });
+    location.hash = "";
+    setTimeout(function () { window.render(); var row = document.querySelector('.row.open'); if (row) row.scrollIntoView({ block: "start" }); }, 0);
+  }
+
   function onClick(e) {
     var t = e.target, b;
     if ((b = t.closest("#hchart button"))) { S.chart = b.dataset.ch; ls("cd_chart", S.chart); render(); return; }
+    if ((b = t.closest("[data-goto]"))) { goTo(b.dataset.goto); return; }
+    if ((b = t.closest("[data-top]")) && !t.closest(".tbd")) { S.topOpen = S.topOpen === b.dataset.top ? null : b.dataset.top; render(); return; }
     if ((b = t.closest("#hpnl button"))) { S.pnlMode = b.dataset.pm; render(); return; }
     if (t.closest("#hpnlall")) { S.pnlAll = !S.pnlAll; render(); return; }
     if (t.closest("#hadvall")) { S.advAll = !S.advAll; render(); return; }
