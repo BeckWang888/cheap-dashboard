@@ -423,5 +423,11 @@
   "type": "etf",
   "group": "",
   "theme": "AI／軟體"
+ },
+ {
+  "symbol": "00708L.TW",
+  "market": "TW",
+  "type": "auto",
+  "group": ""
  }
 ]
