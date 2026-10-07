@@ -65,6 +65,8 @@ jobs:
             git rebase --abort 2>/dev/null || true
             sleep 5
           done
+      - name: 程式檔加上版本號（避免手機瀏覽器用到舊的快取）
+        run: sed -i "s/?v=dev/?v=${GITHUB_RUN_ID}/g" site/index.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site

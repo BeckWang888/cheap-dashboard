@@ -6,6 +6,17 @@ var Scan = (function () {
 
   function ls(k, v) { return GH.ls(k, v); }
   function key() { return ls(KEY) || ""; }
+  var VER = "1007c";   // 畫面上顯示，用來確認手機載入的是不是新版
+  // App 內建瀏覽器（Android WebView 的 UA 會有「; wv)」）通常不支援選檔
+  function inApp() { var u = navigator.userAgent || ""; return /; wv\)/.test(u) || /FBAN|FBAV|Instagram|Line\//.test(u); }
+  function env() {
+    var u = navigator.userAgent || "", m;
+    if (inApp()) return "App 內建瀏覽器";
+    if ((m = /SamsungBrowser\/(\d+)/.exec(u))) return "三星網際網路 " + m[1];
+    if ((m = /Chrome\/(\d+)/.exec(u))) return "Chrome " + m[1];
+    if ((m = /Version\/(\d+).*Safari/.exec(u))) return "Safari " + m[1];
+    return "瀏覽器";
+  }
   function model() { return ls(MODEL) || DEF_MODEL; }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function accts() { return window.HoldParse.ACCOUNTS; }
@@ -17,12 +28,14 @@ var Scan = (function () {
     h += '<p class="note" style="margin:0 0 8px">上傳券商的<b>庫存／持股畫面</b>或<b>成交回報</b>截圖（可一次選多張，同一個帳戶）。AI 讀完會和帳上比對，把「新買、賣出、股數或成本變動」放進下面的表格，<b>檢查、修改後才會存</b>。</p>'
       + '<div class="scanr"><label>帳戶<select id="scacct"><option value="">讓 AI 判斷</option>' + accts().map(function (a) { return '<option value="' + a.id + '"' + (a.id === S.acct ? " selected" : "") + ">" + esc(a.name) + "</option>"; }).join("") + "</select></label>"
       + '<label>截圖內容<select id="scmode">' + [["auto", "讓 AI 判斷"], ["holdings", "庫存／持股畫面"], ["trades", "成交回報／交易明細"]].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === S.mode ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select></label></div>"
-      // 上傳欄位直接蓋在按鈕上（透明），點到的就是真正的檔案欄位：有些手機瀏覽器不支援用 label 打開隱藏的欄位
-      + '<div class="bar" style="margin-top:8px"><span class="btn upl' + (S.busy ? " dis" : "") + '">' + (S.busy ? "辨識中…" : "📷 選擇截圖並辨識")
-      + (S.busy ? "" : '<input type="file" id="scfile" accept="image/*" multiple aria-label="選擇截圖">') + "</span>"
+      // 直接用瀏覽器原生的檔案欄位（不隱藏、不疊按鈕），相容性最好；選完自動辨識
+      + (inApp() ? '<p class="note" style="margin:8px 0 0;color:var(--hot)">⚠ 你現在是在 App 內建的瀏覽器開這個網頁，通常<b>不能選照片</b>。請按右上角「⋮」選「用 Chrome 開啟」，或直接在 Chrome 打開網址。</p>' : "")
+      + '<div class="scup">' + (S.busy ? '<span class="btn dis">辨識中…</span>'
+        : '<label class="dim" style="font-size:13px" for="scfile">① 選擇截圖（選完自動辨識）</label><input type="file" id="scfile" class="fin" accept="image/png,image/jpeg,image/webp,image/heic,image/*" multiple>')
+      + '<div id="scpaste" class="scpaste" contenteditable="true" inputmode="none" aria-label="貼上截圖">② 或長按這裡 →「貼上」剛複製的截圖</div>'
       + (S.files.length && !S.busy ? '<button class="btn ghost" id="scgo">用剛才的 ' + S.files.length + " 張重新辨識</button>" : "") + "</div>"
       + (S.msg ? '<p class="note" style="margin:8px 0 0' + (S.err ? ";color:var(--hot)" : "") + '">' + S.msg + "</p>" : "")
-      + '<p class="dim" style="font-size:12px;margin:8px 0 0">使用 ' + esc(model()) + '（Google 免費額度）。<button class="lk" id="scset">變更金鑰或模型</button></p>';
+      + '<p class="dim" style="font-size:12px;margin:8px 0 0">使用 ' + esc(model()) + '（Google 免費額度）・' + esc(env()) + '・版本 ' + VER + ' <button class="lk" id="scset">變更金鑰或模型</button></p>';
     return h + "</div>";
   }
   function setupHtml() {
@@ -243,6 +256,15 @@ var Scan = (function () {
     }
     return false;
   }
+  function onPaste(e) {
+    if (!e.target.closest || !e.target.closest("#scpaste")) return false;
+    e.preventDefault();
+    var items = (e.clipboardData && e.clipboardData.items) || [], fs = [];
+    for (var i = 0; i < items.length; i++) if (items[i].kind === "file" && /^image\//.test(items[i].type)) fs.push(items[i].getAsFile());
+    if (!fs.length) { S.err = true; S.msg = "剪貼簿裡沒有圖片。先在相簿打開截圖 → 分享或「複製」，再回來貼上。"; Holdings.refresh(); return true; }
+    if (!S.busy) { S.files = fs; S.msg = ""; run(); }
+    return true;
+  }
   function onChange(t) {
     if (t.id === "scfile") {   // 選完圖就直接開始辨識（input 與 change 兩個事件都會進來，run() 會擋掉重複）
       var fs = [].slice.call(t.files || []);
@@ -254,5 +276,6 @@ var Scan = (function () {
     return false;
   }
 
+  document.addEventListener("paste", onPaste);
   return { ui: ui, onClick: onClick, onChange: onChange, _toRows: toRows, _guessAcct: guessAcct };
 })();

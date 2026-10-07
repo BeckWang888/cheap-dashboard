@@ -186,8 +186,11 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 .tbc{cursor:pointer;border-radius:6px;padding:3px 4px;margin:0 -4px}.tbc:hover,.tbc.on{background:var(--chip)}
 .tbc .tbn b::after{content:" ›";color:var(--sub);font-weight:400}.tbc.on .tbn b::after{content:" ▾"}
 .topb{grid-template-columns:minmax(0,1fr)}.tbd{min-width:0;padding:6px 2px 12px;border-bottom:1px solid var(--line);margin-bottom:4px}
-.upl{position:relative;overflow:hidden}.upl input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:100px}
-.upl.dis{opacity:.6;cursor:default}
+.scup{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.fin{font:inherit;font-size:14px;color:var(--sub);max-width:100%}
+.fin::file-selector-button{font:inherit;font-size:15px;font-weight:600;border:0;border-radius:8px;padding:10px 16px;margin-right:10px;background:var(--accent);color:var(--bg);cursor:pointer}
+.scpaste{border:1px dashed var(--line);border-radius:8px;padding:10px;font-size:13px;color:var(--sub);min-height:40px;outline:none}
+.btn.dis{opacity:.6;cursor:default}
 .scan{padding:10px 12px;border:1px dashed var(--line);border-radius:10px;margin:6px 0 4px}
 .scanr{display:flex;gap:8px 14px;flex-wrap:wrap}.scanr label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--sub)}
 .scanr select,.scan input{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 7px}
@@ -280,13 +283,13 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.6/Sortable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@5.2.1/dist/lightweight-charts.standalone.production.js"></script>
-<script src="chart.js"></script>
-<script src="gh.js"></script>
-<script src="parser.js"></script>
-<script src="watchlist.js"></script>
-<script src="holdings.js"></script>
-<script src="scan.js"></script>
-<script src="settings.js"></script>
+<script src="chart.js?v=dev"></script>
+<script src="gh.js?v=dev"></script>
+<script src="parser.js?v=dev"></script>
+<script src="watchlist.js?v=dev"></script>
+<script src="holdings.js?v=dev"></script>
+<script src="scan.js?v=dev"></script>
+<script src="settings.js?v=dev"></script>
 <script>
 try{document.documentElement.setAttribute("data-updn",localStorage.getItem("cd_updn")==="us"?"us":"tw")}catch(e){}
 var D=null,st={m:"all",only:false,cand:false,open:null,v:"full",sort:"custom",dir:-1,sum:null};
