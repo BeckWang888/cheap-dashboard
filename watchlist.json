@@ -1,5 +1,11 @@
 [
  {
+  "symbol": "SMH",
+  "market": "US",
+  "type": "auto",
+  "group": "半導體"
+ },
+ {
   "symbol": "QQQ",
   "name": "那斯達克 100 ETF",
   "market": "US",
