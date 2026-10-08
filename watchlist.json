@@ -2,8 +2,9 @@
  {
   "symbol": "SMH",
   "market": "US",
-  "type": "auto",
-  "group": "半導體"
+  "type": "etf",
+  "group": "半導體",
+  "name": "VanEck Semiconductor ETF"
  },
  {
   "symbol": "QQQ",
