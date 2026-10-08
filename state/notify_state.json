@@ -45,7 +45,7 @@
    "sweet": false
   },
   "SOXX": {
-   "state": "轉折確認",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -100,7 +100,7 @@
    "sweet": false
   },
   "SOXL": {
-   "state": "轉折確認",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -386,7 +386,7 @@
    "sweet": false
   },
   "VT": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -397,7 +397,7 @@
    "sweet": false
   },
   "SOXL.L": {
-   "state": "轉折確認",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -557,6 +557,6 @@
   "TW": 2
  },
  "groups": {
-  "半導體/AI": 5
+  "半導體/AI": 2
  }
 }
