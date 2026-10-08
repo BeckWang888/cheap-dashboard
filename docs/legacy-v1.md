@@ -1,19 +1,6 @@
+> **舊版本 v1 凍結快照（2026-10-08）**：git tag `v1-legacy`／分支 `legacy-v1`。這是凍結當下的 CLAUDE.md 原文，之後不再修改；回復步驟見現行 CLAUDE.md 的「舊版本 v1」段落。
+
 # 量化左側交易 Dashboard（原名便宜度 Dashboard）— 給 Claude 的專案說明
-
-## ⚠ 舊版本 v1（2026-10-08 凍結）與回復方式
-使用者決定以 2026-10-08 的狀態為「**舊版本**」，之後進行**大改版**；改版失敗要能回到舊版本。
-- **git 標記**：tag `v1-legacy`、分支 `legacy-v1`（都已推到 GitHub）。舊版本的完整說明另存在 `docs/legacy-v1.md`（就是凍結當下這份 CLAUDE.md），改版過程中本檔會改，舊版本的細節以那份為準。
-- **舊版本功能總覽**：便宜度分數（回撤 50%／RSI 50% 百分位，−100～100）、甜蜜點（≥80 或月線谷底＋≥20）、強勢谷底、轉折訊號、回測勝率（3／6 個月、1 年＋再跌幅度，✓）、市場溫度、K 線圖（當日／五日／日／週／月 K＋MACD／RSI／定投點／谷底標記）、排序與釘選、上方統計可點篩選、我的持倉顯示、立即更新按鈕、持倉頁（環圈圖、持股排行展開、損益、提醒、各帳戶、語音／打字／AI 整理／截圖辨識新增、買賣自動調整現金）、ntfy 推播、GitHub Actions 14 次排程。
-- **資料與程式要分開看**：`holdings.json`、`watchlist.json`、`config.json`、`state/`、`refresh.json` 是使用者的**資料**，改版後還會持續變動（登打新交易、bot 每次更新 state）。回復舊版本時**只還原程式、保留最新資料**，除非使用者明確要求連資料一起退回。
-- **回復步驟**（在 main 上做，做完 push 會自動觸發部署）：
-  1. `git fetch --tags`
-  2. 只還原程式：`git checkout v1-legacy -- . ":(exclude)holdings.json" ":(exclude)watchlist.json" ":(exclude)config.json" ":(exclude)state" ":(exclude)refresh.json"`
-  3. 刪掉改版新增、舊版本沒有的檔案：`git diff --name-only --diff-filter=A v1-legacy HEAD` 列出來，確認後 `git rm`
-  4. 跑測試（`python -m pytest -q tests`、`node --test tests/parser.test.js tests/scan.test.js`），`git commit -m "回復舊版本 v1"`，`git push`
-  5. 若改版動過資料格式（例如 holdings.json 欄位），要先把資料轉回舊格式，否則舊程式讀不懂；改版時若改資料格式，**務必寫好轉換方式並記在本檔**。
-  6. 完整退回（含資料）：`git reset --hard v1-legacy` 後 `git push --force`——會丟掉之後的所有交易紀錄，**必須先問使用者**。
-- 改版期間建議在分支上開發、確認後再合併到 main，正式網站（Pages 從 main 部署）才不會中途壞掉。
-
 
 ## 使用者與溝通方式
 - 一律用**繁體中文**、白話解釋；術語要說明。使用者偏好先討論再動工，但已授權「能做的直接做，有疑慮的再問」。
