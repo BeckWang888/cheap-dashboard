@@ -128,16 +128,17 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 .lk{font:inherit;font-size:13px;background:none;border:0;color:var(--accent);cursor:pointer;padding:2px 4px}.lk.danger{color:var(--hot);font-weight:600}
 .card a{color:var(--accent)}
 .wl{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
-.wl li{display:flex;gap:8px;align-items:center;padding:8px 10px;border-top:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+.wl li{display:grid;grid-template-columns:auto 60px minmax(0,1fr) 66px auto;gap:6px;align-items:center;padding:5px 8px;border-top:1px solid var(--line);background:var(--panel)}
 .wl li:first-child{border-top:0}
 .dh{cursor:grab;color:var(--sub);font-size:16px;padding:2px 8px 2px 0;touch-action:none;user-select:none;vertical-align:1px}
 .row.sortable-ghost{opacity:.4}
 .wl .hd{cursor:grab;font-size:18px;color:var(--sub);padding:4px 6px;touch-action:none;user-select:none}
-.wl .ws{min-width:64px}.wl .wt{font-size:12px;color:var(--sub)}
+.wl .ws{min-width:0;line-height:1.2}.wl .ws b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis}.wl .wt{display:block;font-size:11px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wl .hd{padding:4px 2px}.wl .lk{padding:2px}
 .wl input,.wadd input,.wadd select{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 7px;min-width:0}
-.wl input{flex:1 1 120px}.wl input.wg{flex:0 1 110px}
+.wl input{width:100%;padding:4px 6px}
 .wl .sortable-ghost{opacity:.4}
-.wadd{display:flex;gap:8px;flex-wrap:wrap}.wadd input{flex:1 1 140px}
+.wadd{display:flex;gap:8px;flex-wrap:wrap}.wadd input{flex:1 1 100px}
 .sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
 .sgrid label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
 .sgrid input{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
@@ -244,6 +245,37 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 @media(max-width:480px){.dn{max-width:100%;margin:0 auto}.wb{flex-basis:80px}}
 .foot{font-size:12px;color:var(--sub);margin-top:18px}
 .foot a{color:var(--sub)}
+/* ---- 顯示方式：精簡（一行一檔）、四宮格、九宮格 ---- */
+.list.lay-compact .row.cr{grid-template-columns:minmax(0,1fr) auto 50px;gap:10px;align-items:center;padding:9px 12px}
+.cr .c1{display:flex;align-items:center;gap:0;white-space:nowrap}.cr .c1 b{font-size:16px}
+.cr .c1 .pin{font-size:15px;padding:2px 5px 2px 0}.cr .c1 .dh{font-size:14px;padding:2px 6px 2px 0}
+.cr .c1 .hlt{margin:0 0 0 6px;font-size:10px}.cr .c1 .hot{font-size:10px}
+.cr .c2{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.cr .c2 em,.tl .tg2 em{font-style:normal;font-weight:700;color:var(--sub)}
+.cr .c2 .sw{margin:0;font-size:10px;padding:0 5px;vertical-align:1px}
+em.go{color:var(--accent)!important}em.mid,em.boss{color:var(--warm)!important}em.strong{color:var(--c1)!important}
+.cq{text-align:right;font-variant-numeric:tabular-nums;font-size:12px;line-height:1.35}.cq b{display:block;font-size:15px;font-weight:600}
+.cs{text-align:right;font-variant-numeric:tabular-nums;line-height:1.1}.cs b{display:block;font-size:21px}.cs span{font-size:11px;font-weight:600}
+.list.lay-g2,.list.lay-g3{display:grid;gap:8px;background:none;border:0;border-radius:0;overflow:visible}
+.list.lay-g2{grid-template-columns:repeat(2,minmax(0,1fr))}.list.lay-g3{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+@media(min-width:640px){.list.lay-g2{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.list.lay-g3{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}}
+.list.lay-g2>.row,.list.lay-g3>.row,.list.lay-g2>.sec,.list.lay-g3>.sec,.list.lay-g2>.empty,.list.lay-g3>.empty{grid-column:1/-1;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.list.lay-g2>.row.sweet,.list.lay-g3>.row.sweet{background:var(--goldbg)}
+.tl{position:relative;min-width:0;cursor:pointer;border:1px solid var(--line);border-radius:10px;padding:8px 9px 12px;background:color-mix(in srgb,var(--lc) 13%,var(--panel));overflow:hidden}
+.tl:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tl.sweet{box-shadow:inset 0 0 0 2px var(--gold);border-color:var(--gold)}.tl.strong{box-shadow:inset 0 0 0 2px var(--c1);border-color:var(--c1)}
+.tl.go{box-shadow:inset 3px 0 0 var(--accent)}.tl.boss{box-shadow:inset 3px 0 0 var(--warm)}
+.t1{display:flex;align-items:center;gap:4px;white-space:nowrap}.t1 b{font-size:16px;overflow:hidden;text-overflow:ellipsis}
+.t1 .tp{color:var(--gold);font-size:12px}.t1 .hlt{margin:0 0 0 auto;font-size:10px;padding:0 5px}
+.tn{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ts{display:flex;align-items:baseline;gap:5px;margin:2px 0 1px;color:var(--lc);font-variant-numeric:tabular-nums}.ts b{font-size:26px;line-height:1.1}.ts span{font-size:12px;font-weight:700}
+.tq{font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sub)}.tq b{color:var(--ink);font-weight:600}.tq.ok{color:var(--accent);font-weight:600}
+.tg2{font-size:12px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tg2 .sw{margin:0;font-size:11px}
+.tbar{position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--hot),var(--warm) 25%,var(--mid) 50%,var(--cool) 75%,var(--cheap));opacity:.85}
+.tbar u{position:absolute;top:-3px;width:4px;height:10px;margin-left:-2px;border-radius:2px;background:var(--ink)}
+.lay-g3 .tl{padding:7px 7px 11px}.lay-g3 .t1 b{font-size:15px}.lay-g3 .ts b{font-size:24px}.lay-g3 .tn,.lay-g3 .tq{font-size:11px}
+.lay-g2 .ts b{font-size:30px}
+#layt button{padding:6px 10px}
 </style>
 </head>
 <body>
@@ -269,6 +301,7 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
     <label class="t"><input type="checkbox" id="only"> 只看便宜區</label>
     <label class="t"><input type="checkbox" id="cand"> 只看候選進場與重點觀察</label>
     <div class="tabs" id="sortt" title="排序"><button data-s="custom" aria-pressed="true">自訂</button><button data-s="score" aria-pressed="false">分數</button><button data-s="chg" aria-pressed="false">漲跌幅</button><button data-s="wr" aria-pressed="false">勝率</button></div>
+    <div class="tabs" id="layt" title="顯示方式"><button data-l="compact">精簡</button><button data-l="g2">四宮格</button><button data-l="g3">九宮格</button><button data-l="full">詳細</button></div>
     <button class="btn ghost" id="wedit">編輯清單</button>
   </div>
   <div class="legend m"><span>很貴</span><span>合理</span><span>很便宜</span></div>
@@ -293,13 +326,14 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 <script src="settings.js?v=dev"></script>
 <script>
 try{document.documentElement.setAttribute("data-updn",localStorage.getItem("cd_updn")==="us"?"us":"tw")}catch(e){}
-var D=null,st={m:"all",only:false,cand:false,open:null,v:"full",sort:"custom",dir:-1,sum:null};
+var D=null,st={m:"all",only:false,cand:false,open:null,v:"full",sort:"custom",dir:-1,sum:null,lay:"compact"};
 try{var ss=localStorage.getItem("cd_sort");if(/^(score|chg|wr)$/.test(ss))st.sort=ss;if(localStorage.getItem("cd_dir")==="1")st.dir=1}catch(e){}
 // 釘選：存在這台裝置的瀏覽器裡，釘選的標的永遠排在最上面
 var PINS=[];try{PINS=JSON.parse(localStorage.getItem("cd_pins")||"[]")||[]}catch(e){}
 function pinned(s){return PINS.indexOf(s)>=0}
 function togglePin(s){if(pinned(s))PINS=PINS.filter(function(x){return x!==s});else PINS.push(s);try{localStorage.setItem("cd_pins",JSON.stringify(PINS))}catch(e){}render()}
 function WR(r){return r.v[st.v].wr}
+try{var sl=localStorage.getItem("cd_lay");if(/^(full|compact|g2|g3)$/.test(sl))st.lay=sl}catch(e){}
 try{var sv=localStorage.getItem("cd_v");if(sv==="5y"||sv==="full")st.v=sv}catch(e){}
 var LV=[[80,"極便宜","--cheap"],[50,"很便宜","--cheap"],[20,"便宜","--cool"],[-10,"合理","--sub"],[-33,"小貴","--warm"],[-66,"中貴","--hot"],[-1e9,"很貴","--hot"]];
 var BAND=[[80,"--cheap",1],[50,"--cheap",.65],[20,"--cool",1],[-10,"--mid",1],[-33,"--warm",1],[-66,"--hot",.6],[-1e9,"--hot",1]];
@@ -340,30 +374,64 @@ function render(){
    else if(st.sort==="chg"){var ca=a.quote&&a.quote.chg,cb=b.quote&&b.quote.chg;d=(ca==null)-(cb==null)||(ca==null?0:st.dir*(ca-cb))}
    else if(st.sort==="wr"){var wa=WR(a),wb=WR(b);d=(!wa)-(!wb)||(wa?wb.p-wa.p:0)}
    return d||x[1]-y[1]}).map(function(x){return x[0]});
- var h="",seen=false;
+ var h="",seen=false,lay=st.lay;
  rows.forEach(function(r){
-  var c=C(r),s=stt(r),L=r.lev,l=c.score==null?null:lv(c.score),p=c.score==null?50:(c.score+100)/2,pf=L?"標的 ":"";
-  if(L&&!seen&&st.sort==="score"&&!pinned(r.symbol)){h+='<div class="sec">槓桿型 ETF：分數與訊號以對應的一倍標的計算，不代表槓桿產品本身安全</div>';seen=true}
-  var dots="";c.sigs.forEach(function(v){dots+='<i class="dt'+(v?" on":"")+'"></i>'});
-  dots+='<i class="dt bs'+(c.trough?" on":c.trough_forming?" half":"")+'" title="月線 MACD 谷底"></i>';
-  var heat=c.heat?'<span class="hot'+(c.heat==="嚴重過熱"?" vh":"")+'">'+c.heat+'</span>':'';
-  h+='<div class="row'+(c.sweet?" sweet":s[1]==="strong"?" strong":s[1]==="go"?" go":s[1]==="boss"?" boss":"")+(st.open===r.symbol?" open":"")+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
-   +'<div class="id">'+(canDrag()&&!pinned(r.symbol)?'<span class="dh" title="拖曳排序" aria-label="拖曳排序">☰</span>':'')+'<button class="pin" data-pin="'+esc(r.symbol)+'" aria-pressed="'+pinned(r.symbol)+'" title="'+(pinned(r.symbol)?'取消釘選':'釘選到最上面')+'" aria-label="釘選">'+(pinned(r.symbol)?'★':'☆')+'</button><b>'+esc(r.symbol.replace(".TW",""))+'</b>'+heat+(r.intraday?'<span class="live">盤中</span>':'')+'<span class="nm">'+esc(r.name)+'</span>'
-   +pxLine(r)+heldLine(r)
-   +(L?'<div class="lv">'+L.x+' 倍・對應 '+esc(L.underlying)+'</div>':'')+(r.thin?'<div class="lv warn">資料不足，分數僅供參考</div>':'')
-   +'<div class="sig"><span>'+dots+'</span><em class="'+s[1]+'">'+s[0]+'</em>'+(c.sweet?'<span class="sw">甜蜜點</span>':'')+'</div></div>'
-   +'<div class="sc"><b>'+(c.score==null?'—':c.score.toFixed(0))+'</b><span style="color:var('+(l?l[2]:'--sub')+')">'+(l?l[1]:'')+'</span>'+(WR(r)?'<span class="wr'+(wrOk(WR(r))?' ok':'')+'" title="回測勝率：歷史上同樣狀態買進，6 個月後上漲的機率；✓＝在便宜區，且 3 個月、6 個月、1 年都高於這檔平常">勝率 '+WR(r).p.toFixed(0)+'%'+(wrOk(WR(r))?' ✓':'')+'</span>':'')+'</div>'
-   +'<div class="th">'+(D.thresholds||[20,50,80]).map(function(t){return'<i style="left:'+((t+100)/2)+'%"></i>'}).join("")+'<u style="left:'+p+'%"></u></div>'
-   +(st.open===r.symbol?detail(r):'<div class="det"></div>')+'</div>';
+  if(r.lev&&!seen&&st.sort==="score"&&!pinned(r.symbol)){h+='<div class="sec">槓桿型 ETF：分數與訊號以對應的一倍標的計算，不代表槓桿產品本身安全</div>';seen=true}
+  // 展開中的標的一律用完整樣式（在宮格裡會橫跨整排）
+  h+=st.open===r.symbol||lay==="full"?fullRow(r):lay==="compact"?crow(r):tile(r,lay==="g2");
  });
  document.getElementById("fbar").innerHTML=sf?'<div class="fbar"><span>只顯示：<b>'+sf[1]+'</b>（'+rows.length+' 檔）</span><button class="lk" id="fclr">顯示全部 ✕</button></div>':'';
- document.getElementById("list").innerHTML=h||'<div class="empty">沒有符合條件的標的。</div>';
+ var list=document.getElementById("list");list.className="list lay-"+lay;
+ list.innerHTML=h||'<div class="empty">沒有符合條件的標的。</div>';
+ document.querySelector(".legend.m").hidden=document.querySelector(".legend.d").hidden=lay!=="full";
  setupDrag();
  var kc=document.querySelector('.row.open .kc');
  if(kc){var r0=D.items.filter(function(r){return r.symbol===st.open})[0];
   KChart.mount(kc,{sym:r0.symbol,ver:D.generated,score:{d:r0.chart.d,s:r0.chart["s_"+st.v]},band:bandColor,
    title:r0.lev?'K 線是 '+esc(r0.symbol)+' 本身價格；分數色帶以 '+esc(r0.lev.underlying)+' 計算。':r0.base!==r0.symbol?'K 線與分數都以 '+esc(r0.base)+' 計算（本身沒有完整歷史價格）。':''})}
  else KChart.destroy();
+}
+function stCls(c,s){return c.sweet?" sweet":s[1]==="strong"?" strong":s[1]==="go"?" go":s[1]==="boss"?" boss":""}
+function scoreTxt(c){return c.score==null?'—':c.score.toFixed(0)}
+function lvColor(c){var l=c.score==null?null:lv(c.score);return l?l[2]:'--sub'}
+// 狀態標籤：只標值得注意的（甜蜜點、強勢谷底、候選進場、重點觀察、轉折初現）
+function stTag(r,short){var c=C(r),s=stt(r);if(c.sweet)return'<span class="sw">甜蜜點</span>';
+ if(s[1]==="off"||s[1]==="wait")return'';var t=short?s[0].replace(/（.*）/,""):s[0];return'<em class="'+s[1]+'">'+t+'</em>'}
+function pinBtn(r){return'<button class="pin" data-pin="'+esc(r.symbol)+'" aria-pressed="'+pinned(r.symbol)+'" title="'+(pinned(r.symbol)?'取消釘選':'釘選到最上面')+'" aria-label="釘選">'+(pinned(r.symbol)?'★':'☆')+'</button>'}
+// 精簡：一檔一行（代碼／名稱・狀態｜價格／漲跌｜分數／級距）
+function crow(r){var c=C(r),q=r.quote,x=heldOf(r),tag=stTag(r,true);
+ return'<div class="row cr'+stCls(c,stt(r))+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
+  +'<div class="ci"><div class="c1">'+(canDrag()&&!pinned(r.symbol)?'<span class="dh" title="拖曳排序" aria-label="拖曳排序">☰</span>':'')+pinBtn(r)
+  +'<b>'+esc(r.symbol.replace(".TW",""))+'</b>'+(x?'<span class="hlt">持有</span>':'')+(c.heat?'<span class="hot'+(c.heat==="嚴重過熱"?" vh":"")+'">'+c.heat+'</span>':'')+'</div>'
+  +'<div class="c2">'+(tag?tag+' ':'')+'<span>'+esc(r.name)+'</span></div></div>'
+  +'<div class="cq">'+(q?'<b>'+fmtPx(q.price)+'</b>'+(q.chg==null?'':pc(q.chg,2)):'')+'</div>'
+  +'<div class="cs" style="color:var('+lvColor(c)+')"><b>'+scoreTxt(c)+'</b><span>'+(c.score==null?'不足':lv(c.score)[1])+'</span></div></div>'}
+// 宮格：四宮格（g2，資訊較多）／九宮格（g3，一眼看完）；底色依便宜度級距
+function tile(r,big){var c=C(r),q=r.quote,x=heldOf(r),w=WR(r),p=c.score==null?50:(c.score+100)/2,tag=stTag(r,!big);
+ return'<div class="tl'+stCls(c,stt(r))+'" tabindex="0" data-t="'+esc(r.symbol)+'" style="--lc:var('+lvColor(c)+')">'
+  +'<div class="t1"><b>'+esc(r.symbol.replace(".TW",""))+'</b>'+(pinned(r.symbol)?'<span class="tp">★</span>':'')+(x?'<span class="hlt">持</span>':'')+'</div>'
+  +'<div class="tn">'+esc(r.name)+'</div>'
+  +'<div class="ts"><b>'+scoreTxt(c)+'</b><span>'+(c.score==null?'資料不足':lv(c.score)[1])+'</span></div>'
+  +(q?'<div class="tq"><b>'+fmtPx(q.price)+'</b> '+(q.chg==null?'':pc(q.chg,big?2:1))+'</div>':'')
+  +(big&&x?'<div class="tq">持有 '+fq(x.qty)+' 股 '+(x.ret==null?'':pc(x.ret))+'</div>':'')
+  +(big&&w?'<div class="tq'+(wrOk(w)?' ok':'')+'">勝率 '+w.p.toFixed(0)+'%'+(wrOk(w)?' ✓':'')+'</div>':'')
+  +(tag?'<div class="tg2">'+tag+'</div>':'')
+  +'<div class="tbar"><u style="left:'+p+'%"></u></div></div>'}
+// 詳細：原本的一檔一列（含分數條、訊號燈），也是展開時的樣式
+function fullRow(r){
+  var c=C(r),s=stt(r),L=r.lev,l=c.score==null?null:lv(c.score),p=c.score==null?50:(c.score+100)/2,h="";
+  var dots="";c.sigs.forEach(function(v){dots+='<i class="dt'+(v?" on":"")+'"></i>'});
+  dots+='<i class="dt bs'+(c.trough?" on":c.trough_forming?" half":"")+'" title="月線 MACD 谷底"></i>';
+  var heat=c.heat?'<span class="hot'+(c.heat==="嚴重過熱"?" vh":"")+'">'+c.heat+'</span>':'';
+  h+='<div class="row'+(c.sweet?" sweet":s[1]==="strong"?" strong":s[1]==="go"?" go":s[1]==="boss"?" boss":"")+(st.open===r.symbol?" open":"")+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
+   +'<div class="id">'+(canDrag()&&!pinned(r.symbol)?'<span class="dh" title="拖曳排序" aria-label="拖曳排序">☰</span>':'')+pinBtn(r)+'<b>'+esc(r.symbol.replace(".TW",""))+'</b>'+heat+(r.intraday?'<span class="live">盤中</span>':'')+'<span class="nm">'+esc(r.name)+'</span>'
+   +pxLine(r)+heldLine(r)
+   +(L?'<div class="lv">'+L.x+' 倍・對應 '+esc(L.underlying)+'</div>':'')+(r.thin?'<div class="lv warn">資料不足，分數僅供參考</div>':'')
+   +'<div class="sig"><span>'+dots+'</span><em class="'+s[1]+'">'+s[0]+'</em>'+(c.sweet?'<span class="sw">甜蜜點</span>':'')+'</div></div>'
+   +'<div class="sc"><b>'+(c.score==null?'—':c.score.toFixed(0))+'</b><span style="color:var('+(l?l[2]:'--sub')+')">'+(l?l[1]:'')+'</span>'+(WR(r)?'<span class="wr'+(wrOk(WR(r))?' ok':'')+'" title="回測勝率：歷史上同樣狀態買進，6 個月後上漲的機率；✓＝在便宜區，且 3 個月、6 個月、1 年都高於這檔平常">勝率 '+WR(r).p.toFixed(0)+'%'+(wrOk(WR(r))?' ✓':'')+'</span>':'')+'</div>'
+   +'<div class="th">'+(D.thresholds||[20,50,80]).map(function(t){return'<i style="left:'+((t+100)/2)+'%"></i>'}).join("")+'<u style="left:'+p+'%"></u></div>'
+   +(st.open===r.symbol?detail(r):'<div class="det"></div>')+'</div>';
+  return h;
 }
 function fmtPx(v){return v==null?'—':v>=1000?v.toLocaleString("en-US",{maximumFractionDigits:1}):v.toFixed(2)}
 function pxLine(r){var q=r.quote;if(!q)return'';var d=q.date.slice(5).replace("-","/");
@@ -461,6 +529,9 @@ document.getElementById("cand").addEventListener("change",function(){st.cand=thi
 function setSort(v){st.sort=v;try{localStorage.setItem("cd_sort",v);localStorage.setItem("cd_dir",String(st.dir))}catch(e){}[].forEach.call(document.getElementById("sortt").children,function(x){x.setAttribute("aria-pressed",x.dataset.s===v);if(x.dataset.s==="chg")x.textContent="漲跌幅"+(v==="chg"?(st.dir<0?"↓":"↑"):"")});if(D)render()}
 // 漲跌幅：再按一次切換「漲最多在上」／「跌最多在上」
 document.getElementById("sortt").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;if(b.dataset.s==="chg"&&st.sort==="chg")st.dir=-st.dir;setSort(b.dataset.s)});
+function setLay(v){st.lay=v;try{localStorage.setItem("cd_lay",v)}catch(e){}[].forEach.call(document.getElementById("layt").children,function(x){x.setAttribute("aria-pressed",x.dataset.l===v)});if(D)render()}
+document.getElementById("layt").addEventListener("click",function(e){var b=e.target.closest("button");if(b)setLay(b.dataset.l)});
+setLay(st.lay);
 document.getElementById("wedit").addEventListener("click",function(){WL.open()});
 // 清單存檔後：先照新順序排、移除刪掉的；新增的要等下一次更新才有分數
 window.onWatchlistSaved=function(list){if(!D)return;var idx={};list.forEach(function(it,i){idx[it.symbol]=i});
@@ -469,7 +540,7 @@ window.onWatchlistSaved=function(list){if(!D)return;var idx={};list.forEach(func
  setSort("custom");document.getElementById("alerts").insertAdjacentHTML("afterbegin",'<div class="alert">清單已儲存'+(added?'，新增的 '+added+' 檔約 2 分鐘後出現（重新整理頁面）':'')+'。</div>')};
 // 主畫面直接拖曳排序：只有「自訂順序」且沒有篩選時才能拖，放開後存回 watchlist.json
 var listSortable=null;
-function canDrag(){return st.sort==="custom"&&st.m==="all"&&!st.only&&!st.cand&&!st.sum&&!!window.Sortable}
+function canDrag(){return(st.lay==="full"||st.lay==="compact")&&st.sort==="custom"&&st.m==="all"&&!st.only&&!st.cand&&!st.sum&&!!window.Sortable}
 function setupDrag(){
  if(listSortable){listSortable.destroy();listSortable=null}
  if(!canDrag())return;
@@ -488,7 +559,9 @@ function note(msg,err){var a=document.getElementById("alerts");a.querySelectorAl
  a.insertAdjacentHTML("afterbegin",'<div class="alert tmp'+(err?' err':'')+'">'+esc(msg)+'</div>');setTimeout(function(){a.querySelectorAll(".alert.tmp").forEach(function(x){x.remove()})},6000)}
 document.getElementById("list").addEventListener("click",function(e){var b=e.target.closest("[data-hgo]");if(!b)return;e.stopPropagation();Holdings.openTop(b.dataset.hgo);location.hash="#holdings";setTimeout(function(){var x=document.querySelector(".tbc.on");if(x)x.scrollIntoView({block:"start"})},600)},true);
 function tog(e){var pb=e.target.closest(".pin");if(pb&&e.type==="click"){e.stopPropagation();togglePin(pb.dataset.pin);return}
- if(e.target.closest(".det")||e.target.closest(".dh")||pb)return;var r=e.target.closest(".row");if(!r)return;if(e.type==="keydown"&&e.key!=="Enter"&&e.key!==" ")return;e.preventDefault();st.open=st.open===r.dataset.t?null:r.dataset.t;render()}
+ if(e.target.closest(".det")||e.target.closest(".dh")||pb)return;var r=e.target.closest(".row,.tl");if(!r)return;if(e.type==="keydown"&&e.key!=="Enter"&&e.key!==" ")return;e.preventDefault();var t=r.dataset.t;st.open=st.open===t?null:t;render();
+ // 精簡／宮格展開後版面會變，捲到這檔的位置
+ if(st.lay!=="full"){var x=document.querySelector('#list [data-t="'+t.replace(/"/g,'')+'"]');if(x)x.scrollIntoView({block:st.open?"start":"nearest"})}}
 document.getElementById("list").addEventListener("click",tog);
 document.getElementById("list").addEventListener("keydown",tog);
 function route(){var h=location.hash==="#holdings"?"holdings":location.hash==="#settings"?"settings":"cheap";

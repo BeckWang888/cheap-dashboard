@@ -19,19 +19,12 @@
       return;
     }
     if (!S.list) { box.innerHTML = '<div class="card"><p class="note">' + esc(S.msg || "載入清單中…") + '</p><button class="btn ghost" data-wl="close">關閉</button></div>'; return; }
-    var h = '<div class="card"><h3>編輯觀察清單</h3><p class="note">按住左邊的 ☰ 上下拖曳排序；名稱和族群可以直接改。改完按「儲存」，新增的標的約 2 分鐘後出現分數。</p><ul class="wl" id="wlist">';
-    S.list.forEach(function (it, i) {
-      var lev = it.type === "leveraged";
-      h += '<li data-i="' + i + '"><span class="hd" aria-label="拖曳排序">☰</span>'
-        + '<b class="ws">' + esc(it.symbol.replace(/\.TW$/, "")) + "</b>"
-        + '<input data-f="name" data-i="' + i + '" value="' + esc(it.name || "") + '" placeholder="名稱" aria-label="名稱">'
-        + '<span class="wt">' + (TYPES[it.type] || "自動判斷中") + (lev ? " " + esc(it.x) + "× " + esc(it.underlying) : "") + "</span>"
-        + '<input data-f="group" data-i="' + i + '" value="' + esc(it.group || "") + '" placeholder="族群" list="wgroups" aria-label="族群" class="wg">'
-        + '<button class="lk' + (S.del === i ? " danger" : "") + '" data-wl="del" data-i="' + i + '">' + (S.del === i ? "確定刪除？" : "刪除") + "</button></li>";
-    });
-    h += '</ul><datalist id="wgroups"><option value="半導體/AI"></datalist>';
-    h += '<h4 style="margin:14px 0 6px;font-size:13px;color:var(--sub)">新增標的</h4>'
-      + '<p class="note" style="margin:0 0 6px">只要輸入代碼就好，名稱、ETF 或個股、槓桿 ETF 的對應標的和倍數，下次更新時會自動判斷。</p><div class="wadd">'
+    // 新增欄位放最上面（清單有 50 檔，放下面要滑很久）；儲存／取消上下各一組
+    var bar = '<div class="bar" style="margin:10px 0"><button class="btn" data-wl="save"' + (S.busy ? " disabled" : "") + ">" + (S.busy ? "儲存中…" : "儲存") + '</button><button class="btn ghost" data-wl="close">取消</button>'
+      + '<span class="dim" style="font-size:13px">共 ' + S.list.length + ' 檔</span></div>';
+    var h = '<div class="card"><h3>編輯觀察清單</h3>'
+      + '<h4 style="margin:10px 0 6px;font-size:13px;color:var(--sub)">新增標的</h4>'
+      + '<p class="note" style="margin:0 0 6px">只要輸入代碼就好，名稱、ETF 或個股、槓桿 ETF 的對應標的和倍數，下次更新時會自動判斷。新增的會放在清單最上面。</p><div class="wadd">'
       + '<input id="wa-sym" placeholder="代碼，例：2330、NVDA、TQQQ" autocapitalize="characters">'
       + '<input id="wa-group" placeholder="族群（選填）" list="wgroups">'
       + '<button class="btn ghost" data-wl="add">加入</button></div>'
@@ -40,8 +33,17 @@
       + '<select id="wa-type"><option value="auto">類型：自動判斷</option><option value="stock">個股</option><option value="etf">ETF</option><option value="leveraged">槓桿 ETF</option></select>'
       + '<input id="wa-under" placeholder="對應標的，例：SOXX" class="lev" hidden autocapitalize="characters">'
       + '<input id="wa-x" placeholder="倍數，例：3" inputmode="decimal" class="lev" hidden></div></details>';
-    h += '<div class="bar" style="margin-top:12px"><button class="btn" data-wl="save"' + (S.busy ? " disabled" : "") + ">" + (S.busy ? "儲存中…" : "儲存") + '</button><button class="btn ghost" data-wl="close">取消</button></div>';
-    if (S.msg) h += '<p class="note" style="margin-top:8px">' + esc(S.msg) + "</p>";
+    if (S.msg) h += '<p class="note" style="margin:8px 0 0">' + esc(S.msg) + "</p>";
+    h += bar + '<p class="note" style="margin:0 0 6px">按住左邊的 ☰ 上下拖曳排序；名稱和族群可以直接改。改完按「儲存」，新增的標的約 2 分鐘後出現分數。</p><ul class="wl" id="wlist">';
+    S.list.forEach(function (it, i) {
+      var lev = it.type === "leveraged";
+      h += '<li data-i="' + i + '"><span class="hd" aria-label="拖曳排序">☰</span>'
+        + '<span class="ws"><b>' + esc(it.symbol.replace(/\.TW$/, "")) + '</b><span class="wt">' + (TYPES[it.type] || "自動判斷中") + (lev ? " " + esc(it.x) + "× " + esc(it.underlying) : "") + "</span></span>"
+        + '<input data-f="name" data-i="' + i + '" value="' + esc(it.name || "") + '" placeholder="名稱" aria-label="名稱">'
+        + '<input data-f="group" data-i="' + i + '" value="' + esc(it.group || "") + '" placeholder="族群" list="wgroups" aria-label="族群" class="wg">'
+        + '<button class="lk' + (S.del === i ? " danger" : "") + '" data-wl="del" data-i="' + i + '">' + (S.del === i ? "確定刪除？" : "刪除") + "</button></li>";
+    });
+    h += '</ul><datalist id="wgroups"><option value="半導體/AI"></datalist>' + bar;
     box.innerHTML = h + "</div>";
     if (window.Sortable) {
       S.sortable = Sortable.create(document.getElementById("wlist"), {
@@ -69,7 +71,7 @@
       if (!u || !(x > 0)) { S.msg = "槓桿 ETF 要填對應標的和倍數。"; render(); return; }
       it.underlying = u; it.x = x;
     }
-    S.list.push(it);
+    S.list.unshift(it);   // 放最上面，加完馬上看得到
     S.msg = "已加入 " + sym.replace(/\.TW$/, "") + "，記得按「儲存」。約 2 分鐘後會自動補上名稱和類型。";
     render();
   }
