@@ -437,8 +437,10 @@
  {
   "symbol": "TQQQ",
   "market": "US",
-  "type": "auto",
+  "type": "leveraged",
   "group": "美股",
-  "name": "三倍納史達克"
+  "name": "三倍納史達克",
+  "underlying": "QQQ",
+  "x": 3
  }
 ]
