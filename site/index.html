@@ -252,6 +252,7 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 .cr .c1 .hlt{margin:0 0 0 6px;font-size:10px}.cr .c1 .hot{font-size:10px}
 .cr .c2{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
 .cr .c2 em,.tl .tg2 em{font-style:normal;font-weight:700;color:var(--sub)}
+.wrt2{font-weight:600;color:var(--sub)}.wrt2.ok{color:var(--accent)}
 .cr .c2 .sw{margin:0;font-size:10px;padding:0 5px;vertical-align:1px}
 em.go{color:var(--accent)!important}em.mid,em.boss{color:var(--warm)!important}em.strong{color:var(--c1)!important}
 .cq{text-align:right;font-variant-numeric:tabular-nums;font-size:12px;line-height:1.35}.cq b{display:block;font-size:15px;font-weight:600}
@@ -367,16 +368,13 @@ function render(){
   return '<button data-f="'+f[0]+'" aria-pressed="'+(st.sum===f[0])+'"'+(n||st.sum===f[0]?'':' disabled')+'><b'+(f[2]?' style="color:var('+f[2]+')"':'')+'>'+n+'</b><span>'+f[1]+'</span></button>'}).join("");
  var sf=st.sum&&SUMF.filter(function(f){return f[0]===st.sum})[0];
  var rows=items.filter(function(r){var c=C(r);return(st.m==="all"||(st.m==="LEV"?isLev(r):r.market===st.m))&&(!st.only||c.score>=20)&&(!st.cand||rank(r)>0)&&(!sf||sf[3](r))})
-  .map(function(r,i){return[r,i]}).sort(function(x,y){var a=x[0],b=y[0],pa=pinned(a.symbol),pb=pinned(b.symbol);
-   if(pa!==pb)return pa?-1:1;
-   var d=0;
-   if(st.sort==="score")d=(isLev(a)?1:0)-(isLev(b)?1:0)||rank(b)-rank(a)||(C(b).score==null?-999:C(b).score)-(C(a).score==null?-999:C(a).score);
-   else if(st.sort==="chg"){var ca=a.quote&&a.quote.chg,cb=b.quote&&b.quote.chg;d=(ca==null)-(cb==null)||(ca==null?0:st.dir*(ca-cb))}
-   else if(st.sort==="wr"){var wa=WR(a),wb=WR(b);d=(!wa)-(!wb)||(wa?wb.p-wa.p:0)}
-   return d||x[1]-y[1]}).map(function(x){return x[0]});
+  .map(function(r,i){return[r,i]}).sort(function(x,y){var a=x[0],b=y[0];
+   // 自訂順序：釘選的在最上面；分數／漲跌幅／勝率：完全照數值排（沒有數值的放最後），再按一次反向
+   if(st.sort==="custom"){var pa=pinned(a.symbol),pb=pinned(b.symbol);if(pa!==pb)return pa?-1:1;return x[1]-y[1]}
+   var va=sortVal(a),vb=sortVal(b);
+   return(va==null)-(vb==null)||(va==null?0:st.dir*(va-vb))||x[1]-y[1]}).map(function(x){return x[0]});
  var h="",seen=false,lay=st.lay;
  rows.forEach(function(r){
-  if(r.lev&&!seen&&st.sort==="score"&&!pinned(r.symbol)){h+='<div class="sec">槓桿型 ETF：分數與訊號以對應的一倍標的計算，不代表槓桿產品本身安全</div>';seen=true}
   // 展開中的標的一律用完整樣式（在宮格裡會橫跨整排）
   h+=st.open===r.symbol||lay==="full"?fullRow(r):lay==="compact"?crow(r):tile(r,lay==="g2");
  });
@@ -391,6 +389,8 @@ function render(){
    title:r0.lev?'K 線是 '+esc(r0.symbol)+' 本身價格；分數色帶以 '+esc(r0.lev.underlying)+' 計算。':r0.base!==r0.symbol?'K 線與分數都以 '+esc(r0.base)+' 計算（本身沒有完整歷史價格）。':''})}
  else KChart.destroy();
 }
+function sortVal(r){var w;return st.sort==="score"?C(r).score:st.sort==="chg"?(r.quote?r.quote.chg:null):st.sort==="wr"?((w=WR(r))?w.p:null):null}
+function wrTxt(r){var w=WR(r);return w?'<span class="wrt2'+(wrOk(w)?' ok':'')+'">勝率 '+w.p.toFixed(0)+'%'+(wrOk(w)?' ✓':'')+'</span>':'<span class="wrt2">勝率 —</span>'}
 function stCls(c,s){return c.sweet?" sweet":s[1]==="strong"?" strong":s[1]==="go"?" go":s[1]==="boss"?" boss":""}
 function scoreTxt(c){return c.score==null?'—':c.score.toFixed(0)}
 function lvColor(c){var l=c.score==null?null:lv(c.score);return l?l[2]:'--sub'}
@@ -403,7 +403,7 @@ function crow(r){var c=C(r),q=r.quote,x=heldOf(r),tag=stTag(r,true);
  return'<div class="row cr'+stCls(c,stt(r))+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
   +'<div class="ci"><div class="c1">'+(canDrag()&&!pinned(r.symbol)?'<span class="dh" title="拖曳排序" aria-label="拖曳排序">☰</span>':'')+pinBtn(r)
   +'<b>'+esc(r.symbol.replace(".TW",""))+'</b>'+(x?'<span class="hlt">持有</span>':'')+(c.heat?'<span class="hot'+(c.heat==="嚴重過熱"?" vh":"")+'">'+c.heat+'</span>':'')+'</div>'
-  +'<div class="c2">'+(tag?tag+' ':'')+'<span>'+esc(r.name)+'</span></div></div>'
+  +'<div class="c2">'+(st.sort==="wr"?wrTxt(r)+' ':'')+(tag?tag+' ':'')+'<span>'+esc(r.name)+'</span></div></div>'
   +'<div class="cq">'+(q?'<b>'+fmtPx(q.price)+'</b>'+(q.chg==null?'':pc(q.chg,2)):'')+'</div>'
   +'<div class="cs" style="color:var('+lvColor(c)+')"><b>'+scoreTxt(c)+'</b><span>'+(c.score==null?'不足':lv(c.score)[1])+'</span></div></div>'}
 // 宮格：四宮格（g2，資訊較多）／九宮格（g3，一眼看完）；底色依便宜度級距
@@ -414,7 +414,7 @@ function tile(r,big){var c=C(r),q=r.quote,x=heldOf(r),w=WR(r),p=c.score==null?50
   +'<div class="ts"><b>'+scoreTxt(c)+'</b><span>'+(c.score==null?'資料不足':lv(c.score)[1])+'</span></div>'
   +(q?'<div class="tq"><b>'+fmtPx(q.price)+'</b> '+(q.chg==null?'':pc(q.chg,big?2:1))+'</div>':'')
   +(big&&x?'<div class="tq">持有 '+fq(x.qty)+' 股 '+(x.ret==null?'':pc(x.ret))+'</div>':'')
-  +(big&&w?'<div class="tq'+(wrOk(w)?' ok':'')+'">勝率 '+w.p.toFixed(0)+'%'+(wrOk(w)?' ✓':'')+'</div>':'')
+  +(big||st.sort==="wr"?'<div class="tq">'+wrTxt(r)+'</div>':'')
   +(tag?'<div class="tg2">'+tag+'</div>':'')
   +'<div class="tbar"><u style="left:'+p+'%"></u></div></div>'}
 // 詳細：原本的一檔一列（含分數條、訊號燈），也是展開時的樣式
@@ -526,9 +526,10 @@ document.getElementById("vt").addEventListener("click",function(e){var b=e.targe
 document.getElementById("tabs").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;st.m=b.dataset.m;[].forEach.call(this.children,function(x){x.setAttribute("aria-pressed",x===b)});render()});
 document.getElementById("only").addEventListener("change",function(){st.only=this.checked;render()});
 document.getElementById("cand").addEventListener("change",function(){st.cand=this.checked;render()});
-function setSort(v){st.sort=v;try{localStorage.setItem("cd_sort",v);localStorage.setItem("cd_dir",String(st.dir))}catch(e){}[].forEach.call(document.getElementById("sortt").children,function(x){x.setAttribute("aria-pressed",x.dataset.s===v);if(x.dataset.s==="chg")x.textContent="漲跌幅"+(v==="chg"?(st.dir<0?"↓":"↑"):"")});if(D)render()}
+var SORTN={custom:"自訂",score:"分數",chg:"漲跌幅",wr:"勝率"};
+function setSort(v){st.sort=v;try{localStorage.setItem("cd_sort",v);localStorage.setItem("cd_dir",String(st.dir))}catch(e){}[].forEach.call(document.getElementById("sortt").children,function(x){var k=x.dataset.s;x.setAttribute("aria-pressed",k===v);x.textContent=SORTN[k]+(k===v&&k!=="custom"?(st.dir<0?"↓":"↑"):"")});if(D)render()}
 // 漲跌幅：再按一次切換「漲最多在上」／「跌最多在上」
-document.getElementById("sortt").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;if(b.dataset.s==="chg"&&st.sort==="chg")st.dir=-st.dir;setSort(b.dataset.s)});
+document.getElementById("sortt").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;st.dir=b.dataset.s===st.sort?-st.dir:-1;setSort(b.dataset.s)});
 function setLay(v){st.lay=v;try{localStorage.setItem("cd_lay",v)}catch(e){}[].forEach.call(document.getElementById("layt").children,function(x){x.setAttribute("aria-pressed",x.dataset.l===v)});if(D)render()}
 document.getElementById("layt").addEventListener("click",function(e){var b=e.target.closest("button");if(b)setLay(b.dataset.l)});
 setLay(st.lay);
