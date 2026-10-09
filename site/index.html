@@ -247,6 +247,10 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 .pd-act{margin-top:6px}.lots2{margin-top:8px;display:grid;gap:2px}
 @media(max-width:480px){.dn{max-width:100%;margin:0 auto}.wb{flex-basis:80px}}
 .foot{font-size:12px;color:var(--sub);margin-top:18px}
+.srch{display:flex;gap:10px;align-items:center;margin:4px 0 10px}
+.srch input{flex:1;min-width:0;font:inherit;font-size:16px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.srch input:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+.srch .dim{font-size:13px;white-space:nowrap}
 .foot a{color:var(--sub)}
 /* ---- 顯示方式：精簡（一行一檔）、四宮格、九宮格 ---- */
 .list.lay-compact .row.cr{grid-template-columns:minmax(0,1fr) auto 50px;gap:10px;align-items:center;padding:9px 12px}
@@ -308,6 +312,7 @@ em.go{color:var(--accent)!important}em.mid,em.boss{color:var(--warm)!important}e
     <div class="tabs" id="layt" title="顯示方式"><button data-l="compact">精簡</button><button data-l="g2">四宮格</button><button data-l="g3">九宮格</button><button data-l="full">詳細</button></div>
     <button class="btn ghost" id="wedit">編輯清單</button>
   </div>
+  <div class="srch"><input type="search" id="q" placeholder="搜尋代碼或名稱，例：SO、NVDA、台積" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="search" aria-label="搜尋標的"><span class="dim" id="qn"></span></div>
   <div class="legend m"><span>很貴</span><span>合理</span><span>很便宜</span></div>
   <div class="legend d"><span>標的</span><span><span>很貴</span><span>中貴</span><span>合理</span><span>便宜（白色刻度＝通知門檻）</span><span>很便宜</span></span><span style="text-align:right">分數</span></div>
   <div id="wl" hidden></div>
@@ -370,8 +375,9 @@ function render(){
  document.getElementById("sum").innerHTML=SUMF.map(function(f){var n=cnt(f[3]);
   return '<button data-f="'+f[0]+'" aria-pressed="'+(st.sum===f[0])+'"'+(n||st.sum===f[0]?'':' disabled')+'><b'+(f[2]?' style="color:var('+f[2]+')"':'')+'>'+n+'</b><span>'+f[1]+'</span></button>'}).join("");
  var sf=st.sum&&SUMF.filter(function(f){return f[0]===st.sum})[0];
- var rows=items.filter(function(r){var c=C(r);return(st.m==="all"||(st.m==="LEV"?isLev(r):r.market===st.m))&&(!st.only||c.score>=20)&&(!st.cand||rank(r)>0)&&(!sf||sf[3](r))})
+ var rows=items.filter(function(r){var c=C(r);return(st.m==="all"||(st.m==="LEV"?isLev(r):r.market===st.m))&&(!st.only||c.score>=20)&&(!st.cand||rank(r)>0)&&(!sf||sf[3](r))&&qHit(r)})
   .map(function(r,i){return[r,i]}).sort(function(x,y){var a=x[0],b=y[0];
+   if(st.q){var ea=a.symbol.replace(/\.TW$/,"")===st.q,eb=b.symbol.replace(/\.TW$/,"")===st.q;if(ea!==eb)return ea?-1:1}
    // 自訂順序：釘選的在最上面；分數／漲跌幅／勝率：完全照數值排（沒有數值的放最後），再按一次反向
    if(st.sort==="custom"){var pa=pinned(a.symbol),pb=pinned(b.symbol);if(pa!==pb)return pa?-1:1;return x[1]-y[1]}
    var va=sortVal(a),vb=sortVal(b);
@@ -561,6 +567,13 @@ function setV(v){st.v=v;try{localStorage.setItem("cd_v",v)}catch(e){}[].forEach.
 document.getElementById("vt").addEventListener("click",function(e){var b=e.target.closest("button");if(b)setV(b.dataset.v)});
 document.getElementById("tabs").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;st.m=b.dataset.m;[].forEach.call(this.children,function(x){x.setAttribute("aria-pressed",x===b)});render()});
 document.getElementById("only").addEventListener("change",function(){st.only=this.checked;render()});
+// 快速搜尋：代碼「開頭」相符（打 S 出現 S 開頭、再打 O 變 SO 開頭），或名稱含有輸入的字；
+// 完整代碼相符的排第一（打 V 時 Visa 在最上面，VOO、VT 仍列在下面，不會被藏起來）
+st.q="";
+function qHit(r){if(!st.q)return true;var k=r.symbol.replace(/\.TW$/,"");
+ return k.indexOf(st.q)===0||((st.q.length>=3||/[^\x00-\x7f]/.test(st.q))&&String(r.name||"").toUpperCase().indexOf(st.q)>=0)}   // 名稱：中文，或英文 3 個字以上才比對（免得打 NV 就跑出名稱含 Invesco 的）
+document.getElementById("q").addEventListener("input",function(){st.q=this.value.trim().toUpperCase();render();
+ document.getElementById("qn").textContent=st.q?document.querySelectorAll("#list [data-t]").length+" 檔":""});
 document.getElementById("cand").addEventListener("change",function(){st.cand=this.checked;render()});
 var SORTN={custom:"自訂",score:"分數",chg:"漲跌幅",wr:"勝率"};
 function setSort(v){st.sort=v;try{localStorage.setItem("cd_sort",v);localStorage.setItem("cd_dir",String(st.dir))}catch(e){}[].forEach.call(document.getElementById("sortt").children,function(x){var k=x.dataset.s;x.setAttribute("aria-pressed",k===v);x.textContent=SORTN[k]+(k===v&&k!=="custom"?(st.dir<0?"↓":"↑"):"")});if(D)render()}
@@ -577,7 +590,7 @@ window.onWatchlistSaved=function(list){if(!D)return;var idx={};list.forEach(func
  setSort("custom");document.getElementById("alerts").insertAdjacentHTML("afterbegin",'<div class="alert">清單已儲存'+(added?'，新增的 '+added+' 檔約 2 分鐘後出現（重新整理頁面）':'')+'。</div>')};
 // 主畫面直接拖曳排序：只有「自訂順序」且沒有篩選時才能拖，放開後存回 watchlist.json
 var listSortable=null;
-function canDrag(){return(st.lay==="full"||st.lay==="compact")&&st.sort==="custom"&&st.m==="all"&&!st.only&&!st.cand&&!st.sum&&!!window.Sortable}
+function canDrag(){return(st.lay==="full"||st.lay==="compact")&&st.sort==="custom"&&st.m==="all"&&!st.only&&!st.cand&&!st.sum&&!st.q&&!!window.Sortable}
 function setupDrag(){
  if(listSortable){listSortable.destroy();listSortable=null}
  if(!canDrag())return;
