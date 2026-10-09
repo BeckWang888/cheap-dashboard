@@ -86,4 +86,5 @@ Claude 的建議優先順序：6 每日總結推播、2 資產走勢圖。
 - Lightweight Charts 陷阱：多格圖表用 `setStretchFactor` 分高度（`setHeight` 在 autoSize 第一次畫之前無效）；某一格唯一的價格軸設 `visible:false` 或 RSI 設 `autoScale:false` 會整張圖畫不出來（Value is null）。
 - 瀏覽器窗格被遮住時 requestAnimationFrame 不跑，圖表量不到高度；要截圖才會真的畫。
 - Yahoo 還原價早期可能是負數（000660.KS 2002 年以前）、0050.TW 的 Yahoo 資料 2014-01-02 有錯誤跳空；`data._clean` 會砍掉負價以前的資料，`lev_target` 單日虧損上限 −99%。
+- 2026-10-09 網頁新增持倉（AI 整理／截圖辨識）把華南金、第一金美股現金對調、均價也略有誤差；使用者說先不用修，偏好直接請 Claude 登打。之後網頁存的持倉要多核對帳戶與現金。
 - Moomoo 顯示夜盤即時價，和網站收盤價會有落差。
