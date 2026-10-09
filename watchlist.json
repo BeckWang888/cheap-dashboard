@@ -480,8 +480,10 @@
   "symbol": "WLDU",
   "name": "Leverage Shares 2X",
   "market": "US",
-  "type": "auto",
-  "group": ""
+  "type": "leveraged",
+  "group": "",
+  "underlying": "VT",
+  "x": 2
  },
  {
   "symbol": "MSFT",

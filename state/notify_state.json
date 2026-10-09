@@ -45,7 +45,7 @@
    "sweet": false
   },
   "SOXX": {
-   "state": "未進便宜區",
+   "state": "轉折確認",
    "heat": "",
    "trough": "",
    "armed": {
@@ -126,7 +126,7 @@
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -292,7 +292,7 @@
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -375,11 +375,11 @@
    "sweet": false
   },
   "SOXQ": {
-   "state": "未進便宜區",
+   "state": "轉折確認",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -526,6 +526,196 @@
     "80": true
    },
    "sweet": false
+  },
+  "QLD": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "QQQI": {
+   "state": "",
+   "heat": "",
+   "trough": "",
+   "armed": {},
+   "sweet": false
+  },
+  "VTI": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "WLDU": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "MSFT": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "CRM": {
+   "state": "轉折初現",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": false,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "RBLX": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "DBX": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "TEM": {
+   "state": "",
+   "heat": "",
+   "trough": "",
+   "armed": {},
+   "sweet": false
+  },
+  "PANW": {
+   "state": "未進便宜區",
+   "heat": "嚴重過熱",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "CRWD": {
+   "state": "未進便宜區",
+   "heat": "過熱",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "V": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "XYZ": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "IBKR": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "LLY": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "BE": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "VST": {
+   "state": "強勢谷底",
+   "heat": "",
+   "trough": "形成中",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "COHR": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
   }
  },
  "sent": {
@@ -550,13 +740,16 @@
   "SOXL.L|cross20": "2026-10-09",
   "SOXL.L|confirm": "2026-10-09",
   "INTC|cross20": "2026-10-09",
-  "半導體/AI|group": "2026-10-09"
+  "半導體/AI|group": "2026-10-09",
+  "SOXQ|cross20": "2026-10-10",
+  "SOXQ|confirm": "2026-10-10",
+  "VST|trough形成中": "2026-10-10"
  },
  "market": {
   "US": 0,
   "TW": 2
  },
  "groups": {
-  "半導體/AI": 4
+  "半導體/AI": 6
  }
 }
