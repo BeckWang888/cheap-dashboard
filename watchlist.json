@@ -1,5 +1,11 @@
 [
  {
+  "symbol": "SNDK",
+  "market": "US",
+  "type": "auto",
+  "group": "記憶體"
+ },
+ {
   "symbol": "SMH",
   "market": "US",
   "type": "etf",
