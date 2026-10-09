@@ -147,6 +147,9 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 #mkt summary{cursor:pointer;font-size:15px}#mkt summary .chip{margin-left:8px}
 .chip{display:inline-block;font-size:12px;font-weight:600;padding:1px 8px;border-radius:10px;background:var(--chip);color:var(--sub)}
 .chip.hot{background:var(--warm);color:#1b2430}.chip.vhot{background:var(--hot);color:#fff}
+.chip.mid{background:color-mix(in srgb,var(--warm) 30%,var(--chip));color:var(--ink)}
+.mh{font-size:14px;margin:16px 0 0;padding-top:12px;border-top:2px solid var(--line)}
+#mkt-sum .chip{margin-right:4px}
 .mi{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 0;border-top:1px solid var(--line)}
 .mi:first-of-type{border-top:0}.mi .bar2{grid-column:1/-1;height:6px;border-radius:3px;background:var(--chip);position:relative;overflow:hidden}
 .mi .bar2 i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--mid),var(--warm) 80%,var(--hot))}
@@ -505,7 +508,7 @@ function marketCard(){
  var M=D.market,box=document.getElementById("mkt");if(!M||!M.indicators||!M.indicators.length){box.hidden=true;return}
  box.hidden=false;var NM={US:"美股",TW:"台股"};
  var chips=Object.keys(M.summary).map(function(k){var s=M.summary[k];return'<span class="chip'+(s.hot>=2?" vhot":s.hot?" hot":"")+'">'+NM[k]+" "+s.hot+"/"+s.total+" 過熱</span>"}).join("");
- document.getElementById("mkt-sum").innerHTML="<b>市場溫度</b>"+chips;
+ document.getElementById("mkt-sum").innerHTML="<b>市場溫度</b>"+chips+macroChip(M.macro);
  var f=function(x,fmt){return fmt==="pct"?(x>0?"+":"")+(x*100).toFixed(1)+"%":x.toFixed(1)};
  var h='<p class="note" style="margin:6px 0">每個指標和自己的歷史比，百分位越高越熱；前 10% 算過熱、前 3% 算嚴重過熱。下面的回測是「進入過熱後」大盤 6 個月的中位數報酬和基準比較：美股的過熱指標歷史上沒有預測力（強勢常延續），台股稍有參考價值。當作「別追高、別加碼」的提醒，不是賣出訊號。</p>';
  ["US","TW"].forEach(function(mk){M.indicators.filter(function(x){return x.market===mk}).forEach(function(x){
@@ -514,8 +517,23 @@ function marketCard(){
    +'<div class="v">'+f(x.value,x.fmt)+' <span class="dim" style="font-size:12px">前 '+Math.max(1,Math.round((1-x.heat)*100))+'%</span></div>'
    +'<div class="bar2"><i style="width:'+(x.heat*100).toFixed(0)+'%"></i></div>'
    +'<div class="bt">過熱後 6 個月：'+pc(b.r126)+'（上漲機率 '+pp(b.win126)+'，'+b.n+' 次）・任意日：'+pc(base.r126)+'（'+pp(base.win126)+'）・資料自 '+x.since.slice(0,4)+' 年</div></div>'})});
+ h+=macroBody(M.macro);
  document.getElementById("mkt-body").innerHTML=h;
 }
+// 總經壓力（油價、利率、殖利率曲線、失業率）：和過熱分開，標示 偏高／過高／超高（或 倒掛、觸發）
+var MSTAT={"偏高":"mid","過高":"hot","超高":"vhot","倒掛":"vhot","觸發":"vhot","升溫":"hot"};
+function macroChip(M){if(!M||!M.total)return'';return'<span class="chip'+(M.warn>=2?" vhot":M.warn?" hot":"")+'">總經壓力 '+M.warn+'/'+M.total+'</span>'}
+function macroBody(M){
+ if(!M||!M.indicators||!M.indicators.length)return'';
+ var f=function(v,fmt){return fmt==="pct"?(v>0?"+":"")+(v*100).toFixed(1)+"%":fmt==="rate"?v.toFixed(2)+"%":fmt==="pp"?(v>0?"+":"")+v.toFixed(2)+" 個百分點":v.toFixed(1)};
+ var h='<h4 class="mh">總經壓力（利率、油價、就業）</h4><p class="note" style="margin:4px 0 6px">和自己的歷史比：前 20% 偏高、前 10% 過高、前 3% 超高（利率只和近 20 年比）。回測對象是標普 500 之後 6 個月：<b>只有「油價年漲幅」過高時明顯偏弱</b>；利率高、殖利率倒掛在 6 個月內沒有一致的影響，比較像「估值承壓、別期待太高」的背景說明。</p>';
+ M.indicators.forEach(function(x){var b=x.bt_hot,base=x.bt_base,top=x.key==="sahm"?'':'前 '+Math.max(1,Math.round((1-x.heat)*100))+'%';
+  h+='<div class="mi"><div><b>'+esc(x.name)+'</b>'+(x.status?' <span class="chip '+(MSTAT[x.status]||"hot")+'">'+x.status+'</span>':' <span class="chip">適中</span>')+'</div>'
+   +'<div class="v">'+f(x.value,x.fmt)+(top?' <span class="dim" style="font-size:12px">'+top+'</span>':'')+'</div>'
+   +'<div class="bar2"><i style="width:'+(x.heat*100).toFixed(0)+'%"></i></div>'
+   +'<div class="bt">'+(x.extra?esc(x.extra)+'・':'')+esc(x.note)+'</div>'
+   +(b&&b.n?'<div class="bt">'+(x.key==="curve"?'倒掛後':'過高時（前 10%）')+' 6 個月：'+pc(b.r126)+'（上漲機率 '+pp(b.win126)+'，'+b.n+' 次）・任意日：'+pc(base.r126)+'（'+pp(base.win126)+'）</div>':'')+'</div>'});
+ return h}
 function alerts(){
  var h="";Object.keys(D.groups||{}).forEach(function(g){var s=D.groups[g];if(s.length>=D.group_alert_min)h+='<div class="alert">'+esc(g)+' 有 '+s.length+' 檔同時在便宜區（'+s.map(esc).join("、")+'），分批時留意這一塊的總曝險。</div>'});
  if(D.failed&&D.failed.length)h+='<div class="alert err">這次更新抓不到：'+D.failed.map(esc).join("、")+'（沿用上次資料或未顯示）</div>';
