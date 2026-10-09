@@ -1,5 +1,12 @@
 {
  "items": {
+  "SNDK": {
+   "state": "",
+   "heat": "",
+   "trough": "",
+   "armed": {},
+   "sweet": false
+  },
   "SMH": {
    "state": "未進便宜區",
    "heat": "",
@@ -375,7 +382,7 @@
    "sweet": false
   },
   "SOXQ": {
-   "state": "轉折確認",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -750,6 +757,6 @@
   "TW": 2
  },
  "groups": {
-  "半導體/AI": 6
+  "半導體/AI": 5
  }
 }

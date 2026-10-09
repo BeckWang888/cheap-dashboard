@@ -2,8 +2,9 @@
  {
   "symbol": "SNDK",
   "market": "US",
-  "type": "auto",
-  "group": "記憶體"
+  "type": "stock",
+  "group": "記憶體",
+  "name": "Sandisk Corporation"
  },
  {
   "symbol": "SMH",
