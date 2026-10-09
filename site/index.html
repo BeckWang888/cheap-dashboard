@@ -287,7 +287,7 @@ em.go{color:var(--accent)!important}em.mid,em.boss{color:var(--warm)!important}e
   <div class="top">
     <div><h1>量化左側交易 Dashboard</h1>
     <p class="note" id="meta">載入中…</p>
-    <div class="rfw"><button class="btn ghost" id="rf">⟳ 立即更新價格</button><span class="dim" id="rfmsg"></span></div></div>
+    <div class="rfw"><button class="btn ghost" id="rf">⟳ 更新最新股價</button><span class="dim" id="rfmsg"></span></div></div>
     <div class="tabs" id="vt" title="百分位基準"><button data-v="full" aria-pressed="true">全部歷史</button><button data-v="5y" aria-pressed="false">近 5 年</button></div>
   </div>
   <nav class="nav"><a href="#" data-view="cheap" aria-current="page">便宜度</a><a href="#holdings" data-view="holdings">持倉</a><a href="#settings" data-view="settings">設定</a></nav>
@@ -438,7 +438,25 @@ function fullRow(r){
 }
 function fmtPx(v){return v==null?'—':v>=1000?v.toLocaleString("en-US",{maximumFractionDigits:1}):v.toFixed(2)}
 function pxLine(r){var q=r.quote;if(!q)return'';var d=q.date.slice(5).replace("-","/");
- return '<div class="px"><b>'+fmtPx(q.price)+'</b>'+(q.chg==null?'':pc(q.chg,2))+'<span class="dim">　'+d+(r.intraday?' 盤中':' 收盤')+'</span></div>'}
+ return '<div class="px"><b>'+fmtPx(q.price)+'</b>'+(q.chg==null?'':pc(q.chg,2))+'<span class="dim">　'+d+(q.live?' '+esc(q.time)+' 即時':r.intraday?' 盤中':' 收盤')+'</span></div>'}
+// ---- 即時報價：Cloudflare Worker 代抓（美股 Yahoo、台股證交所），開網頁和按「更新最新股價」時各抓一次 ----
+var LIVE_URL="https://cheap-dashboard-quotes.beckwang888.workers.dev/quotes";
+function liveSyms(){var s={"TWD=X":1};
+ D.items.forEach(function(r){var k=r.symbol.replace(/\.TW$/,"");if(!/^AU99/.test(k))s[k]=1});   // 臺銀金（AU9901）的價格來自櫃買中心，不抓
+ if(window.Holdings&&Holdings.syms)Holdings.syms().forEach(function(x){if(!/^AU99/.test(x))s[x]=1});
+ return Object.keys(s)}
+function liveFetch(){
+ if(!D)return Promise.reject(new Error("資料還沒載入"));
+ return fetch(LIVE_URL+"?s="+encodeURIComponent(liveSyms().join(",")),{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error("即時報價 HTTP "+r.status);return r.json()}).then(function(j){
+  window.LIVE_Q=j;var n=0,tw=null,us=null;
+  D.items.forEach(function(r){var k=r.symbol.replace(/\.TW$/,""),v=j.q[k],o=r.quote;
+   if(!v||(o&&o.date&&v.date<o.date))return;
+   r.quote={price:v.price,prev:v.prev,chg:v.chg,date:v.date,time:v.time,live:true};r.price=v.price;n++;
+   if(r.market==="TW")tw=tw&&tw>v.date+v.time?tw:v.date+v.time;else us=us&&us>v.date+v.time?us:v.date+v.time});
+  if(window.Holdings&&Holdings.applyLive)Holdings.applyLive();
+  render();
+  var f=function(x){return x?x.slice(5,10).replace("-","/")+" "+x.slice(10):"—"};
+  return n+" 檔已更新（台股 "+f(tw)+"、美股 "+f(us)+"，台灣時間）"})}
 // ---- 我的持倉（從持倉頁的資料算，背景載入；沒有持有就不顯示） ----
 function heldOf(r){return window.Holdings&&Holdings.held?Holdings.held(r.symbol.replace(/\.TW$/,"")):null}
 function fq(v){return v==null?'—':Number(v).toLocaleString("en-US",{maximumFractionDigits:4})}
@@ -597,33 +615,39 @@ function rfWait(since,t0){
  RF.busy=true;document.getElementById("rf").disabled=true;
  var tick=function(){var sec=Math.round((Date.now()-t0)/1000);
   if(sec>600){RF.busy=false;document.getElementById("rf").disabled=false;rfMsg("超過 10 分鐘還沒好（GitHub 可能在排隊），稍後重新整理看看。",true);return}
-  rfMsg("更新中…已等 "+Math.floor(sec/60)+" 分 "+(sec%60)+" 秒（約需 2～3 分鐘，可以先做別的事）");
+  rfMsg("✓ 股價已即時更新；便宜度分數重算中…已等 "+Math.floor(sec/60)+" 分 "+(sec%60)+" 秒（約需 2～3 分鐘）");
   fetch("data.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){
-   if(j.generated!==since){rfMsg("已更新到 "+j.generated+"，重新載入中…");try{localStorage.removeItem("cd_rf")}catch(e){}setTimeout(function(){location.reload()},800)}
+   if(j.generated!==since){rfMsg("分數已重算（"+j.generated+"），重新載入中…");try{localStorage.removeItem("cd_rf")}catch(e){}setTimeout(function(){location.reload()},800)}
    else RF.timer=setTimeout(tick,20000)}).catch(function(){RF.timer=setTimeout(tick,20000)})};
  tick();
 }
 document.getElementById("rf").addEventListener("click",function(){
- if(RF.busy||!D)return;
- if(!GH.token()){rfMsg("這台裝置還沒設定 GitHub 權杖：到「持倉」頁最下方的「存檔設定」貼上權杖後就能用。",true);return}
- var since=D.generated,t0=Date.now();rfMsg("送出中…");this.disabled=true;var btn=this;
+ if(RF.busy||!D)return;var btn=this;btn.disabled=true;rfMsg("抓最新股價中…");
+ liveFetch().then(function(m){btn.disabled=false;rfMsg("✓ "+m+(GH.token()?"。便宜度分數另外送去重算…":"。便宜度分數要等排程重算（設定 GitHub 權杖後按這裡也會一起重算）。"));if(GH.token())setTimeout(rfScores,1500)},
+  function(e){btn.disabled=false;rfMsg("即時股價抓取失敗（"+e.message+"），改請 GitHub 重抓…",true);if(GH.token())rfScores()});
+});
+// 便宜度分數要用整段歷史重算，交給 GitHub Actions（約 2～3 分鐘）
+function rfScores(){
+ var btn=document.getElementById("rf");
+ var since=D.generated,t0=Date.now();btn.disabled=true;
  GH.get("refresh.json").then(function(r){
   var last=Date.parse(r.data.at||0);
   if(Date.now()-last<5*60*1000){   // 5 分鐘內有人按過：已經更新好就告訴他，不然等那次的結果
    var gen=Date.parse(since.replace(" ","T")+":00+08:00");
-   if(gen>=last-60000){btn.disabled=false;rfMsg("剛剛已更新過（"+since+"），5 分鐘後才能再按。");return}
+   if(gen>=last-60000){btn.disabled=false;rfMsg("✓ 股價已是最新；分數剛剛已重算過（"+since+"），5 分鐘內不重複送出。");return}
    rfWait(since,last);return}
   return GH.put("refresh.json",{at:new Date().toISOString(),note:r.data.note||""},r.sha,"手動更新價格").then(function(){
    try{localStorage.setItem("cd_rf",JSON.stringify({since:since,t0:t0}))}catch(e){}
    rfWait(since,t0)});
  }).catch(function(e){btn.disabled=false;rfMsg(e.message,true)});
-});
+}
 // 重新整理頁面後，如果剛按過更新，接著等
 try{var rfs=JSON.parse(localStorage.getItem("cd_rf")||"null");if(rfs&&Date.now()-rfs.t0<600000)setTimeout(function(){if(D&&D.generated===rfs.since)rfWait(rfs.since,rfs.t0);else localStorage.removeItem("cd_rf")},1500)}catch(e){}
 fetch("data.json?t="+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(j){
  D=j;document.getElementById("meta").textContent="更新時間 "+j.generated+"（台灣時間）・台股盤中與收盤後、美股盤中與收盤後自動更新";
  alerts();marketCard();setV(st.v);
- if(window.Holdings&&Holdings.preload)Holdings.preload().then(function(){if(D)render()},function(){});
+ var lv=function(){liveFetch().then(function(m){rfMsg("即時股價："+m)},function(e){rfMsg("即時股價暫時抓不到（"+e.message+"），先顯示排程的價格。",true)})};
+ if(window.Holdings&&Holdings.preload)Holdings.preload().then(function(){if(D)render();lv()},lv);else lv();
 }).catch(function(e){document.getElementById("list").innerHTML='<div class="empty">資料載入失敗（'+esc(e.message)+'），請稍後重新整理。</div>'});
 </script>
 </body>

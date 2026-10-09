@@ -58,6 +58,7 @@
 - 網站標題「量化左側交易 Dashboard」（2026-10-06 使用者要求，不要再叫便宜度）。上方統計（甜蜜點、候選進場、強勢谷底…）可點，點了清單只顯示那幾檔，再點一次或「顯示全部」取消。
 - 釘選存在各裝置瀏覽器 localStorage（`cd_pins`），手機和電腦各自獨立。排序：自訂／分數／漲跌幅／勝率，後三種完全照數值排（沒數值的放最後），再按一次反向、按鈕顯示 ↓↑；釘選置頂只在「自訂」（2026-10-08 改：原本分數排序先分槓桿、再依狀態，看起來沒排好）。依勝率排時精簡／九宮格會多顯示勝率。
 - 走勢圖分當日／五日／日K／週K／月K；月K 用完整歷史合成，標月線 MACD 谷底。
+- **即時報價**（2026-10-09）：Cloudflare Worker `worker/`（`cheap-dashboard-quotes.beckwang888.workers.dev/quotes?s=代碼,…`，使用者的免費 Cloudflare 帳號，workers.dev 子網域 beckwang888；本機已 `wrangler login`，改完在 `worker/` 執行 `npx wrangler@4 deploy`）。台股（數字開頭）問證交所 mis.twse.com.tw（上市上櫃都試，盤中約 5 秒；從 Cloudflare 可連）、抓不到再問 Yahoo .TW/.TWO；美股、.L、匯率 TWD=X 用 Yahoo spark 批次（20 檔一批）；同組代碼快取 10 秒；CORS 只開放正式網站與 localhost:8765。網頁開啟時自動抓一次、頁首「⟳ 更新最新股價」再抓：便宜度頁的價格漲跌（標「即時 HH:MM」）與持倉頁（`window.LIVE_Q` → holdings.js `mergeLive` 蓋在 prices.json 上，日期較舊不蓋）。分數仍要 GitHub 重算：有權杖時按鈕接著觸發下面的 refresh 流程。AU9901 不抓（櫃買中心）。moomoo API 需電腦一直開著 OpenD，使用者不要。本機 curl（schannel）連 workers.dev 會 TLS 失敗，用 Python／瀏覽器測。
 - **立即更新價格**按鈕（頁首）：用存檔權杖改寫 `refresh.json` → push 觸發 update.yml（不需 Actions 權限）→ 約 2～3 分鐘後網頁自動重新載入。5 分鐘內（跨裝置）只觸發一次。FinMind 免費每小時約 300 次、每次更新用 60～80 次，所以不能狂按。不花 Claude token。
 - 排程實測（2026-10-06）：常延遲 1～5 小時、偶爾跳過；要準時需 cron-job.org。
 - 便宜度頁每檔顯示「我的持倉」：卡片價格下一行「持有 N 股・成本 X ±%」，展開最上方藍框（股數、均價、現價、漲幅、市值、損益、佔總資產、各帳戶），「到持倉頁」跳到持股排行並展開；上方統計多「我的持股」可篩選。資料由 holdings.js 的 `Holdings.preload()/held()` 背景載入。

@@ -299,7 +299,7 @@
       + '<div class="hbar" role="img" aria-label="股票 ' + ((1 - cashR) * 100).toFixed(0) + "%、現金 " + (cashR * 100).toFixed(0) + '%"><i style="width:' + ((1 - cashR) * 100).toFixed(1) + '%"></i></div>'
       + '<div class="hbl"><span><i class="sw2" style="background:var(--c1)"></i>股票 ' + compact(sm.stock) + "（" + ((1 - cashR) * 100).toFixed(0) + '%）</span><span><i class="sw2" style="background:var(--cnull)"></i>現金 ' + compact(sm.cash) + "（" + (cashR * 100).toFixed(0) + "%）</span></div></div>";
     h += '<p class="note">美元匯率 ' + (fxv ? fxv.toFixed(3) + "（" + S.prices.fx.date.slice(5).replace("-", "/") + "）" : "—")
-      + "・價格更新 " + esc(S.prices ? S.prices.generated : "—")
+      + "・價格更新 " + esc(S.prices ? S.prices.generated : "—") + (S.prices && S.prices.liveAt ? "・即時報價 " + esc(new Date(S.prices.liveAt).toTimeString().slice(0, 5)) : "")
       + (sm.missing ? '・<span class="neg">' + sm.missing + " 檔還沒有價格</span>" : "")
       + '・<button class="lk" id="hupdn">漲跌色：' + (upDown() === "tw" ? "紅漲綠跌" : "綠漲紅跌") + "</button></p>";
     h += chartCard(sm) + adviceCard(sm) + pnlCard(sm);
@@ -705,6 +705,20 @@
     }
   }
 
+  // 即時報價（Cloudflare 轉接站抓的，index.html 的 Live）蓋在排程的 prices.json 上；日期比較舊的不蓋
+  function mergeLive() {
+    var L = window.LIVE_Q;
+    if (!L || !S.prices || S.prices.liveAt === L.at) return;
+    var q = {};
+    Object.keys(S.prices.q || {}).forEach(function (k) {
+      var o = S.prices.q[k], v = L.q[k];
+      q[k] = v && (!o.date || v.date >= o.date) ? Object.assign({}, o, { price: v.price, prev: v.prev, chg: v.chg, date: v.date, time: v.time, live: true, est: false }) : o;
+    });
+    var f = L.q["TWD=X"], fx0 = S.prices.fx;
+    S.prices = Object.assign({}, S.prices, { q: q, liveAt: L.at, fx: f ? { price: f.price, prev: f.prev, chg: f.chg, date: f.date } : fx0 });
+  }
+  function applyLive() { mergeLive(); if (started && !document.getElementById("holdings").hidden) render(); }
+
   var started = false;
   function start() {
     if (started) return; started = true;
@@ -723,7 +737,7 @@
     render();
     Promise.all([
       loadHoldings(),
-      fetch("prices.json?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.prices = j; }, function () {}),
+      fetch("prices.json?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.prices = j; mergeLive(); }, function () {}),
       fetch("data.json?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.data = j; if (j && j.position_cap) CAP = j.position_cap; }, function () {})
     ]).then(render, function (e) { S.msg = e.message; render(); });
   }
@@ -731,7 +745,7 @@
   function preload() {
     var ps = [];
     if (!S.h) ps.push(loadHoldings());
-    if (!S.prices) ps.push(fetch("prices.json?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.prices = j; }));
+    if (!S.prices) ps.push(fetch("prices.json?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.prices = j; mergeLive(); }));
     return Promise.all(ps);
   }
   // 某代碼跨帳戶合計（原幣別）＋各帳戶明細；沒有持有回傳 null
@@ -751,7 +765,8 @@
   }
 
   window.Holdings = {
-    preload: preload, held: held,
+    preload: preload, held: held, applyLive: applyLive,
+    syms: function () { return S.h ? S.h.lots.map(function (l) { return l.sym; }) : []; },
     openTop: function (sym) { S.chart = "top"; ls("cd_chart", "top"); S.topOpen = sym; },
     start: start, refresh: function () { render(); }, positions: function () { return S.h ? positions() : []; },
     // 截圖辨識的結果放進表格（不直接存檔）
