@@ -478,12 +478,13 @@
  },
  {
   "symbol": "WLDU",
-  "name": "Leverage Shares 2X",
+  "name": "兩倍全球股市",
   "market": "US",
   "type": "leveraged",
   "group": "",
   "underlying": "VT",
-  "x": 2
+  "x": 2,
+  "theme": "全球"
  },
  {
   "symbol": "MSFT",
