@@ -178,6 +178,15 @@ def holdings_prices(now_tw, watched: set) -> dict:
         except Exception as e:
             print(f"[警告] 持股 {sym} 報價失敗：{e}")
             ys, s = "", pd.Series(dtype=float)
+        if ys.endswith((".TW", ".TWO")):
+            # Yahoo 的台股日線偶爾漏掉最新一天（收盤是空的，例如 2026-10-08），價格會停在前一天：
+            # 用便宜度頁同一份 FinMind 資料（當天已抓過、有快取）補上。最新一天本來就是原始價，前一日仍用 Yahoo 的原始價。
+            try:
+                fm = data.load(sym + ".TW")["Close"].dropna()
+                if not fm.empty and (s.empty or fm.index[-1] > s.index[-1]):
+                    s = pd.concat([s, fm.iloc[[-1]]])
+            except Exception as e:
+                print(f"[警告] 持股 {sym} FinMind 補價失敗：{e}")
         if s.empty:
             out["missing"].append(sym)
             continue
