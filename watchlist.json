@@ -449,5 +449,150 @@
   "name": "三倍納史達克",
   "underlying": "QQQ",
   "x": 3
+ },
+ {
+  "symbol": "QLD",
+  "name": "兩倍那斯達克 100",
+  "market": "US",
+  "type": "leveraged",
+  "group": "",
+  "theme": "美股大盤",
+  "underlying": "QQQ",
+  "x": 2
+ },
+ {
+  "symbol": "QQQI",
+  "name": "那斯達克 100 高股息 ETF",
+  "market": "US",
+  "type": "etf",
+  "group": "",
+  "theme": "美股大盤"
+ },
+ {
+  "symbol": "VTI",
+  "name": "美國整體股市 ETF",
+  "market": "US",
+  "type": "etf",
+  "group": "",
+  "theme": "美股大盤"
+ },
+ {
+  "symbol": "WLDU",
+  "name": "Leverage Shares 2X",
+  "market": "US",
+  "type": "auto",
+  "group": ""
+ },
+ {
+  "symbol": "MSFT",
+  "name": "微軟",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "AI／軟體"
+ },
+ {
+  "symbol": "CRM",
+  "name": "賽富時",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "AI／軟體"
+ },
+ {
+  "symbol": "RBLX",
+  "name": "Roblox",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "AI／軟體"
+ },
+ {
+  "symbol": "DBX",
+  "name": "Dropbox",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "AI／軟體"
+ },
+ {
+  "symbol": "TEM",
+  "name": "Tempus AI",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "AI／軟體"
+ },
+ {
+  "symbol": "PANW",
+  "name": "Palo Alto Networks",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "資安"
+ },
+ {
+  "symbol": "CRWD",
+  "name": "CrowdStrike",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "資安"
+ },
+ {
+  "symbol": "V",
+  "name": "Visa",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "金融"
+ },
+ {
+  "symbol": "XYZ",
+  "name": "Block",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "金融"
+ },
+ {
+  "symbol": "IBKR",
+  "name": "盈透證券",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "金融"
+ },
+ {
+  "symbol": "LLY",
+  "name": "禮來",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "生技"
+ },
+ {
+  "symbol": "BE",
+  "name": "Bloom Energy",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "AI 電力"
+ },
+ {
+  "symbol": "VST",
+  "name": "Vistra Energy",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "AI 電力"
+ },
+ {
+  "symbol": "COHR",
+  "name": "Coherent",
+  "market": "US",
+  "type": "stock",
+  "group": "半導體/AI",
+  "theme": "光通訊"
  }
 ]
