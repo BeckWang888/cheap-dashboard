@@ -52,7 +52,7 @@
    "sweet": false
   },
   "SOXX": {
-   "state": "未進便宜區",
+   "state": "轉折確認",
    "heat": "",
    "trough": "",
    "armed": {
@@ -63,11 +63,11 @@
    "sweet": false
   },
   "IBB": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -107,7 +107,7 @@
    "sweet": false
   },
   "SOXL": {
-   "state": "未進便宜區",
+   "state": "轉折確認",
    "heat": "",
    "trough": "",
    "armed": {
@@ -129,7 +129,7 @@
    "sweet": false
   },
   "GGLL": {
-   "state": "轉折確認",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -295,7 +295,7 @@
    "sweet": false
   },
   "GOOG": {
-   "state": "轉折確認",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -404,7 +404,7 @@
    "sweet": false
   },
   "SOXL.L": {
-   "state": "未進便宜區",
+   "state": "轉折確認",
    "heat": "",
    "trough": "",
    "armed": {
@@ -586,7 +586,7 @@
    "sweet": false
   },
   "CRM": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -597,11 +597,11 @@
    "sweet": false
   },
   "RBLX": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -627,7 +627,7 @@
   },
   "PANW": {
    "state": "未進便宜區",
-   "heat": "過熱",
+   "heat": "嚴重過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -670,7 +670,7 @@
    "sweet": false
   },
   "IBKR": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -714,7 +714,7 @@
    "sweet": false
   },
   "COHR": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -762,6 +762,6 @@
   "TW": 2
  },
  "groups": {
-  "半導體/AI": 3
+  "半導體/AI": 5
  }
 }
