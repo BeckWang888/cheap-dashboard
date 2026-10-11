@@ -30,9 +30,23 @@
       + '<label>族群提醒門檻（檔數）<input id="st-gmin" type="number" min="2" max="20" step="1" value="' + esc(c.group_alert_min) + '"></label>'
       + '<label>單一持股上限（佔總資產 %）<input id="st-cap" type="number" min="1" max="100" step="1" value="' + esc(Math.round((c.position_cap || 0.1) * 100)) + '"></label>'
       + "</div></div>";
+    var tg = Alloc.targetsOf(c.alloc_targets);
+    h += '<div class="card"><h3>目標配置（佔總資產 %）</h3><p class="note">持倉頁「目標配置」用這組比例比較現況、算出還差多少。七項加起來要等於 100。</p><div class="sgrid">'
+      + Alloc.BUCKETS.map(function (b) { return '<label>' + esc(b.name) + ' <span class="dim">' + esc(b.role) + '</span><input id="st-al-' + b.id + '" class="st-al" type="number" min="0" max="100" step="1" value="' + esc(tg[b.id]) + '"></label>'; }).join("")
+      + '<label>偏離幾個百分點以內算正常<input id="st-band" type="number" min="1" max="30" step="1" value="' + esc(c.alloc_band || Alloc.DEFAULT_BAND) + '"></label>'
+      + '</div><p class="note" id="st-al-sum" style="margin-top:6px"></p>'
+      + '<h3 style="margin-top:14px">💡 各部位建議</h3><p class="note">持倉頁「目標配置」點開或滑鼠移上去時顯示。情況改變時直接改這裡，不用改程式。</p>'
+      + Alloc.BUCKETS.map(function (b) { return '<label class="stn">' + esc(b.name) + '<textarea id="st-nt-' + b.id + '" rows="5">' + esc((c.alloc_notes || {})[b.id] || "") + "</textarea></label>"; }).join("")
+      + "</div>";
     h += '<div class="bar">' + (can ? '<button class="btn" id="st-save"' + (S.busy ? " disabled" : "") + ">" + (S.busy ? "儲存中…" : "儲存設定") + "</button>" : '<span class="note">要先在「持倉」分頁的「存檔設定」貼上權杖，才能儲存設定。</span>') + "</div>";
     if (S.msg) h += '<p class="note" style="margin-top:8px">' + esc(S.msg) + "</p>";
     el().innerHTML = h;
+    alSum();
+  }
+  function alSum() {
+    var o = document.getElementById("st-al-sum"); if (!o) return;
+    var t = Alloc.BUCKETS.reduce(function (a, b) { return a + (Number(document.getElementById("st-al-" + b.id).value) || 0); }, 0);
+    o.innerHTML = "目前加總 <b>" + t + "%</b>" + (Math.abs(t - 100) > 0.5 ? '<span class="neg">（要等於 100%）</span>' : " ✓");
   }
 
   function num(id) { return Number(document.getElementById(id).value); }
@@ -48,6 +62,13 @@
     c.cooldown_days = Math.max(0, Math.round(num("st-cool")) || 0);
     c.group_alert_min = Math.max(2, Math.round(num("st-gmin")) || 3);
     c.position_cap = Math.min(1, Math.max(0.01, (num("st-cap") || 10) / 100));
+    var al = {}, alSumV = 0;
+    Alloc.BUCKETS.forEach(function (b) { al[b.id] = Math.max(0, num("st-al-" + b.id) || 0); alSumV += al[b.id]; });
+    if (Math.abs(alSumV - 100) > 0.5) { S.msg = "目標配置七項加起來要等於 100%（現在是 " + alSumV + "%）。"; render(); return; }
+    c.alloc_targets = al;
+    c.alloc_notes = {};
+    Alloc.BUCKETS.forEach(function (b) { var v = document.getElementById("st-nt-" + b.id).value.trim(); if (v) c.alloc_notes[b.id] = v; });
+    c.alloc_band = Math.min(30, Math.max(1, Math.round(num("st-band")) || Alloc.DEFAULT_BAND));
     S.busy = true; S.msg = ""; render();
     GH.put("config.json", c, S.sha, "更新設定").then(function (sha) {
       S.sha = sha; S.cfg = c; S.busy = false;
@@ -63,6 +84,7 @@
     if (!started) {
       started = true;
       el().addEventListener("click", function (e) { if (e.target.closest("#st-save")) save(); });
+      el().addEventListener("input", function (e) { if (e.target.classList.contains("st-al")) alSum(); });
     }
     load();
   }
