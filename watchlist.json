@@ -349,6 +349,14 @@
   "theme": "全球"
  },
  {
+  "symbol": "VWRA.L",
+  "name": "Vanguard 全球股市（倫敦，累積型）",
+  "market": "US",
+  "type": "etf",
+  "group": "",
+  "theme": "全球"
+ },
+ {
   "symbol": "SOXL.L",
   "name": "4倍半導體（倫敦）",
   "market": "US",

@@ -16,4 +16,4 @@ jobs:
           cache: pip
       - run: pip install -r requirements-dev.txt
       - run: python -m pytest -q tests
-      - run: node --test tests/parser.test.js
+      - run: node --test tests/parser.test.js tests/alloc.test.js

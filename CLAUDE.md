@@ -35,7 +35,7 @@
 - `update.py` 排程主程式（也產生 `site/k/<代碼>.json` 給 K 線圖：約 5 年日線 OHLC＋近 5 日 5 分鐘走勢）；`dip_backtest.py` 定投點回測；`run_backtest.py` → `report.html`（本機回測報告）；`calibrate.py` 權重校準。
 - `site/index.html`（便宜度頁）、`chart.js`（走勢圖，TradingView Lightweight Charts v5，jsdelivr 載入）、`holdings.js`（持倉頁）、`parser.js`（語音句型解析）、`watchlist.js`（清單編輯、拖曳）、`scan.js`（截圖辨識）、`settings.js`、`gh.js`。
 - 資料：`watchlist.json`（50 檔，欄位 symbol/name/market/type/group/theme，槓桿有 underlying/x，AU9901 有 proxy）、`holdings.json`（lots、cash、names、targets、manual）、`config.json`（門檻、通知開關、冷卻、族群門檻、position_cap）。
-- 測試：`python -m pytest -q tests`、`node --test tests/parser.test.js tests/scan.test.js`。
+- 測試：`python -m pytest -q tests`、`node --test tests/parser.test.js tests/scan.test.js tests/alloc.test.js`。
 
 ## 已定的設計決策
 - 便宜度分數 −100～100：各指標換成「相對自身歷史百分位」。**權重 回撤 50%／MA200 0%／RSI 50%**（calibrate.py 校準結果；權重 0 的指標不參與）。級距 ≥80 極便宜、≥50 很便宜、≥20 便宜、−10~20 合理、−33~−10 小貴、−66~−33 中貴、≤−66 很貴。百分位基準可切「全部歷史／近 5 年」。
@@ -56,6 +56,7 @@
 - **定投點**（使用者提的「RSI<50＋MACD 綠柱」改良）：RSI<50、綠柱開始縮短、站上 200 日均線。回測只比任意日好約 0.5～1 個百分點；「等訊號才買」輸給每月定額（約 95% 標的）。所以只在日K 標箭頭當「不是在追高」參考，週K 不標（加過濾後 5 年才 1 次且表現差），不推播。
 - **v2 改版 1（2026-10-08）顯示方式**：便宜度頁清單可切「精簡／四宮格／九宮格／詳細」（存 localStorage `cd_lay`，預設精簡）。精簡＝一行一檔（代碼、持有、狀態、價格漲跌、分數級距）；宮格底色依級距、底部分數條、甜蜜點金框／強勢谷底藍框；點開會以「詳細」樣式橫跨整排顯示完整內容。詳細＝舊版本的列。拖曳排序只在精簡／詳細。編輯清單：新增欄位與儲存鈕移到最上面（底部也有一組），新增的標的放清單最上面，每檔壓成一行。
 - 網站標題「量化左側交易 Dashboard」（2026-10-06 使用者要求，不要再叫便宜度）。上方統計（甜蜜點、候選進場、強勢谷底…）可點，點了清單只顯示那幾檔，再點一次或「顯示全部」取消。
+- **目標配置**（2026-10-11，持倉頁圖表分頁「目標配置」）：持股依觀察清單的 type／theme 自動歸到七個部位（`site/alloc.js` 的 `bucketOf`）：台股正2（leveraged＋theme 台股大盤）、主題 ETF（其他 1 倍 ETF）、高風險衛星（其他槓桿 ETF＋個股，含 2 倍全球）、全球 ETF（theme 全球，如 VWRA.L、VT）、1 倍大盤（theme 含「大盤」）、黃金（theme 黃金或 AU9901，含 00708L）、現金。目標比例存 `config.json` 的 `alloc_targets`（預設 25/15/7/15/5/18/15，2026-10 回測後的建議）、`alloc_band`（偏離幾個百分點內算正常，預設 5），設定頁可改（七項要加總 100），經 update.py 寫進 data.json。每列顯示目前 %（色條）、目標 %（直線）、還差／超出金額，點開看該部位的持股；超出或不足時「提醒與建議」會列出（現金超出時改成「可以分批投入」）。持股、現金、價格一變就自動重算，不用手動改。新標的若分類不對，改 watchlist 的 theme／type 即可。測試：`node --test tests/alloc.test.js`。風險類別圖也多了「全球 ETF」。
 - **快速搜尋**（2026-10-10）：清單上方搜尋欄（`#q`），代碼開頭相符（打 S→S 開頭、SO→SO 開頭），或名稱含輸入字（中文、或英文 3 字以上）；完整代碼相符的排第一但不藏其他（打 V 時 VOO、VT 仍在）。搜尋時不能拖曳。
 - 釘選存在各裝置瀏覽器 localStorage（`cd_pins`），手機和電腦各自獨立。排序：自訂／分數／漲跌幅／勝率，後三種完全照數值排（沒數值的放最後），再按一次反向、按鈕顯示 ↓↑；釘選置頂只在「自訂」（2026-10-08 改：原本分數排序先分槓桿、再依狀態，看起來沒排好）。依勝率排時精簡／九宮格會多顯示勝率。
 - 走勢圖分當日／五日／日K／週K／月K；月K 用完整歷史合成，標月線 MACD 谷底。

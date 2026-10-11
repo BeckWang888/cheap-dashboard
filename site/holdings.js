@@ -69,7 +69,7 @@
 
   // ---------- 分類 ----------
   var RISK = [   // 顏色跟著類別固定，不跟排名變
-    ["大盤 ETF", "var(--c1)"], ["槓桿 ETF", "var(--c2)"], ["產業／主題 ETF", "var(--c3)"],
+    ["大盤 ETF", "var(--c1)"], ["全球 ETF", "var(--c5)"], ["槓桿 ETF", "var(--c2)"], ["產業／主題 ETF", "var(--c3)"],
     ["黃金", "var(--c4)"], ["個股", "var(--c7)"], ["現金", "var(--cnull)"]
   ];
   var THEME_COLOR = { "半導體": "var(--c1)", "記憶體": "var(--c2)", "美股大盤": "var(--c3)", "台股大盤": "var(--c4)",
@@ -86,7 +86,8 @@
     if (m.type === "leveraged") return "槓桿 ETF";
     if (sym === "AU9901" || m.theme === "黃金") return "黃金";
     if (m.type === "stock") return "個股";
-    return /大盤|全球/.test(m.theme) ? "大盤 ETF" : "產業／主題 ETF";
+    if (m.theme === "全球") return "全球 ETF";
+    return /大盤/.test(m.theme) ? "大盤 ETF" : "產業／主題 ETF";
   }
 
   // ---------- 彙總：同一代碼跨帳戶合併（台幣）----------
@@ -162,7 +163,39 @@
     }
     return [];
   }
-  var CHARTS = [["alloc", "資產配置"], ["risk", "風險類別"], ["theme", "產業主題"], ["acct", "帳戶"], ["top", "持股排行"]];
+  var CHARTS = [["alloc", "資產配置"], ["goal", "目標配置"], ["risk", "風險類別"], ["theme", "產業主題"], ["acct", "帳戶"], ["top", "持股排行"]];
+
+  // ---------- 目標配置：七個部位的現況 vs 目標（分類規則在 alloc.js）----------
+  function goalCalc(sm) {
+    var d = S.data || {};
+    return window.Alloc.compute(sm.syms.map(function (s) { return { sym: s.sym, mv: s.mv, m: s.m }; }), sm.cash, d.alloc_targets, d.alloc_band);
+  }
+  function goalView(sm) {
+    var g = goalCalc(sm), max = 0;
+    g.rows.forEach(function (r) { max = Math.max(max, r.pct, r.target); });
+    max = Math.max(10, Math.ceil(max / 10) * 10);
+    var h = '<p class="note" style="margin:10px 0 6px">每個部位<b>目前</b>佔總資產的比例（色條）和<b>目標</b>（直線）。偏離 ±' + g.band + " 個百分點以內算在範圍內。<b>點一列看包含哪些持股。</b></p>";
+    h += '<div class="gl">';
+    g.rows.forEach(function (r) {
+      var on = S.goalOpen === r.id;
+      var tag = r.status === "ok" ? '<span class="gok">✓ 在範圍內</span>'
+        : r.status === "over" ? '<span class="gov">超出 ' + compact(-r.diffAmt) + "</span>" : '<span class="gun">還差 ' + compact(r.diffAmt) + "</span>";
+      h += '<div class="gr' + (on ? " on" : "") + '" data-goal="' + r.id + '" tabindex="0" role="button" aria-expanded="' + on + '">'
+        + '<div class="gr1"><span><i class="sw2" style="background:' + r.color + '"></i><b>' + esc(r.name) + '</b> <span class="dim">' + esc(r.role) + "</span></span>" + tag + "</div>"
+        + '<div class="gbar"><i style="width:' + (r.pct / max * 100).toFixed(1) + "%;background:" + r.color + '"></i><u style="left:' + (r.target / max * 100).toFixed(1) + '%"></u></div>'
+        + '<div class="gr2"><span>目前 <b>' + r.pct.toFixed(1) + "%</b>（" + compact(r.mv) + "）</span><span>目標 <b>" + r.target + "%</b>（" + compact(r.target / 100 * g.total) + "）</span></div>";
+      if (on) {
+        h += '<div class="gsy">' + (r.id === "cash" ? '<span class="dim">台幣現金 ' + compact(sm.cashTW) + "、美元現金 " + compact(sm.cashUS) + "</span>"
+          : r.syms.length ? r.syms.map(function (x) { return "<span><b>" + esc(x.sym) + "</b> " + x.pct.toFixed(1) + "%</span>"; }).join("") : '<span class="dim">目前沒有持股</span>') + "</div>";
+      }
+      h += "</div>";
+    });
+    h += "</div>";
+    h += '<p class="note" style="margin:8px 0 0">' + (g.move > 0 ? "全部調到目標，大約要搬動 <b>" + compact(g.move) + "</b>（總資產的 " + g.movePct.toFixed(0) + "%）。不用一次調完：新的錢先補不足的部位，超出的部位挑反彈時分批減碼。" : "各部位都在目標附近。")
+      + (Math.abs(g.targetSum - 100) > 0.5 ? ' <span class="neg">目標加總是 ' + g.targetSum + "%，請到「設定」調整成 100%。</span>" : "")
+      + " 分類依觀察清單的類型與主題自動判斷；目標比例在「設定」頁修改。</p>";
+    return h;
+  }
 
   function chartCard(sm) {
     var kind = S.chart || "alloc";
@@ -179,9 +212,10 @@
       });
       return h + "</div></div>";
     }
+    if (kind === "goal") return h + goalView(sm) + "</div>";
     var sl = chartSlices(sm, kind);
     var center = kind === "theme" ? ["股票部位", compact(sm.stock)] : ["總資產", compact(sm.total)];
-    var notes = { alloc: "台股、美股與現金的比例。", risk: "由穩到積極：大盤 ETF、產業 ETF、個股、槓桿 ETF；現金與黃金是緩衝。", theme: "只算股票部位，依產業或主題分類。", acct: "每個帳戶的總值（含現金）。" };
+    var notes = { alloc: "台股、美股與現金的比例。", risk: "由穩到積極：大盤 ETF、全球 ETF、產業 ETF、個股、槓桿 ETF；現金與黃金是緩衝。", theme: "只算股票部位，依產業或主題分類。", acct: "每個帳戶的總值（含現金）。" };
     return h + '<div class="dnw">' + donut(sl, center[0], center[1]) + legend(sl) + "</div><p class='note' style='margin:4px 0 0'>" + notes[kind] + "</p></div>";
   }
 
@@ -255,8 +289,9 @@
       var w = s.mv / sm.total;
       if (w > CAP) A.push(["warn", s.sym + " 佔總資產 " + (w * 100).toFixed(1) + "%", "超過單一持股上限 " + Math.round(CAP * 100) + "%，先別再加碼。"]);
     });
-    var lev = sm.syms.filter(function (s) { return s.risk === "槓桿 ETF"; }).reduce(function (a, s) { return a + s.mv; }, 0) / (sm.total || 1);
-    if (lev > 0.15) A.push([lev > 0.25 ? "warn" : "caution", "槓桿 ETF 佔總資產 " + (lev * 100).toFixed(1) + "%", "槓桿產品波動與耗損大，建議控制在 15% 以內；大跌時虧損會放大 2～4 倍。"]);
+    // 台股正2、黃金正2 是目標配置裡的核心部位，不算進這條（它們的比例看「目標配置」）
+    var lev = sm.syms.filter(function (s) { return s.risk === "槓桿 ETF" && window.Alloc.bucketOf(s.m, s.sym) === "risky"; }).reduce(function (a, s) { return a + s.mv; }, 0) / (sm.total || 1);
+    if (lev > 0.15) A.push([lev > 0.25 ? "warn" : "caution", "槓桿 ETF（不含台股正2）佔總資產 " + (lev * 100).toFixed(1) + "%", "槓桿產品波動與耗損大，建議控制在 15% 以內；大跌時虧損會放大 2～4 倍。"]);
     var semi = sm.syms.filter(function (s) { return /半導體|記憶體/.test(s.m.theme); }).reduce(function (a, s) { return a + s.mv; }, 0) / (sm.stock || 1);
     if (semi > 0.4) A.push(["caution", "半導體與記憶體佔股票部位 " + (semi * 100).toFixed(0) + "%", "這個族群常一起漲跌，分散到其他產業可以降低單一產業修正的衝擊。"]);
     if (cashR < 0.1) A.push(["caution", "現金只剩 " + (cashR * 100).toFixed(1) + "%", "左側分批需要子彈，遇到便宜區時可能沒有資金。"]);
@@ -276,6 +311,16 @@
       if (r < -0.25) A.push([s.risk === "個股" || s.risk === "槓桿 ETF" ? "warn" : "caution", s.sym + " 虧損 " + (r * 100).toFixed(0) + "%", s.risk === "槓桿 ETF" ? "槓桿 ETF 回本需要更大的漲幅，確認是否還符合你的計畫。" : "檢查是否有基本面變化，再決定續抱、停損或分批攤平。"]);
       var t = S.h.targets[s.sym];
       if (t != null) { var gap = t / 100 * sm.total - s.mv; if (gap > sm.total * 0.01) A.push(["info", s.sym + " 距目標 " + t + "% 還差 " + compact(gap), "可等便宜度到門檻時補足。"]); }
+    });
+    goalCalc(sm).rows.forEach(function (r) {
+      if (r.status === "ok") return;
+      var g = Math.abs(r.diffPct);
+      if (r.status === "over" && r.id === "cash") A.push(["info", "現金比目標多 " + g.toFixed(0) + " 個百分點",
+        "目前 " + r.pct.toFixed(1) + "%，目標 " + r.target + "%，約有 " + compact(-r.diffAmt) + " 可以分批投入不足的部位。"]);
+      else if (r.status === "over") A.push([g > 15 ? "warn" : "caution", r.name + " 超出目標 " + g.toFixed(0) + " 個百分點",
+        "目前 " + r.pct.toFixed(1) + "%，目標 " + r.target + "%，約多了 " + compact(-r.diffAmt) + "。新的錢先不要再放這裡，反彈時可以分批減碼。"]);
+      else A.push(["info", r.name + " 低於目標 " + g.toFixed(0) + " 個百分點",
+        "目前 " + r.pct.toFixed(1) + "%，目標 " + r.target + "%，還差約 " + compact(r.diffAmt) + "。新的錢或減碼的錢優先補這裡。"]);
     });
     var order = { warn: 0, caution: 1, chance: 2, info: 3 }, label = { warn: "警示", caution: "注意", chance: "機會", info: "資訊" };
     A.sort(function (a, b) { return order[a[0]] - order[b[0]]; });
@@ -603,6 +648,7 @@
     if (window.Scan && Scan.onClick(t)) return;
     if ((b = t.closest("#hchart button"))) { S.chart = b.dataset.ch; ls("cd_chart", S.chart); render(); return; }
     if ((b = t.closest("[data-goto]"))) { goTo(b.dataset.goto); return; }
+    if ((b = t.closest("[data-goal]"))) { S.goalOpen = S.goalOpen === b.dataset.goal ? null : b.dataset.goal; render(); return; }
     if ((b = t.closest("[data-top]")) && !t.closest(".tbd")) { S.topOpen = S.topOpen === b.dataset.top ? null : b.dataset.top; render(); return; }
     if ((b = t.closest("#hpnl button"))) { S.pnlMode = b.dataset.pm; render(); return; }
     if (t.closest("#hpnlall")) { S.pnlAll = !S.pnlAll; render(); return; }
@@ -728,6 +774,7 @@
     el.addEventListener("input", onInput);
     el.addEventListener("change", onInput);
     el.addEventListener("keydown", function (e) {
+      if (e.target.dataset && e.target.dataset.goal && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); e.target.click(); return; }
       if (e.target.id === "htgt" && e.key === "Enter") { e.preventDefault(); var tk = document.querySelector("[data-tgt-ok]"); if (tk) tk.click(); return; }
       if (e.target.id === "hman" && e.key === "Enter") { e.preventDefault(); var ok = document.querySelector("[data-man-ok]"); if (ok) ok.click(); return; }
       if (e.target.id !== "hren") return;
