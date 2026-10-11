@@ -40,6 +40,10 @@ test("計算：比例、差距金額、要搬動的資金", () => {
   assert.strictEqual(r.move, 500);                // 高風險超出 400＋現金超出 100
 });
 
+test("預設目標加總 100%", () => {
+  assert.strictEqual(Object.values(A.DEFAULT_TARGETS).reduce((a, b) => a + b, 0), 100);
+});
+
 test("目標缺漏時用預設值", () => {
   const t = A.targetsOf({ tw2x: 30 });
   assert.strictEqual(t.tw2x, 30);

@@ -12,8 +12,8 @@
     { id: "gold", name: "黃金", role: "保險", color: "var(--c4)" },
     { id: "cash", name: "現金", role: "生活費與大跌加碼", color: "var(--cnull)" }
   ];
-  // 2026-10 回測後的建議配置（設定頁可改，存在 config.json 的 alloc_targets）
-  var DEFAULT_TARGETS = { tw2x: 25, theme: 15, risky: 7, global: 15, index: 5, gold: 18, cash: 15 };
+  // 2026-10-11 定案的配置（設定頁可改，存在 config.json 的 alloc_targets）
+  var DEFAULT_TARGETS = { tw2x: 28, theme: 15, risky: 7, global: 18, index: 5, gold: 12, cash: 15 };
   var DEFAULT_BAND = 5;   // 偏離目標幾個百分點以內算「在範圍內」
 
   /** m：觀察清單的 {type, theme}；sym：代碼。 */

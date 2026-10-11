@@ -171,20 +171,22 @@
     return window.Alloc.compute(sm.syms.map(function (s) { return { sym: s.sym, mv: s.mv, m: s.m }; }), sm.cash, d.alloc_targets, d.alloc_band);
   }
   function goalView(sm) {
-    var g = goalCalc(sm), max = 0;
+    var g = goalCalc(sm), max = 0, notes = (S.data && S.data.alloc_notes) || {};
     g.rows.forEach(function (r) { max = Math.max(max, r.pct, r.target); });
     max = Math.max(10, Math.ceil(max / 10) * 10);
-    var h = '<p class="note" style="margin:10px 0 6px">每個部位<b>目前</b>佔總資產的比例（色條）和<b>目標</b>（直線）。偏離 ±' + g.band + " 個百分點以內算在範圍內。<b>點一列看包含哪些持股。</b></p>";
+    var h = '<p class="note" style="margin:10px 0 6px">每個部位<b>目前</b>佔總資產的比例（色條）和<b>目標</b>（直線）。偏離 ±' + g.band + " 個百分點以內算在範圍內。<b>點一列看建議（💡）與包含哪些持股</b>；電腦把滑鼠移上去也會出現建議。</p>";
     h += '<div class="gl">';
     g.rows.forEach(function (r) {
       var on = S.goalOpen === r.id;
       var tag = r.status === "ok" ? '<span class="gok">✓ 在範圍內</span>'
         : r.status === "over" ? '<span class="gov">超出 ' + compact(-r.diffAmt) + "</span>" : '<span class="gun">還差 ' + compact(r.diffAmt) + "</span>";
-      h += '<div class="gr' + (on ? " on" : "") + '" data-goal="' + r.id + '" tabindex="0" role="button" aria-expanded="' + on + '">'
-        + '<div class="gr1"><span><i class="sw2" style="background:' + r.color + '"></i><b>' + esc(r.name) + '</b> <span class="dim">' + esc(r.role) + "</span></span>" + tag + "</div>"
+      var note = notes[r.id] || "";
+      h += '<div class="gr' + (on ? " on" : "") + (note && !on ? " tip" : "") + '" data-goal="' + r.id + '" tabindex="0" role="button" aria-expanded="' + on + '"' + (note && !on ? ' data-tip="💡 ' + esc(note) + '"' : "") + ">"
+        + '<div class="gr1"><span><i class="sw2" style="background:' + r.color + '"></i><b>' + esc(r.name) + "</b>" + (note ? ' <span class="gi" aria-hidden="true">💡</span>' : "") + ' <span class="dim">' + esc(r.role) + "</span></span>" + tag + "</div>"
         + '<div class="gbar"><i style="width:' + (r.pct / max * 100).toFixed(1) + "%;background:" + r.color + '"></i><u style="left:' + (r.target / max * 100).toFixed(1) + '%"></u></div>'
         + '<div class="gr2"><span>目前 <b>' + r.pct.toFixed(1) + "%</b>（" + compact(r.mv) + "）</span><span>目標 <b>" + r.target + "%</b>（" + compact(r.target / 100 * g.total) + "）</span></div>";
       if (on) {
+        if (note) h += '<div class="gnote">💡 ' + esc(note) + "</div>";
         h += '<div class="gsy">' + (r.id === "cash" ? '<span class="dim">台幣現金 ' + compact(sm.cashTW) + "、美元現金 " + compact(sm.cashUS) + "</span>"
           : r.syms.length ? r.syms.map(function (x) { return "<span><b>" + esc(x.sym) + "</b> " + x.pct.toFixed(1) + "%</span>"; }).join("") : '<span class="dim">目前沒有持股</span>') + "</div>";
       }
@@ -193,7 +195,7 @@
     h += "</div>";
     h += '<p class="note" style="margin:8px 0 0">' + (g.move > 0 ? "全部調到目標，大約要搬動 <b>" + compact(g.move) + "</b>（總資產的 " + g.movePct.toFixed(0) + "%）。不用一次調完：新的錢先補不足的部位，超出的部位挑反彈時分批減碼。" : "各部位都在目標附近。")
       + (Math.abs(g.targetSum - 100) > 0.5 ? ' <span class="neg">目標加總是 ' + g.targetSum + "%，請到「設定」調整成 100%。</span>" : "")
-      + " 分類依觀察清單的類型與主題自動判斷；目標比例在「設定」頁修改。</p>";
+      + " 分類依觀察清單的類型與主題自動判斷；目標比例與💡建議文字都在「設定」頁修改。</p>";
     return h;
   }
 
