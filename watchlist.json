@@ -628,5 +628,13 @@
   "type": "stock",
   "group": "半導體/AI",
   "theme": "光通訊"
+ },
+ {
+  "symbol": "MSTR",
+  "name": "Strategy（比特幣概念股）",
+  "market": "US",
+  "type": "stock",
+  "group": "",
+  "theme": "比特幣"
  }
 ]
