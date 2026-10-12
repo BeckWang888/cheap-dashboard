@@ -8,3 +8,4 @@ site/prices.json
 calibration.csv
 site/k/
 dip_backtest.csv
+worker/.wrangler/
