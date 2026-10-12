@@ -758,11 +758,11 @@
    "sweet": false
   },
   "MSTR": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -806,7 +806,8 @@
   "USD|cross20": "2026-10-12",
   "AAOI|cross20": "2026-10-12",
   "INTC|cross50": "2026-10-12",
-  "SMCI|cross20": "2026-10-12"
+  "SMCI|cross20": "2026-10-12",
+  "MSTR|cross20": "2026-10-13"
  },
  "market": {
   "US": 0,
