@@ -1,5 +1,21 @@
 [
  {
+  "symbol": "HACK",
+  "name": "資安 ETF（Amplify）",
+  "market": "US",
+  "type": "etf",
+  "group": "",
+  "theme": "資安"
+ },
+ {
+  "symbol": "CIBR",
+  "name": "資安 ETF（First Trust）",
+  "market": "US",
+  "type": "etf",
+  "group": "",
+  "theme": "資安"
+ },
+ {
   "symbol": "SNDK",
   "market": "US",
   "type": "stock",
