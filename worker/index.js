@@ -35,7 +35,7 @@ async function yahoo(symbols) {
         const close = (v.close || []).filter((x) => x != null);
         const price = v.fulldayPrice ?? close[close.length - 1];
         const prev = v.previousClose ?? v.chartPreviousClose;
-        if (price == null) continue;
+        if (!(price > 0)) continue;   // 還沒成交的商品 Yahoo 會給 0
         const ts = v.timestamp ? v.timestamp[v.timestamp.length - 1] : v.end;
         const [date, time] = ts ? twTime(ts) : ["", ""];
         out[sym] = { price, prev: prev ?? null, chg: prev ? price / prev - 1 : null, date, time, src: "yahoo" };
@@ -66,10 +66,38 @@ async function twse(ids) {
   return out;
 }
 
+// 台指期近月（期交所 MIS）：08:45～15:00 用日盤，其餘時間用夜盤（15:00～隔天 05:00；收盤後仍顯示夜盤最後價）
+async function taifexSession(mt) {
+  const body = JSON.stringify({ MarketType: mt, SymbolType: "F", KindID: "1", CID: "TXF", ExpireMonth: "", RowSize: "全部", PageNo: "", SortColumn: "", AscDesc: "A" });
+  const r = await fetch("https://mis.taifex.com.tw/futures/api/getQuoteList", { method: "POST", body, headers: { ...UA, "Content-Type": "application/json" } });
+  if (!r.ok) return null;
+  const rows = ((await r.json()).RtData || {}).QuoteList || [];
+  const spot = rows.find((x) => /^TXF-[SP]$/.test(x.SymbolID));
+  const near = rows.find((x) => /^TXF[A-Z]\d-[FM]$/.test(x.SymbolID));   // 第一個就是近月
+  if (!near) return null;
+  const price = parseFloat(near.CLastPrice), ref = parseFloat(near.CRefPrice), t = near.CTime || "";
+  return { price: price > 0 ? price : null, prev: ref > 0 ? ref : null, chg: price > 0 && ref > 0 ? price / ref - 1 : null,
+           time: t ? t.slice(0, 2) + ":" + t.slice(2, 4) : "", name: near.DispCName, spot: spot && parseFloat(spot.CLastPrice) || null };
+}
+async function taifex() {
+  try {
+    const now = new Date(Date.now() + 8 * 3600 * 1000), hm = now.getUTCHours() * 100 + now.getUTCMinutes();
+    const dayFirst = hm >= 845 && hm < 1500;
+    const [day, night] = await Promise.all([taifexSession("0"), taifexSession("1")]);
+    const pick = dayFirst ? (day && day.price ? [day, "日盤"] : [night, "夜盤"]) : (night && night.price ? [night, "夜盤"] : [day, "日盤"]);
+    if (!pick[0] || !pick[0].price) return null;
+    const open = dayFirst ? hm < 1345 : hm >= 1500 || hm < 500;
+    return { ...pick[0], session: pick[1], open, spot: day && day.spot, date: now.toISOString().slice(0, 10), src: "taifex" };
+  } catch (e) { return null; }
+}
+
 async function quotes(list) {
+  const fut = list.includes("TXF");
+  list = list.filter((s) => s !== "TXF");
   const tw = list.filter(isTW), other = list.filter((s) => !isTW(s));
-  const [a, b] = await Promise.all([twse(tw), yahoo(other)]);
+  const [a, b, f] = await Promise.all([twse(tw), yahoo(other), fut ? taifex() : null]);
   const q = { ...b, ...a };
+  if (f) q.TXF = f;
   const miss = tw.filter((s) => !q[s]);
   if (miss.length) {
     const y = await yahoo(miss.flatMap((s) => [s + ".TW", s + ".TWO"]));
@@ -83,6 +111,16 @@ export default {
     const h = cors(req);
     if (req.method === "OPTIONS") return new Response(null, { headers: h });
     const url = new URL(req.url);
+    if (url.pathname === "/debug") {   // 除錯：看證交所、期交所從 Cloudflare 連得到嗎
+      const out = {};
+      for (const [k, u, init] of [
+        ["twse", "https://mis.twse.com.tw/stock/api/getStockInfo.jsp?json=1&delay=0&ex_ch=tse_0050.tw", { headers: UA }],
+        ["taifex", "https://mis.taifex.com.tw/futures/api/getQuoteList", { method: "POST", headers: { ...UA, "Content-Type": "application/json" },
+          body: JSON.stringify({ MarketType: "1", SymbolType: "F", KindID: "1", CID: "TXF", ExpireMonth: "", RowSize: "全部", PageNo: "", SortColumn: "", AscDesc: "A" }) }]]) {
+        try { const r = await fetch(u, init); out[k] = r.status + " " + (await r.text()).slice(0, 300); } catch (e) { out[k] = "ERR " + e.message; }
+      }
+      return new Response(JSON.stringify(out, null, 1), { headers: { ...h, "Content-Type": "application/json" } });
+    }
     if (url.pathname !== "/quotes") return new Response("ok", { headers: h });
     const list = [...new Set((url.searchParams.get("s") || "").split(",").map((s) => s.trim().toUpperCase()).filter((s) => /^[A-Z0-9.=^-]{1,15}$/.test(s)))].slice(0, 150);
     // 同一組代碼 10 秒內共用結果，避免連按時重複去抓
