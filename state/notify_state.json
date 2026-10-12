@@ -30,11 +30,11 @@
    "sweet": false
   },
   "SMH": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -74,7 +74,7 @@
    "sweet": false
   },
   "SOXX": {
-   "state": "轉折確認",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -129,7 +129,7 @@
    "sweet": false
   },
   "SOXL": {
-   "state": "轉折確認",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -140,11 +140,11 @@
    "sweet": false
   },
   "USD": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -404,7 +404,7 @@
    "sweet": false
   },
   "SOXQ": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -437,7 +437,7 @@
    "sweet": false
   },
   "SOXL.L": {
-   "state": "轉折確認",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -481,11 +481,11 @@
    "sweet": false
   },
   "AAOI": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -522,7 +522,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -619,11 +619,11 @@
    "sweet": false
   },
   "CRM": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -707,7 +707,7 @@
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -747,7 +747,7 @@
    "sweet": false
   },
   "COHR": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -790,13 +790,18 @@
   "IBKR|cross20": "2026-10-10",
   "COHR|cross20": "2026-10-10",
   "SKUU|cross80": "2026-10-12",
-  "SKUU|sweet": "2026-10-12"
+  "SKUU|sweet": "2026-10-12",
+  "SMH|cross20": "2026-10-12",
+  "USD|cross20": "2026-10-12",
+  "AAOI|cross20": "2026-10-12",
+  "INTC|cross50": "2026-10-12"
  },
  "market": {
   "US": 0,
   "TW": 2
  },
  "groups": {
-  "半導體/AI": 5
+  "半導體": 1,
+  "半導體/AI": 9
  }
 }
