@@ -1,5 +1,27 @@
 {
  "items": {
+  "HACK": {
+   "state": "未進便宜區",
+   "heat": "嚴重過熱",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "CIBR": {
+   "state": "未進便宜區",
+   "heat": "嚴重過熱",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
   "SNDK": {
    "state": "",
    "heat": "",
@@ -42,7 +64,7 @@
   },
   "0050.TW": {
    "state": "未進便宜區",
-   "heat": "過熱",
+   "heat": "",
    "trough": "",
    "armed": {
     "20": true,
@@ -141,7 +163,7 @@
   },
   "00631L.TW": {
    "state": "未進便宜區",
-   "heat": "過熱",
+   "heat": "",
    "trough": "",
    "armed": {
     "20": true,
@@ -152,7 +174,7 @@
   },
   "00663L.TW": {
    "state": "未進便宜區",
-   "heat": "過熱",
+   "heat": "",
    "trough": "",
    "armed": {
     "20": true,
@@ -163,7 +185,7 @@
   },
   "00685L.TW": {
    "state": "未進便宜區",
-   "heat": "過熱",
+   "heat": "",
    "trough": "",
    "armed": {
     "20": true,
@@ -345,9 +367,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "SNXX": {
    "state": "",
@@ -766,7 +788,9 @@
   "GOOG|cross20": "2026-10-10",
   "RBLX|cross20": "2026-10-10",
   "IBKR|cross20": "2026-10-10",
-  "COHR|cross20": "2026-10-10"
+  "COHR|cross20": "2026-10-10",
+  "SKUU|cross80": "2026-10-12",
+  "SKUU|sweet": "2026-10-12"
  },
  "market": {
   "US": 0,
