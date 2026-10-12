@@ -96,11 +96,11 @@
    "sweet": false
   },
   "SMCI": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -155,7 +155,7 @@
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -321,7 +321,7 @@
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -369,7 +369,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "SNXX": {
    "state": "",
@@ -660,7 +660,7 @@
   },
   "PANW": {
    "state": "未進便宜區",
-   "heat": "嚴重過熱",
+   "heat": "過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -671,7 +671,7 @@
   },
   "CRWD": {
    "state": "未進便宜區",
-   "heat": "過熱",
+   "heat": "",
    "trough": "",
    "armed": {
     "20": true,
@@ -794,7 +794,8 @@
   "SMH|cross20": "2026-10-12",
   "USD|cross20": "2026-10-12",
   "AAOI|cross20": "2026-10-12",
-  "INTC|cross50": "2026-10-12"
+  "INTC|cross50": "2026-10-12",
+  "SMCI|cross20": "2026-10-12"
  },
  "market": {
   "US": 0,
@@ -802,6 +803,6 @@
  },
  "groups": {
   "半導體": 1,
-  "半導體/AI": 9
+  "半導體/AI": 10
  }
 }
