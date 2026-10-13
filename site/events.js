@@ -5,9 +5,9 @@
 (function () {
   "use strict";
   var S = { cal: null, auto: [], house: [], filter: "all", past: false, msg: "", open: null };
-  var CATS = [["all", "全部"], ["macro", "總經・利率"], ["earn", "財報"], ["tw", "台股"], ["pol", "政治"], ["mine", "我的持股"], ["house", "房產"]];
-  var KIND_CAT = { FOMC: "macro", FOMC_SEP: "macro", CPI: "macro", NFP: "macro", CBC: "macro", TSMC: "tw", TSMC_REV: "tw", ELECTION_US: "pol", ELECTION_TW: "pol", WITCHING: "macro", EARN: "earn", HOUSE: "house" };
-  var KIND_LABEL = { macro: "總經", earn: "財報", tw: "台股", pol: "政治", house: "房產" };
+  var CATS = [["all", "全部"], ["macro", "總經・利率"], ["earn", "財報"], ["tw", "台股"], ["pol", "政治"], ["mine", "我的持股・計畫"], ["house", "房產"]];
+  var KIND_CAT = { FOMC: "macro", FOMC_SEP: "macro", CPI: "macro", NFP: "macro", CBC: "macro", TSMC: "tw", TSMC_REV: "tw", ELECTION_US: "pol", ELECTION_TW: "pol", WITCHING: "macro", EARN: "earn", HOUSE: "house", PLAN: "plan" };
+  var KIND_LABEL = { macro: "總經", earn: "財報", tw: "台股", pol: "政治", house: "房產", plan: "計畫" };
   var WD = "日一二三四五六";
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -35,7 +35,7 @@
     return list.filter(function (e) {
       if (!S.past && daysTo(e.date) < -1) return false;
       if (S.filter === "all") return true;
-      if (S.filter === "mine") return e.mine || e.cat === "house";
+      if (S.filter === "mine") return e.mine || e.cat === "house" || e.cat === "plan";
       return e.cat === S.filter;
     });
   }

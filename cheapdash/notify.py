@@ -100,7 +100,7 @@ def compose(events: list, scores: dict) -> tuple[str, str, int]:
         sc = scores.get(s)
         head = f"{s} {sc:.0f} 分" if sc is not None else s
         lines.append(f"{head}｜{'、'.join(by_sym[s])}")
-    urgent = any(k in ("cross80", "confirm", "sweet") for _, k, _ in events)
+    urgent = any(k in ("cross80", "confirm", "sweet", "plan") for _, k, _ in events)
     title = f"便宜度提醒：{len(order)} 項"
     return title, "\n".join(lines), 4 if urgent else 3
 
@@ -125,3 +125,70 @@ def send(title: str, message: str, priority: int = 3, click: str = "") -> bool:
         detail = e.read().decode("utf-8", "replace") if hasattr(e, "read") else ""
         print(f"[警告] 推播失敗：{e} {detail}")
         return False
+
+
+# ---------------- 計畫提醒（config.json 的 plan_alerts）：依使用者自己的操作計畫，時機到了推播 ----------------
+def avg_costs(holdings: dict) -> dict:
+    """各代碼跨帳戶的平均成本（原幣別、平均成本法，和持倉頁相同）。代碼不含 .TW。"""
+    by = {}
+    for l in sorted(holdings.get("lots", []), key=lambda x: str(x.get("date") or "")):
+        k = (l.get("acct"), l.get("sym"))
+        q, c = by.get(k, (0.0, 0.0))
+        qty, px = float(l.get("qty") or 0), float(l.get("px") or 0)
+        if qty >= 0:
+            q, c = q + qty, c + qty * px
+        else:
+            avg = c / q if q else 0
+            q, c = q + qty, c - avg * -qty
+        by[k] = (q, c)
+    tot = {}
+    for (_, sym), (q, c) in by.items():
+        if q > 1e-9:
+            tq, tc = tot.get(sym, (0.0, 0.0))
+            tot[sym] = (tq + q, tc + c)
+    return {s: c / q for s, (q, c) in tot.items() if q}
+
+
+def plan_events(rows: dict, costs: dict, prev: dict, rules: dict, today: date) -> tuple[list, dict]:
+    """rows：{代碼: {"price", "r5"（近 5 日報酬）, "n_sig"}}；costs：平均成本；prev：上次的 plan 狀態。
+    回傳 (事件, 新的 plan 狀態)。每種提醒各自有冷卻，日期提醒只發一次。"""
+    st = {"sig": dict(prev.get("sig", {})), "be": dict(prev.get("be", {})), "sent": dict(prev.get("sent", {})),
+          "dates": list(prev.get("dates", []))}
+    out = []
+
+    def cool(key, days):
+        last = st["sent"].get(key)
+        if last and (today - date.fromisoformat(last)).days < days:
+            return False
+        st["sent"][key] = today.isoformat()
+        return True
+
+    r = rules.get("signal") or {}
+    for s in r.get("syms", []):
+        x = rows.get(s)
+        if not x or x.get("n_sig") is None:
+            continue
+        on = x["n_sig"] >= r.get("min_sig", 2)
+        # 第一次看到只記錄、不通知；之後從「沒亮夠」變成「亮夠」才通知
+        if on and st["sig"].get(s) is False and cool(s + "|plan_sig", r.get("cooldown", 7)):
+            out.append((s, "plan", f"【計畫】亮 {x['n_sig']} 顆轉折訊號：{r.get('msg', '')}"))
+        st["sig"][s] = on
+    r = rules.get("rebound") or {}
+    for s in r.get("syms", []):
+        x = rows.get(s)
+        if x and x.get("r5") is not None and x["r5"] >= r.get("pct", 0.08) and cool(s + "|plan_rb", r.get("cooldown", 7)):
+            out.append((s, "plan", f"【計畫】近 5 日漲 {x['r5'] * 100:.0f}%：{r.get('msg', '')}"))
+    r = rules.get("breakeven") or {}
+    for s in r.get("syms", []):
+        x, c = rows.get(s), costs.get(s)
+        if not x or not c or x.get("price") is None:
+            continue
+        up = x["price"] >= c
+        if up and st["be"].get(s) is False:   # 之前在成本下、這次回到成本以上才通知
+            out.append((s, "plan", f"【計畫】回到成本 {c:.2f}（現價 {x['price']:.2f}）：{r.get('msg', '')}"))
+        st["be"][s] = up
+    for d in rules.get("dates", []):
+        if d.get("date") and today.isoformat() >= d["date"] and d["date"] not in st["dates"]:
+            out.append(("計畫", "plan", f"【{d['date']}】{d.get('msg', '')}"))
+            st["dates"].append(d["date"])
+    return out, st

@@ -83,6 +83,8 @@ def analyze(item: dict) -> dict:
         own = data.tpex_gold().get(item["symbol"].replace(".TW", "")) if item["symbol"].startswith("AU") else None
         out["quote"] = own or out["quote"]
     out["price"] = out["quote"]["price"]
+    own = (real if lev else ohlc["Close"]).dropna()
+    out["r5"] = num(own.iloc[-1] / own.iloc[-6] - 1, 4) if len(own) > 5 and not item.get("proxy") else None
     # K 線圖用實際買進的那檔（槓桿 ETF 用本身價格）；proxy 標的只有代理標的的歷史
     kdf = real_ohlc if lev else ohlc
     out["_k"] = kdf.iloc[-K_DAYS:]
@@ -305,6 +307,12 @@ def main():
             notify.send("量化左側交易 Dashboard 已啟動", msg, 3, click)
     else:
         events = notify.apply_cooldown(events, state, cfg, now_tw.date())
+        if cfg.get("plan_alerts"):
+            rows = {r["symbol"].replace(".TW", ""): {"price": r.get("price"), "r5": r.get("r5"),
+                    "n_sig": sum(r["v"]["full"]["current"]["sigs"])} for r in results}
+            pe, state["plan"] = notify.plan_events(rows, notify.avg_costs(read_json(ROOT / "holdings.json", {})),
+                                                   prev.get("plan", {}), cfg["plan_alerts"], now_tw.date())
+            events += pe
         if events and send:
             scores = {r["symbol"]: r["v"]["full"]["current"]["score"] for r in results}
             title, msg, pri = notify.compose(events, scores)
