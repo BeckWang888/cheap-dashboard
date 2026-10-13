@@ -34,6 +34,18 @@
 
   // ---------- 計算（萬元）----------
   function annuity(P, rate, years) { var i = rate / 12, n = years * 12; return i ? P * i / (1 - Math.pow(1 + i, -n)) : P / n; }
+  /** 每月房貸（好情況：估價 10 成、第二戶 7 成）。at(r) 回傳利率 r 時各筆月付（萬元）。 */
+  function monthly(d) {
+    var L = d.loan, nA = need(d, 1, 0.7), my = 0, wifeNew = 0;
+    d.presale.units.forEach(function (u, i) { if (u.owner === "太太") wifeNew += nA.loans[i]; else my += nA.loans[i]; });
+    var fi = d.presale.units.map(function (u) { return !!u.first; }).indexOf(true), fl = fi < 0 ? 0 : nA.loans[fi];
+    return { my: my, wifeNew: wifeNew, at: function (r) {
+      // 太太現有房貸：知道實際月付就以它為準，利率上升只加上差額（估）
+      var ex = L.wife_existing_payment ? L.wife_existing_payment + annuity(L.wife_existing, r, L.years) - annuity(L.wife_existing, L.rate, L.years) : annuity(L.wife_existing, r, L.years);
+      var o = { my: annuity(my, r, L.years), wife: annuity(wifeNew, r, L.years), ex: ex, gNow: fl * r / 12, gAfter: annuity(fl, r, L.years - L.grace_years) };
+      o.tot = o.my + o.wife + o.ex; return o;
+    } };
+  }
   /** f：銀行估價／合約價；r2：第二戶貸款成數上限。回傳交屋要補的現金（含雜費），以及我、太太各自的部分。 */
   function need(d, f, r2) {
     var ps = d.presale, mine = 0, wife = 0, loans = [];
@@ -105,19 +117,24 @@
     h += "</tbody></table></div></div>";
 
     // 3. 月付
-    var L = d.loan, nA = need(d, 1, 0.7), my = 0, wifeNew = 0;
-    d.presale.units.forEach(function (u, i) { if (u.owner === "太太") wifeNew += nA.loans[i]; else my += nA.loans[i]; });
-    var first = d.presale.units.filter(function (u) { return u.first; })[0], fi = d.presale.units.indexOf(first);
-    var pmy = annuity(my, L.rate, L.years), pw = annuity(wifeNew, L.rate, L.years), pex = L.wife_existing_payment || annuity(L.wife_existing, L.rate, L.years);
-    var fl = nA.loans[fi], gNow = fl * L.rate / 12, gAfter = annuity(fl, L.rate, L.years - L.grace_years);
-    h += '<div class="card"><h3>③ 每月房貸（好情況、利率 ' + (L.rate * 100).toFixed(2) + "%、" + L.years + ' 年本息均攤）</h3><table class="ht hs-tb"><tbody>'
-      + tr("我（新貸 " + w(my) + "）", w(pmy, 1) + " / 月", "")
-      + tr("太太新貸 " + w(wifeNew), w(pw, 1) + " / 月", "")
-      + tr("太太現有房貸 " + w(L.wife_existing), w(pex, 1) + " / 月" + (L.wife_existing_payment ? "" : '<span class="dim">（估）</span>'), "")
-      + tr("<b>全家合計</b>", "<b>" + w(pmy + pw + pex, 1) + " / 月</b>", "")
-      + tr("我的第一戶寬限期 " + L.grace_years + " 年", w(annuity(fl, L.rate, L.years), 1) + " → " + w(gNow, 1) + "，" + L.grace_years + " 年後 " + w(gAfter, 1), "")
-      + tr("每月收入（我）", w(incomeNow(d), 1) + '<span class="dim">（YouTube ' + d.income.youtube + "＋租金 " + d.income.rent + "）</span>", "")
-      + "</tbody></table><p class=\"note\" style=\"margin-top:8px\">太太的獨立收入、現有房貸實際月付：待確認。</p></div>";
+    var L = d.loan, UP = 0.005, M = monthly(d), my = M.my, wifeNew = M.wifeNew;
+    var p0 = M.at(L.rate), p1 = M.at(L.rate + UP), t0 = p0.tot, t1 = p1.tot;
+    function r3(a, k, bold) {
+      var x = [p0[k], p1[k]], f = function (v) { return (bold ? "<b>" : "") + v.toFixed(1) + (bold ? "</b>" : ""); };
+      return "<tr><td>" + a + "</td><td>" + f(x[0]) + "</td><td>" + f(x[1]) + '</td><td class="hs-warn">+' + (x[1] - x[0]).toFixed(1) + "</td></tr>";
+    }
+    var inc = incomeNow(d);
+    h += '<div class="card"><h3>③ 每月房貸（好情況、' + L.years + ' 年本息均攤，萬元／月）</h3><table class="ht hs-tb"><thead><tr><th></th><th>利率 ' + (L.rate * 100).toFixed(2)
+      + "%</th><th>升息 0.5%<br>（" + ((L.rate + UP) * 100).toFixed(2) + '%）</th><th>多付</th></tr></thead><tbody>'
+      + r3("我（新貸 " + w(my) + "）", "my")
+      + r3("太太新貸 " + w(wifeNew), "wife")
+      + r3("太太現有房貸 " + w(L.wife_existing) + (L.wife_existing_payment ? "" : '<span class="dim">（估）</span>'), "ex")
+      + r3("<b>全家合計</b>", "tot", true)
+      + r3("我的第一戶：寬限期內只繳利息", "gNow")
+      + r3("我的第一戶：寬限期 " + L.grace_years + " 年後", "gAfter")
+      + '<tr><td>每月收入（我）</td><td colspan="3">' + w(inc, 1) + '<span class="dim">（YouTube ' + d.income.youtube + "＋租金 " + d.income.rent + "）</span></td></tr>"
+      + "</tbody></table><p class=\"note\" style=\"margin-top:8px\">升息 0.5% ≈ 台灣央行升息兩碼，房貸利率通常跟著調（指數型房貸）。全家一年多付約 "
+      + w((t1 - t0) * 12, 1) + " 萬。太太的獨立收入、現有房貸實際月付：待確認。</p></div>";
 
     // 4. 提醒
     h += '<div class="card"><h3>④ 提醒條件</h3>' + checks(d, sn, nb).map(function (c) {
@@ -272,7 +289,8 @@
       return { asof: d.asof, delivery: d.presale.delivery_date || "2027（月份待確認）", stock: Math.round(a.stock), lev: Math.round(sn.lev / 1e4), my_cash: Math.round(a.cash), wife_cash: a.wife,
         need_conservative: Math.round(nb.cons.total), need_aggressive: Math.round(nb.aggr.total),
         stock_cap_conservative: Math.round(a.total - nb.cons.total), stock_cap_aggressive: Math.round(a.total - nb.aggr.total),
-        cash_short_conservative: Math.round(Math.max(0, nb.cons.total - a.cash - a.wife)), monthly_income: incomeNow(d), plans: d.plans, pending: d.pending };
+        cash_short_conservative: Math.round(Math.max(0, nb.cons.total - a.cash - a.wife)), monthly_income: incomeNow(d),
+        mortgage_monthly_family: +monthly(d).at(d.loan.rate).tot.toFixed(1), mortgage_monthly_family_if_rate_up_0_5: +monthly(d).at(d.loan.rate + 0.005).tot.toFixed(1), plans: d.plans, pending: d.pending };
     });
   }
 
