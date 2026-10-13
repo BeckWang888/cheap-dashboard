@@ -1,0 +1,132 @@
+# 接手說明（給任何 AI／開發者）
+
+> 這份是**快速上手**：讀完 10 分鐘內就知道這個專案在做什麼、怎麼運作、常見的事怎麼做。
+> 每個功能的細節、參數與「為什麼這樣決定」記在 [`CLAUDE.md`](CLAUDE.md)（按功能累積的設計決策，以它為準）。
+> 這個 repo 是**公開的**：這份文件和 repo 裡的明文檔案都不要寫入密碼、金鑰、權杖或家庭財務金額。
+
+---
+
+## 1. 這是什麼、為誰做的
+
+**量化左側交易 Dashboard**：使用者 Beck（台灣，投資台股＋美股，集中半導體／AI）的個人投資紀律工具。
+網站：https://beckwang888.github.io/cheap-dashboard/
+
+它幫使用者做到四件事：
+1. **不追高**：每檔標的算「便宜度分數」（相對自身歷史），便宜時分批買、貴時不追。
+2. **守住資產配置**：持股自動歸到七個部位，和目標比例比較，算出要補多少、超出多少。
+3. **2027 交屋資金**：三間預售屋交屋時現金要夠，股票部位有上限（資料加密）。
+4. **按計畫執行**：事件表提醒重大日期；AI 依他自己的計畫整理下一步。
+
+**最重要的原則**
+- 這是**紀律輔助工具，不是投資建議**。畫面上要保留這句話；AI 輸出不預測漲跌、不推薦計畫外的新標的。
+- 一律用**繁體中文**、白話。使用者不是工程師：步驟要講清楚，能直接幫他做的就直接做，有疑慮再問。
+- 回測數字要誠實：沒有優勢就說沒有，不要給假精準的機率。
+
+---
+
+## 2. 網站有哪些分頁
+
+| 分頁 | 網址 | 做什麼 | 主要程式 |
+|---|---|---|---|
+| 💹 便宜度 | `#` | 每檔分數（−100～100）、狀態、轉折訊號、甜蜜點、回測勝率、K 線、市場溫度 | `site/index.html`、`chart.js` |
+| 💼 持倉 | `#holdings` | 6 個券商帳戶持股與現金、損益、環圈圖、**目標配置**、截圖／語音登打 | `holdings.js`、`alloc.js`、`scan.js`、`parser.js` |
+| 🧭 建議操作 | `#notes` | AI 依目標配置／交屋／事件整理步驟（按鈕更新）＋使用者筆記 | `notes.js` |
+| 🏠 交屋 | `#housing` | 交屋資金分桶、壓力測試、月付、提醒（**加密資料**） | `housing.js` |
+| 📅 事件表 | `#events` | FOMC、CPI、選舉、財報、台積電、交屋日期 | `events.js`、`events.json` |
+| ⚙️ 設定 | `#settings` | 通知門檻、目標配置比例、各部位建議文字 | `settings.js` |
+
+---
+
+## 3. 架構與資料流
+
+```
+                 ┌──────────────── GitHub Actions：update.yml（交易日 14 次＋改資料檔時）──────────────┐
+watchlist.json ─▶│ update.py                                                                            │
+holdings.json  ─▶│  ├ cheapdash/data.py     抓價格：美股 Yahoo、台股 FinMind（失敗改 Yahoo）           │
+config.json    ─▶│  ├ cheapdash/model.py    便宜度分數、訊號、狀態                                      │
+                 │  ├ backtest.py／winrate.py 回測勝率                                                   │
+                 │  ├ market.py             市場溫度、總經壓力                                          │
+                 │  ├ events.py             美股財報日                                                  │
+                 │  └ notify.py             ntfy 推播（甜蜜點、門檻、族群…）                            │
+                 └─▶ site/data.json、site/prices.json、site/k/*.json ─▶ GitHub Pages 部署              │
+                     state/（通知狀態、每日訊號紀錄）由 bot 提交回 main                                 │
+                 └──────────────────────────────────────────────────────────────────────────────────────┘
+
+瀏覽器（純靜態頁，無後端）
+  ├ 讀 data.json／prices.json／events.json
+  ├ 用使用者的 GitHub 權杖（localStorage）經 GitHub API 讀寫：holdings.json、watchlist.json、config.json、notes.json、housing.enc.json、refresh.json
+  ├ 即時報價：Cloudflare Worker（worker/，Yahoo 奇摩／證交所／Yahoo Finance）
+  └ AI：瀏覽器直接呼叫 Gemini（使用者自己的免費金鑰，存在 localStorage）
+```
+
+- **沒有伺服器**：所有計算在 GitHub Actions（Python）或瀏覽器（純 JS，無框架、無建置步驟）。
+- **網頁存檔**：寫入 main 分支的 JSON → 若是 `holdings/watchlist/config/refresh/site/**` 會觸發重新計算與部署；`notes.json`、`housing.enc.json` 不會。
+
+---
+
+## 4. 檔案地圖
+
+**資料（使用者的，會一直變動；改版回復時要保留）**
+| 檔案 | 內容 |
+|---|---|
+| `holdings.json` | `lots`（每筆買賣：acct、sym、date、qty、px、cashAdj）、`cash`（各帳戶各幣別現金）、`names`、`manual` |
+| `watchlist.json` | 觀察清單：symbol（台股加 `.TW`）、name、market、type（etf／stock／leveraged）、theme、槓桿的 `underlying`／`x`、`proxy`、`hist_proxy` |
+| `config.json` | 通知門檻與開關、目標配置 `alloc_targets`、偏離範圍 `alloc_band`、各部位建議 `alloc_notes` |
+| `notes.json` | 使用者筆記 `text`＋AI 建議 `ai` |
+| `housing.enc.json` | 交屋資料（**AES-GCM 加密**，密碼只有使用者有） |
+| `site/events.json` | 固定行事曆（總經、選舉、台積電…），**AI 要定期整理** |
+| `state/` | bot 寫的通知狀態、`signal_log.csv`（每日分數紀錄） |
+| `refresh.json` | 網頁「立即更新」按鈕寫入，用來觸發排程 |
+
+**程式**
+| 位置 | 用途 |
+|---|---|
+| `update.py` | 排程主程式 |
+| `cheapdash/` | Python 模組（見上圖） |
+| `site/*.js` | 各分頁；`gh.js`＝GitHub API 讀寫共用 |
+| `worker/` | Cloudflare Worker 即時報價（`npx wrangler@4 deploy`，使用者本機登入過） |
+| `tests/` | `python -m pytest -q tests`、`node --test tests/*.test.js` |
+| `calibrate.py`、`run_backtest.py`、`dip_backtest.py` | 本機研究用 |
+
+**其他文件**：`CLAUDE.md`（設計決策與陷阱，最完整）、`SPEC.md`（最初規格）、`README.md`、`docs/legacy-v1.md`（舊版本 v1 說明與回復方式）。
+長期投資研究（槓桿、黃金、各國股市、配置回測）在另一個 repo：`BeckWang888/10X` 的 `lrs/results/*.md`。
+
+---
+
+## 5. 核心觀念（做判斷前要懂）
+
+- **便宜度分數**：離一年高點的回撤 50%＋RSI 50%，各自換成「相對這檔自身歷史的百分位」。≥20 便宜、≥50 很便宜、≥80 極便宜。
+  基準「全部歷史」是主要依據（推播、甜蜜點、勝率都用它）；「近 5 年」只是參考。需要約 4 年資料，新標的用 `hist_proxy` 補歷史。
+- **槓桿 ETF** 用一倍標的計分（SOXL→SOXX、台股正2→0050…）。
+- **甜蜜點**＝分數 ≥80，或月線 MACD 谷底確認且分數 ≥20。
+- **目標配置（2026-10-11 定案）**：台股正2 28%、主題 ETF 15%、高風險衛星 7%、全球 ETF 18%、1 倍大盤 5%、黃金 12%、現金 15%。
+  使用者的執行原則：槓桿部位反彈時分批賣、不攤平；正2 分批買；VWRA 可一次買；黃金分批。
+- **交屋優先**：2027 交屋的保守情境現金要夠，股票有持有上限；交屋專款不算在投資配置裡。細節在加密的交屋分頁。
+
+---
+
+## 6. 常見操作
+
+| 使用者說 | 怎麼做 |
+|---|---|
+| 「買了／賣了 X」或傳券商截圖 | 改 `holdings.json`：新增一筆 lot（賣出 qty 為負），價格用**含手續費的成本**；華南金、第一金的現金＝銀行交割戶餘額，要跟著扣／加，使用者給了餘額就以他給的為準。幣別以截圖為準。新代碼也要加進 `watchlist.json`。 |
+| 「新增追蹤 X」 | `watchlist.json` 加一筆；上市不到約 4 年的加 `hist_proxy`；槓桿型填 `underlying`、`x`。 |
+| 「改目標配置／建議文字」 | `config.json` 的 `alloc_targets`（七項加總 100）、`alloc_notes`（開頭標日期）。 |
+| 「改交屋資料」 | 資料加密，**請使用者提供密碼**（或請他在交屋分頁「編輯資料」自己改）。不要把密碼或明文寫進任何檔案。 |
+| 官方公布新的 FOMC／CPI 日期 | 更新 `site/events.json`，推算的日期標 `"est": true`。 |
+| 改網頁功能 | 改 `site/`，用 375px 手機寬度實際看過（深色、淺色都看），再提交。 |
+
+**提交方式**：功能改動開分支 → PR → 合併到 main（Pages 從 main 部署）。純資料更新（登打持倉、筆記）可直接進 main。合併後確認 Actions「更新 dashboard」成功。
+
+---
+
+## 7. 規則與陷阱
+
+- **安全**：repo 公開。金鑰、權杖、ntfy 頻道（repo secret `NTFY_TOPIC`）、交屋密碼都不能進 repo；Gemini 金鑰與 GitHub 權杖只存在使用者瀏覽器。
+- **資料 vs 程式**：回復舊版本或大改時只動程式、保留資料檔；改了資料格式要寫轉換方式。
+- **FinMind 免費額度**每小時約 300 次，每次更新用 60～80 次：不要頻繁觸發排程。
+- `update.py` 的 `main()` 裡有區域變數叫 `events`，事件模組要用別名 `evcal` 匯入。
+- 漲跌色是**紅漲綠跌**：`.pos`／`.neg` 的顏色跟著它變，表示「好／壞」時不要直接用這兩個 class。
+- 本機預覽（`python -m http.server 8765`，開 `/site/`）不能存檔；`site/data.json`、`prices.json` 不進版控，本機那份可能是測試用假資料。
+- 台股 T+2 交割；AU9901 單位是台錢（3.75 公克）；Moomoo 顯示夜盤價，和網站收盤價會有落差。
+- 更多陷阱見 `CLAUDE.md` 的「已知陷阱」。

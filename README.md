@@ -2,8 +2,10 @@
 
 避免 FOMO、輔助左側分批進場的工具。規格見 [SPEC.md](SPEC.md)。不提供投資建議。
 
+**接手（AI 或開發者）請先讀 [AGENTS.md](AGENTS.md)**：目的、架構、檔案地圖、常見操作。設計決策細節在 [CLAUDE.md](CLAUDE.md)。
+
 ## 運作方式
-- GitHub Actions 每個交易日自動執行 6 次（台股、美股各在開盤後、盤中、收盤後），見 `.github/workflows/update.yml`。
+- GitHub Actions 每個交易日自動執行 14 次（台股、美股盤中與收盤後），改了資料檔也會馬上跑，見 `.github/workflows/update.yml`。
 - 每次執行 `update.py`：抓資料 → 算分數與訊號 → 產生 `site/data.json` → 發布到 GitHub Pages → 有新事件就用 ntfy 推播。
 - `state/` 由 Actions 自動提交：通知狀態（避免重複通知）與每日訊號紀錄 `signal_log.csv`（日後檢驗用）。
 
