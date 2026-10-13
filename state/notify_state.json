@@ -898,5 +898,18 @@
   "記憶體": 1,
   "半導體": 1,
   "半導體/AI": 16
+ },
+ "plan": {
+  "sig": {
+   "MU": false,
+   "SNDK": false
+  },
+  "be": {
+   "SNXX": false,
+   "MUU": false,
+   "SKUU": false
+  },
+  "sent": {},
+  "dates": []
  }
 }
