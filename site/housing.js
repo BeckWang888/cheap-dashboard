@@ -178,7 +178,7 @@
     ["appraisal.pct", "銀行估價結果 %（例 85，沒有留空）"], ["appraisal.r2", "銀行核准的第二戶成數（例 0.7）"],
     ["thresholds.stock_drop_pct", "股票跌幅提醒 %"], ["thresholds.stock_base", "股票基準（萬）"], ["thresholds.income_floor", "月收入底線"]
   ];
-  var LISTS = [["properties", "房產"], ["presale_notes", "左營預售屋"], ["tax", "稅務規則"], ["plans", "已定方向"], ["pending", "待確認"]];
+  var LISTS = [["milestones", "重要日期（一行一個：YYYY-MM-DD 事件，會出現在事件表）"], ["properties", "房產"], ["presale_notes", "左營預售屋"], ["tax", "稅務規則"], ["plans", "已定方向"], ["pending", "待確認"]];
   function get(o, p) { return p.split(".").reduce(function (a, k) { return a == null ? a : a[k]; }, o); }
   function set(o, p, v) { var ks = p.split("."), last = ks.pop(); ks.reduce(function (a, k) { return a[k] = a[k] || {}; }, o)[last] = v; }
   function editCard(d) {
@@ -276,5 +276,30 @@
     });
   }
 
-  window.Housing = { start: start, summary: summary, _calc: { need: need, annuity: annuity } };
+  /** 給事件表用：已解鎖（或這台裝置記住密碼）時回傳房產相關的日期，否則回傳空陣列。 */
+  function events() {
+    var ready = S.data ? Promise.resolve(S.data)
+      : !GH.ls(PWKEY) ? Promise.resolve(null)
+      : (S.file ? Promise.resolve(S.file) : GH.get(FILE).then(function (r) { S.file = r.data; S.sha = r.sha; return r.data; }))
+          .then(function (f) { return decrypt(f, GH.ls(PWKEY)); }).then(function (d) { S.data = d; return d; }, function () { return null; });
+    return ready.then(function (d) {
+      if (!d) return [];
+      var out = (d.milestones || []).map(function (line) {
+        var m = /^(\d{4}-\d{2}-\d{2})\s+(.+)$/.exec(line); return m ? { date: m[1], title: m[2], kind: "HOUSE", level: "高" } : null;
+      }).filter(Boolean);
+      var dd = d.presale.delivery_date;
+      if (dd) {
+        var t = new Date(dd.length === 7 ? dd + "-01" : dd);
+        if (!isNaN(t)) {
+          var iso = function (x) { return x.toISOString().slice(0, 10); };
+          out.push({ date: iso(t), title: "左營預售屋交屋（付尾款）", kind: "HOUSE", level: "高" });
+          var c = new Date(t); c.setMonth(c.getMonth() - 6);
+          out.push({ date: iso(c), title: "距交屋 6 個月：找銀行估價、確認現金是否備足", kind: "HOUSE", level: "高" });
+        }
+      }
+      return out;
+    });
+  }
+
+  window.Housing = { start: start, summary: summary, events: events, _calc: { need: need, annuity: annuity } };
 })();

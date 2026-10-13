@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 
 from cheapdash import backtest, data, market, meta, notify, winrate
+from cheapdash import events as evcal
 from cheapdash.model import SIGNAL_NAMES, compute
 from cheapdash.summary import current, lev_info, lev_target, num
 
@@ -268,6 +269,11 @@ def main():
     except Exception as e:
         print(f"[警告] 市場溫度計算失敗：{e}")
         payload["market"] = None
+    try:
+        payload["events_auto"] = evcal.earnings(evcal.symbols_for(items))
+    except Exception as e:
+        print(f"[警告] 財報日抓取失敗：{e}")
+        payload["events_auto"] = []
     (SITE / "data.json").write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     log_signals(results, now_tw.strftime("%Y-%m-%d"))
     prices = holdings_prices(now_tw, {r["symbol"].replace(".TW", "") for r in results})
