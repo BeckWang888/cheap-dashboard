@@ -368,7 +368,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "GOOG": {
    "state": "未進便宜區",
@@ -628,7 +628,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "TQQQ": {
    "state": "未進便宜區",
