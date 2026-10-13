@@ -34,7 +34,7 @@
 - `cheapdash/model.py` 分數與訊號；`backtest.py`；`market.py` 市場溫度；`meta.py` 新標的自動判斷（名稱、類型、槓桿對應與倍數）；`notify.py`；`summary.py`；`winrate.py` 回測勝率。
 - `update.py` 排程主程式（也產生 `site/k/<代碼>.json` 給 K 線圖：約 5 年日線 OHLC＋近 5 日 5 分鐘走勢）；`dip_backtest.py` 定投點回測；`run_backtest.py` → `report.html`（本機回測報告）；`calibrate.py` 權重校準。
 - `site/index.html`（便宜度頁）、`chart.js`（走勢圖，TradingView Lightweight Charts v5，jsdelivr 載入）、`holdings.js`（持倉頁）、`parser.js`（語音句型解析）、`watchlist.js`（清單編輯、拖曳）、`scan.js`（截圖辨識）、`settings.js`、`gh.js`。
-- 資料：`watchlist.json`（50 檔，欄位 symbol/name/market/type/group/theme，槓桿有 underlying/x，AU9901 有 proxy）、`holdings.json`（lots、cash、names、targets、manual）、`config.json`（門檻、通知開關、冷卻、族群門檻、position_cap）。
+- 資料：`watchlist.json`（約 80 檔，欄位 symbol/name/market/type/group/theme，槓桿有 underlying/x，AU9901 有 proxy，新標的可有 hist_proxy）、`holdings.json`（lots、cash、names、targets、manual）、`config.json`（門檻、通知開關、冷卻、族群門檻、position_cap）。
 - 測試：`python -m pytest -q tests`、`node --test tests/parser.test.js tests/scan.test.js tests/alloc.test.js`。
 
 ## 已定的設計決策
@@ -46,7 +46,7 @@
 - 月K 標記：金▲甜蜜（谷底時分數 ≥20）、藍▲強勢（站上年線）、灰▲弱（跌破年線）。
 - **總經壓力**（2026-10-09 使用者要求，市場溫度卡片下方、與過熱分開計數，`market.build_macro`）：油價年漲幅（WTI CL=F，全歷史百分位）、美債 10 年 ^TNX／3 個月 ^IRX（近 20 年百分位）、殖利率曲線 10Y−3M（<0 倒掛）、失業率 Sahm 規則（BLS 免金鑰 API，近 3 年，同日快取 data/bls_unrate.json；≥0.3 升溫、≥0.5 觸發）。前 20% 偏高／前 10% 過高／前 3% 超高，摘要「總經壓力 n/5」（過高以上才算），不推播。回測（SPY 6 個月）：**只有油價年漲幅前 10% 明顯偏弱**（−2.4%、上漲 39% vs 任意日 +7%、78%；SOXX −4.7% vs +10.6%）；利率水準高、10Y 半年急升、倒掛 6 個月內都沒有偏空。非農、CPI 等單月數據太雜、不另列，就業以 Sahm 規則代表。油價、短債曾 ≤0，`data._clean` 會砍掉之前歷史，所以用 `_raw_yahoo` 不經清理。FRED 從本機連不上（逾時），所以沒用。
 - 個股乖離過熱與美股市場過熱指標回測**沒有預測力**（強勢延續），只當「別追高」提醒；台股市場溫度略有參考性。市場溫度指標：標普/台灣50 乖離、VIX、FINRA 美股融資、FinMind 台股融資。巴菲特指標、AAII、NAAIM 因資料來源不可用而不做。
-- 槓桿 ETF 以一倍標的計分（SOXL→SOXX×3、USD→SMH×2、GGLL→GOOGL×2、SOXL.L→SOXX×4、台股正2→0050×2、SKUU→000660.KS×2、MAGX→MAGS×2、SNXX→SNDK×2）。歷史太短的新 ETF 顯示「資料不足」。
+- 槓桿 ETF 以一倍標的計分（SOXL→SOXX×3、USD→SMH×2、GGLL→GOOGL×2、SOXL.L→SOXX×4、台股正2→0050×2、SKUU→000660.KS×2、MAGX→MAGS×2、SNXX→SNDK×2）。歷史太短的新標的顯示「資料不足」（分數要約 4 年資料：52 週回撤先要 1 年，百分位再要 3 年）。**補歷史**（2026-10-13）：watchlist 的 `hist_proxy` 欄位＝上市前用相近標的的走勢補歷史（`data.splice_history`，等比例接在上市第一天），只影響分數與回測，報價、K 線仍用本身；槓桿 ETF 則補它對應的一倍標的。目前：台股科技／半導體 ETF（00947、00941、00990A、00927、00929）→ 0052；00995A、009816 → 0050；009800、009801、MAGS、MAGX、ANTW、QQQI → QQQ；SNDK、SNXX、DRAM → MU。卡片顯示「上市前用 X 的走勢補歷史」。沒有合適代理的（SPCX、TEM、6940）維持資料不足。
 - AU9901 臺銀金：櫃買中心交易，**單位是台錢（3.75 公克）**，價格用櫃買 API，分數用國際金價 GC=F。
 - 持倉成本：第一金用「投資成本÷股數」（含手續費），華南金用畫面「成本均」。賣出用平均成本法；尚無已實現損益。
 - 漲跌色預設**紅漲綠跌**（可切換）。持倉頁有環圈圖（資產配置／風險類別／產業主題／帳戶）、持股排行、損益條圖、提醒與建議。持股排行可點開：跨帳戶合計（股數、平均成本、現價、漲幅、市值、損益、今日、佔比、目標、便宜度）＋各帳戶明細卡片，並可跳到便宜度頁看該檔走勢。

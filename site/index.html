@@ -451,7 +451,7 @@ function fullRow(r){
   h+='<div class="row'+(c.sweet?" sweet":s[1]==="strong"?" strong":s[1]==="go"?" go":s[1]==="boss"?" boss":"")+(st.open===r.symbol?" open":"")+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
    +'<div class="id">'+(canDrag()&&!pinned(r.symbol)?'<span class="dh" title="拖曳排序" aria-label="拖曳排序">☰</span>':'')+pinBtn(r)+'<b>'+esc(r.symbol.replace(".TW",""))+'</b>'+heat+(r.intraday?'<span class="live">盤中</span>':'')+'<span class="nm">'+esc(r.name)+'</span>'
    +pxLine(r)+heldLine(r)
-   +(L?'<div class="lv">'+L.x+' 倍・對應 '+esc(L.underlying)+'</div>':'')+(r.thin?'<div class="lv warn">資料不足，分數僅供參考</div>':'')
+   +(L?'<div class="lv">'+L.x+' 倍・對應 '+esc(L.underlying)+'</div>':'')+(r.hist_proxy?'<div class="lv">上市前用 '+esc(r.hist_proxy.replace(".TW",""))+' 的走勢補歷史</div>':'')+(r.thin?'<div class="lv warn">資料不足，分數僅供參考</div>':'')
    +'<div class="sig"><span>'+dots+'</span><em class="'+s[1]+'">'+s[0]+'</em>'+(c.sweet?'<span class="sw">甜蜜點</span>':'')+'</div></div>'
    +'<div class="sc"><b>'+(c.score==null?'—':c.score.toFixed(0))+'</b><span style="color:var('+(l?l[2]:'--sub')+')">'+(l?l[1]:'')+'</span>'+(WR(r)?'<span class="wr'+(wrOk(WR(r))?' ok':'')+'" title="回測勝率：歷史上同樣狀態買進，6 個月後上漲的機率；✓＝在便宜區，且 3 個月、6 個月、1 年都高於這檔平常">勝率 '+WR(r).p.toFixed(0)+'%'+(wrOk(WR(r))?' ✓':'')+'</span>':'')+'</div>'
    +'<div class="th">'+(D.thresholds||[20,50,80]).map(function(t){return'<i style="left:'+((t+100)/2)+'%"></i>'}).join("")+'<u style="left:'+p+'%"></u></div>'

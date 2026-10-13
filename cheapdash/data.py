@@ -217,3 +217,17 @@ def tpex_gold() -> dict:
         out[x["GoldCode"]] = {"price": price, "date": date_s, "prev": round(price / (1 + chg), 2),
                               "chg": round(chg, 5), "ys": "櫃買黃金現貨", "ccy": "TWD"}
     return out
+
+
+def splice_history(own: pd.Series, proxy: pd.Series) -> pd.Series:
+    """上市不久的 ETF 歷史太短（分數要約 4 年資料才算得出來），上市前用相近標的的走勢補：
+    proxy 在 own 第一天之前的價格，等比例縮放到 own 第一天的價位接上去。之後完全用 own 本身。"""
+    own, proxy = own.dropna(), proxy.dropna()
+    if own.empty or proxy.empty:
+        return own
+    first = own.index[0]
+    before = proxy[proxy.index < first]
+    at = proxy[proxy.index <= first]
+    if before.empty or at.empty:
+        return own
+    return pd.concat([before * (own.iloc[0] / at.iloc[-1]), own])
