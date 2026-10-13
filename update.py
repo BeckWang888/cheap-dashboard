@@ -42,12 +42,16 @@ def analyze(item: dict) -> dict:
     base = item["underlying"] if lev else item.get("proxy") or item["symbol"]
     ohlc = data.load(base, refresh=True)
     close = ohlc["Close"]
+    if item.get("hist_proxy"):
+        # 上市不久的標的（槓桿 ETF 則是它對應的一倍標的）：上市前用相近標的的走勢補歷史，分數才算得出來；報價、K 線仍用本身
+        # 只用到上市前的舊資料，當天抓過就用快取（省 FinMind 額度）
+        close = data.splice_history(close, data.load(item["hist_proxy"])["Close"])
     last_day = close.index[-1].date()
     closed_today = last_day < now.date() or now.time() >= close_t
     target = lev_target(close, item["x"]) if lev else close
     naive_now = now.replace(tzinfo=None)
 
-    out = {k: item.get(k) for k in ("symbol", "name", "market", "type", "group", "theme", "x")}
+    out = {k: item.get(k) for k in ("symbol", "name", "market", "type", "group", "theme", "x", "hist_proxy")}
     out["base"] = base
     out["intraday"] = not closed_today
     out["quote"] = quote(close)

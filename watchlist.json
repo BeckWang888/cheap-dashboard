@@ -1,5 +1,23 @@
 [
  {
+  "symbol": "00927.TW",
+  "name": "群益半導體收益",
+  "market": "TW",
+  "type": "etf",
+  "group": "半導體/AI",
+  "theme": "半導體",
+  "hist_proxy": "0052.TW"
+ },
+ {
+  "symbol": "00929.TW",
+  "name": "復華台灣科技優息",
+  "market": "TW",
+  "type": "etf",
+  "group": "半導體/AI",
+  "theme": "半導體",
+  "hist_proxy": "0052.TW"
+ },
+ {
   "symbol": "HACK",
   "name": "資安 ETF（Amplify）",
   "market": "US",
@@ -20,7 +38,8 @@
   "market": "US",
   "type": "stock",
   "group": "記憶體",
-  "name": "Sandisk Corporation"
+  "name": "Sandisk Corporation",
+  "hist_proxy": "MU"
  },
  {
   "symbol": "SMH",
@@ -175,7 +194,8 @@
   "market": "TW",
   "type": "etf",
   "group": "半導體/AI",
-  "theme": "半導體"
+  "theme": "半導體",
+  "hist_proxy": "0052.TW"
  },
  {
   "symbol": "00830.TW",
@@ -191,7 +211,8 @@
   "market": "TW",
   "type": "etf",
   "group": "半導體/AI",
-  "theme": "半導體"
+  "theme": "半導體",
+  "hist_proxy": "0052.TW"
  },
  {
   "symbol": "00990A.TW",
@@ -199,7 +220,8 @@
   "market": "TW",
   "type": "etf",
   "group": "半導體/AI",
-  "theme": "AI／軟體"
+  "theme": "AI／軟體",
+  "hist_proxy": "0052.TW"
  },
  {
   "symbol": "00995A.TW",
@@ -207,7 +229,8 @@
   "market": "TW",
   "type": "etf",
   "group": "",
-  "theme": "台股大盤"
+  "theme": "台股大盤",
+  "hist_proxy": "0050.TW"
  },
  {
   "symbol": "009816.TW",
@@ -215,7 +238,8 @@
   "market": "TW",
   "type": "etf",
   "group": "",
-  "theme": "台股大盤"
+  "theme": "台股大盤",
+  "hist_proxy": "0050.TW"
  },
  {
   "symbol": "00662.TW",
@@ -231,7 +255,8 @@
   "market": "TW",
   "type": "etf",
   "group": "",
-  "theme": "美股大盤"
+  "theme": "美股大盤",
+  "hist_proxy": "QQQ"
  },
  {
   "symbol": "009801.TW",
@@ -239,7 +264,8 @@
   "market": "TW",
   "type": "etf",
   "group": "",
-  "theme": "美股大盤"
+  "theme": "美股大盤",
+  "hist_proxy": "QQQ"
  },
  {
   "symbol": "00757.TW",
@@ -320,7 +346,8 @@
   "underlying": "SNDK",
   "x": 2,
   "group": "半導體/AI",
-  "theme": "記憶體"
+  "theme": "記憶體",
+  "hist_proxy": "MU"
  },
  {
   "symbol": "MAGX",
@@ -330,7 +357,8 @@
   "underlying": "MAGS",
   "x": 2,
   "group": "",
-  "theme": "美股大盤"
+  "theme": "美股大盤",
+  "hist_proxy": "QQQ"
  },
  {
   "symbol": "DRAM",
@@ -338,7 +366,8 @@
   "type": "etf",
   "group": "半導體/AI",
   "name": "Roundhill Memory ETF",
-  "theme": "記憶體"
+  "theme": "記憶體",
+  "hist_proxy": "MU"
  },
  {
   "symbol": "MU",
@@ -428,7 +457,8 @@
   "market": "US",
   "type": "etf",
   "group": "",
-  "theme": "美股大盤"
+  "theme": "美股大盤",
+  "hist_proxy": "QQQ"
  },
  {
   "symbol": "AMZN",
@@ -460,7 +490,8 @@
   "market": "US",
   "type": "etf",
   "group": "",
-  "theme": "AI／軟體"
+  "theme": "AI／軟體",
+  "hist_proxy": "QQQ"
  },
  {
   "symbol": "00708L.TW",
@@ -497,7 +528,8 @@
   "market": "US",
   "type": "etf",
   "group": "",
-  "theme": "美股大盤"
+  "theme": "美股大盤",
+  "hist_proxy": "QQQ"
  },
  {
   "symbol": "VTI",
