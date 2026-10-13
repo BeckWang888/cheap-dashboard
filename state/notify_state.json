@@ -360,7 +360,7 @@
    "sweet": false
   },
   "AU9901.TW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -368,7 +368,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "GOOG": {
    "state": "未進便宜區",
@@ -423,7 +423,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "SNXX": {
    "state": "觀察中",
@@ -587,7 +587,7 @@
    "sweet": false
   },
   "INTC": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -620,7 +620,7 @@
    "sweet": false
   },
   "00708L.TW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -628,7 +628,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "TQQQ": {
    "state": "未進便宜區",
@@ -860,7 +860,7 @@
   "00708L.TW|cross20": "2026-10-07",
   "00708L.TW|cross50": "2026-10-07",
   "00708L.TW|cross80": "2026-10-07",
-  "00708L.TW|sweet": "2026-10-07",
+  "00708L.TW|sweet": "2026-10-14",
   "SOXX|cross20": "2026-10-09",
   "SOXX|confirm": "2026-10-09",
   "SOXL|cross20": "2026-10-09",
