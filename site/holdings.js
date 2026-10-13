@@ -813,8 +813,21 @@
       accts: ps.sort(function (a, b) { return b.qty - a.qty; }).map(function (p) { return { name: acctName(p.acct), qty: p.qty, avg: p.avg, ret: p.cost && p.mv != null ? p.mv / p.cost - 1 : null }; }) };
   }
 
+  // 給交屋、建議操作等頁面用：持倉市值摘要（台幣）。lev＝槓桿 ETF 市值；buckets＝目標配置各部位
+  function snapshot() {
+    var ps = [preload()];
+    if (!S.data) ps.push(fetch("data.json?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { S.data = j; }, function () {}));
+    return Promise.all(ps).then(function () {
+      var sm = summarize(), lev = 0, g = goalCalc(sm);
+      sm.syms.forEach(function (s) { if (s.m.type === "leveraged") lev += s.mv; });
+      return { stock: sm.stock, lev: lev, cash: sm.cash, total: sm.total, missing: sm.missing,
+        fx: fx(), at: S.prices ? S.prices.generated : "", goal: g,
+        syms: sm.syms.map(function (s) { return { sym: s.sym, name: s.m.name, type: s.m.type, theme: s.m.theme, mv: s.mv, ret: s.cost ? s.mv / s.cost - 1 : null, score: s.m.cur ? s.m.cur.score : null, state: s.m.cur ? s.m.cur.state : "" }; }) };
+    });
+  }
+
   window.Holdings = {
-    preload: preload, held: held, applyLive: applyLive,
+    preload: preload, held: held, applyLive: applyLive, snapshot: snapshot,
     syms: function () { return S.h ? S.h.lots.map(function (l) { return l.sym; }) : []; },
     openTop: function (sym) { S.chart = "top"; ls("cd_chart", "top"); S.topOpen = sym; },
     start: start, refresh: function () { render(); }, positions: function () { return S.h ? positions() : []; },
