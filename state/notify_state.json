@@ -105,17 +105,17 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
   },
   "IBB": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -160,7 +160,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -404,11 +404,11 @@
    "sweet": false
   },
   "MUU": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -453,17 +453,17 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
   },
   "MU": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -475,7 +475,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -508,7 +508,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -587,7 +587,7 @@
    "sweet": false
   },
   "INTC": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -609,12 +609,12 @@
    "sweet": false
   },
   "ANTW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -781,11 +781,11 @@
    "sweet": false
   },
   "IBKR": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -836,7 +836,7 @@
    "sweet": false
   },
   "MSTR": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -888,7 +888,15 @@
   "MSTR|cross20": "2026-10-13",
   "00830.TW|cross20": "2026-10-13",
   "00941.TW|confirm": "2026-10-13",
-  "00990A.TW|confirm": "2026-10-13"
+  "00990A.TW|confirm": "2026-10-13",
+  "SOXX|cross50": "2026-10-13",
+  "SOXL|cross50": "2026-10-13",
+  "MUU|cross20": "2026-10-13",
+  "DRAM|cross50": "2026-10-13",
+  "MU|cross20": "2026-10-13",
+  "SOXQ|cross50": "2026-10-13",
+  "SOXL.L|cross50": "2026-10-13",
+  "ANTW|cross50": "2026-10-13"
  },
  "market": {
   "US": 0,
@@ -897,7 +905,7 @@
  "groups": {
   "記憶體": 1,
   "半導體": 1,
-  "半導體/AI": 16
+  "半導體/AI": 18
  },
  "plan": {
   "sig": {
