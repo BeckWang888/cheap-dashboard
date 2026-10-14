@@ -111,7 +111,7 @@
    "sweet": false
   },
   "IBB": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -368,7 +368,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "GOOG": {
    "state": "未進便宜區",
@@ -404,7 +404,7 @@
    "sweet": false
   },
   "MUU": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -459,7 +459,7 @@
    "sweet": false
   },
   "MU": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -628,7 +628,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "TQQQ": {
    "state": "未進便宜區",
@@ -720,7 +720,7 @@
   },
   "DBX": {
    "state": "未進便宜區",
-   "heat": "過熱",
+   "heat": "",
    "trough": "",
    "armed": {
     "20": true,
@@ -905,7 +905,7 @@
  "groups": {
   "記憶體": 1,
   "半導體": 1,
-  "半導體/AI": 18
+  "半導體/AI": 16
  },
  "plan": {
   "sig": {
