@@ -492,7 +492,7 @@
    "sweet": false
   },
   "VWRA.L": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -911,24 +911,8 @@
   "美股": 1
  },
  "digest": {
-  "pending": [
-   [
-    "USD",
-    "cross50",
-    "跨上 50"
-   ],
-   [
-    "GOOG",
-    "confirm",
-    "轉折確認"
-   ],
-   [
-    "TSLA",
-    "trough形成中",
-    "月線 MACD 谷底（形成中，跌破年線，弱勢谷底小心）"
-   ]
-  ],
-  "last": "2026-10-14"
+  "pending": [],
+  "last": "2026-10-15"
  },
  "plan": {
   "sig": {
