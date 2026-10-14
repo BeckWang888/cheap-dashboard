@@ -306,20 +306,26 @@ def main():
         if send:
             notify.send("量化左側交易 Dashboard 已啟動", msg, 3, click)
     else:
+        holdings = read_json(ROOT / "holdings.json", {})
+        events = notify.filter_scope(events, notify.scope_syms(cfg, holdings), {r["symbol"] for r in results})
         events = notify.apply_cooldown(events, state, cfg, now_tw.date())
+        # 一般事件併入每日摘要；計畫提醒（使用者自己的操作計畫）照樣即時發
+        events, state["digest"] = notify.digest(events, prev.get("digest", {}), cfg, now_tw)
+        scores = {r["symbol"]: r["v"]["full"]["current"]["score"] for r in results}
+        if events and send:
+            title, msg, pri = notify.compose(events, scores, "便宜度每日摘要" if cfg.get("digest") else "便宜度提醒")
+            notify.send(title, msg, min(pri, 3) if cfg.get("digest") else pri, click)
         if cfg.get("plan_alerts"):
             rows = {r["symbol"].replace(".TW", ""): {"price": r.get("price"), "r5": r.get("r5"),
                     "n_sig": sum(r["v"]["full"]["current"]["sigs"])} for r in results}
-            pe, state["plan"] = notify.plan_events(rows, notify.avg_costs(read_json(ROOT / "holdings.json", {})),
+            pe, state["plan"] = notify.plan_events(rows, notify.avg_costs(holdings),
                                                    prev.get("plan", {}), cfg["plan_alerts"], now_tw.date())
+            if pe and send:
+                title, msg, pri = notify.compose(pe, scores, "計畫提醒")
+                notify.send(title, msg, pri, click)
             events += pe
-        if events and send:
-            scores = {r["symbol"]: r["v"]["full"]["current"]["score"] for r in results}
-            title, msg, pri = notify.compose(events, scores)
-            notify.send(title, msg, pri, click)
-        print(f"新事件 {len(events)} 項")
-    if failed and send:
-        notify.send("便宜度：部分資料抓取失敗", "、".join(failed) + "\n其餘標的已更新。", 2, click)
+        print(f"發出事件 {len(events)} 項")
+    # 抓取失敗不推播，網站上會顯示（payload["failed"]）
     (STATE / "notify_state.json").write_text(json.dumps(state, ensure_ascii=False, indent=1), encoding="utf-8")
     print("完成", payload["generated"])
 

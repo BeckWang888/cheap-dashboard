@@ -14,6 +14,11 @@
   "sweet": true
  },
  "cooldown_days": 7,
+ "notify_cross_min": 50,
+ "notify_scope": "held",
+ "focus": [],
+ "digest": true,
+ "digest_hour": 6,
  "group_alert_min": 3,
  "site_url": "https://beckwang888.github.io/cheap-dashboard/",
  "position_cap": 0.1,
