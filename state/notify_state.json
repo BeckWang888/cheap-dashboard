@@ -133,9 +133,9 @@
    "sweet": false
   },
   "TSLA": {
-   "state": "轉折初現",
+   "state": "重點觀察",
    "heat": "",
-   "trough": "",
+   "trough": "形成中",
    "armed": {
     "20": false,
     "50": true,
@@ -598,7 +598,7 @@
    "sweet": false
   },
   "TSM": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -653,7 +653,7 @@
    "sweet": false
   },
   "QQQI": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -664,7 +664,7 @@
    "sweet": false
   },
   "VTI": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -848,7 +848,7 @@
   }
  },
  "sent": {
-  "TSLA|trough形成中": "2026-10-03",
+  "TSLA|trough形成中": "2026-10-15",
   "GGLL|confirm": "2026-10-10",
   "TSLA|cross50": "2026-10-03",
   "台股市場|market": "2026-10-03",
@@ -921,6 +921,11 @@
     "GOOG",
     "confirm",
     "轉折確認"
+   ],
+   [
+    "TSLA",
+    "trough形成中",
+    "月線 MACD 谷底（形成中，跌破年線，弱勢谷底小心）"
    ]
   ],
   "last": "2026-10-14"
