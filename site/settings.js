@@ -25,6 +25,11 @@
     h += '<div class="card"><h3>通知類型</h3>' + NOTIFY.map(function (n) {
       return '<label class="tg"><input type="checkbox" id="st-n-' + n[0] + '"' + ((c.notify || {})[n[0]] ? " checked" : "") + "><span><b>" + esc(n[1]) + '</b><span class="dim">' + esc(n[2]) + "</span></span></label>";
     }).join("") + "</div>";
+    h += '<div class="card"><h3>推播範圍與頻率</h3><p class="note">減少推播：一般事件每天整理成一則摘要（美股收盤後），「計畫提醒」照樣即時發；抓取失敗只在網站顯示。</p>'
+      + '<label class="tg"><input type="checkbox" id="st-digest"' + (c.digest ? " checked" : "") + '><span><b>每日摘要</b><span class="dim">一天只推一次，台灣時間早上 ' + esc(c.digest_hour || 6) + ' 點後第一次更新時發</span></span></label>'
+      + '<label class="tg"><input type="checkbox" id="st-scope"' + (c.notify_scope === "held" ? " checked" : "") + '><span><b>只通知持股＋重點觀察</b><span class="dim">不勾＝觀察清單全部都通知</span></span></label>'
+      + '<div class="sgrid"><label>重點觀察代碼（逗號分隔，台股不用 .TW）<input id="st-focus" type="text" value="' + esc((c.focus || []).join(", ")) + '"></label>'
+      + '<label>「跨上門檻」從幾分開始通知<input id="st-cmin" type="number" min="-100" max="100" step="1" value="' + esc(c.notify_cross_min == null ? th[0] : c.notify_cross_min) + '"></label></div></div>';
     h += '<div class="card"><h3>其他</h3><div class="sgrid">'
       + '<label>同一事件冷卻天數<input id="st-cool" type="number" min="0" max="60" step="1" value="' + esc(c.cooldown_days) + '"></label>'
       + '<label>族群提醒門檻（檔數）<input id="st-gmin" type="number" min="2" max="20" step="1" value="' + esc(c.group_alert_min) + '"></label>'
@@ -60,6 +65,10 @@
     c.notify = c.notify || {};
     NOTIFY.forEach(function (n) { c.notify[n[0]] = document.getElementById("st-n-" + n[0]).checked; });
     c.cooldown_days = Math.max(0, Math.round(num("st-cool")) || 0);
+    c.digest = document.getElementById("st-digest").checked;
+    c.notify_scope = document.getElementById("st-scope").checked ? "held" : "all";
+    c.focus = document.getElementById("st-focus").value.split(/[,，\s]+/).map(function (x) { return x.trim().toUpperCase().replace(/\.TW$/, ""); }).filter(Boolean);
+    c.notify_cross_min = isFinite(num("st-cmin")) ? num("st-cmin") : th[0];
     c.group_alert_min = Math.max(2, Math.round(num("st-gmin")) || 3);
     c.position_cap = Math.min(1, Math.max(0.01, (num("st-cap") || 10) / 100));
     var al = {}, alSumV = 0;

@@ -47,7 +47,7 @@ config.json    ─▶│  ├ cheapdash/model.py    便宜度分數、訊號、�
                  │  ├ backtest.py／winrate.py 回測勝率                                                   │
                  │  ├ market.py             市場溫度、總經壓力                                          │
                  │  ├ events.py             美股財報日                                                  │
-                 │  └ notify.py             ntfy 推播（甜蜜點、門檻、族群…）                            │
+                 │  └ notify.py             ntfy 推播（每日摘要＋計畫即時）                             │
                  └─▶ site/data.json、site/prices.json、site/k/*.json ─▶ GitHub Pages 部署              │
                      state/（通知狀態、每日訊號紀錄）由 bot 提交回 main                                 │
                  └──────────────────────────────────────────────────────────────────────────────────────┘
@@ -145,6 +145,7 @@ config.json    ─▶│  ├ cheapdash/model.py    便宜度分數、訊號、�
 - **安全**：repo 公開。金鑰、權杖、ntfy 頻道（repo secret `NTFY_TOPIC`）、交屋密碼都不能進 repo；Gemini 金鑰與 GitHub 權杖只存在使用者瀏覽器。
 - **資料 vs 程式**：回復舊版本或大改時只動程式、保留資料檔；改了資料格式要寫轉換方式。
 - **FinMind 免費額度**每小時約 300 次，每次更新用 60～80 次：不要頻繁觸發排程。
+- **推播要少**（2026-10-14）：一般事件只發每日摘要（早上 6 點後一次）、只限持股＋重點觀察、不推「跨上 20」、抓取失敗不推；只有【計畫】提醒即時發。設定在 `config.json`（`digest`、`notify_scope`、`focus`、`notify_cross_min`），細節見 CLAUDE.md「減少推播」。新增推播類型前先想會不會又變多。
 - `update.py` 的 `main()` 裡有區域變數叫 `events`，事件模組要用別名 `evcal` 匯入。
 - 漲跌色是**紅漲綠跌**：`.pos`／`.neg` 的顏色跟著它變，表示「好／壞」時不要直接用這兩個 class。
 - 本機預覽（`python -m http.server 8765`，開 `/site/`）不能存檔；`site/data.json`、`prices.json` 不進版控，本機那份可能是測試用假資料。

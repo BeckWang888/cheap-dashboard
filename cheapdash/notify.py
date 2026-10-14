@@ -12,6 +12,7 @@ def find_events(items: list, prev: dict, cfg: dict) -> tuple[list, dict]:
     """items：本次各標的的 current（預設百分位基準）。回傳 (事件清單, 新狀態)。"""
     on = cfg["notify"]
     ths = cfg["thresholds"]
+    cross_min = cfg.get("notify_cross_min", -999)  # 低於這個門檻的「跨上」只記錄、不通知（例如不通知跨上 20）
     new_items, events = {}, []
     for it in items:
         sym, c = it["symbol"], it["current"]
@@ -25,7 +26,7 @@ def find_events(items: list, prev: dict, cfg: dict) -> tuple[list, dict]:
                 k = str(th)
                 was_armed = armed.get(k, score < th)  # 第一次看到這檔：目前在門檻下才算 armed
                 if was_armed and score >= th:
-                    if on["cross"]:
+                    if on["cross"] and th >= cross_min:
                         events.append((sym, f"cross{th}", f"跨上 {th}"))
                     armed[k] = False
                 elif score < th - HYSTERESIS:
@@ -89,7 +90,7 @@ def apply_cooldown(events: list, state: dict, cfg: dict, today: date) -> list:
     return keep
 
 
-def compose(events: list, scores: dict) -> tuple[str, str, int]:
+def compose(events: list, scores: dict, title: str = "便宜度提醒") -> tuple[str, str, int]:
     """彙整成一則：依分數由高到低排序，同一檔的事件合併成一行。"""
     by_sym = {}
     for sym, key, text in events:
@@ -101,8 +102,40 @@ def compose(events: list, scores: dict) -> tuple[str, str, int]:
         head = f"{s} {sc:.0f} 分" if sc is not None else s
         lines.append(f"{head}｜{'、'.join(by_sym[s])}")
     urgent = any(k in ("cross80", "confirm", "sweet", "plan") for _, k, _ in events)
-    title = f"便宜度提醒：{len(order)} 項"
+    title = f"{title}：{len(order)} 項"
     return title, "\n".join(lines), 4 if urgent else 3
+
+
+def norm(sym: str) -> str:
+    return sym[:-3] if sym.endswith(".TW") else sym
+
+
+def scope_syms(cfg: dict, holdings: dict):
+    """notify_scope 為 "held" 時：只通知持股＋config 的 focus（重點觀察）＋計畫提醒裡的代碼。回傳 None 代表全部都通知。"""
+    if cfg.get("notify_scope", "all") != "held":
+        return None
+    pa = cfg.get("plan_alerts") or {}
+    plan = {s for k in ("signal", "rebound", "breakeven") for s in (pa.get(k) or {}).get("syms", [])}
+    return set(avg_costs(holdings)) | {norm(s) for s in cfg.get("focus", [])} | plan
+
+
+def filter_scope(events: list, syms, watch: set) -> list:
+    """個股事件只留範圍內的；族群、市場等不是個股的事件照留。"""
+    if syms is None:
+        return events
+    return [e for e in events if e[0] not in watch or norm(e[0]) in syms]
+
+
+def digest(events: list, prev: dict, cfg: dict, now) -> tuple[list, dict]:
+    """每日摘要：事件先存起來，每天第一次跑到 digest_hour（台灣時間，預設 6 點，美股收盤後）才一次發出。
+    回傳 (這次要發的事件, 新的 digest 狀態)。沒開 digest 時直接回傳原事件。"""
+    if not cfg.get("digest"):
+        return events, {}
+    pend = [list(e) for e in prev.get("pending", [])] + [list(e) for e in events]
+    today = now.date().isoformat()
+    if now.hour >= cfg.get("digest_hour", 6) and prev.get("last") != today:
+        return [tuple(e) for e in pend], {"pending": [], "last": today}
+    return [], {"pending": pend, "last": prev.get("last")}
 
 
 def send(title: str, message: str, priority: int = 3, click: str = "") -> bool:
