@@ -111,7 +111,7 @@
    "sweet": false
   },
   "IBB": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -254,7 +254,7 @@
    "sweet": false
   },
   "00830.TW": {
-   "state": "轉折初現",
+   "state": "轉折確認",
    "heat": "",
    "trough": "",
    "armed": {
@@ -276,7 +276,7 @@
    "sweet": false
   },
   "00990A.TW": {
-   "state": "轉折初現",
+   "state": "轉折確認",
    "heat": "",
    "trough": "",
    "armed": {
@@ -360,7 +360,7 @@
    "sweet": false
   },
   "AU9901.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -404,7 +404,7 @@
    "sweet": false
   },
   "MUU": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -459,7 +459,7 @@
    "sweet": false
   },
   "MU": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -620,7 +620,7 @@
    "sweet": false
   },
   "00708L.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -720,7 +720,7 @@
   },
   "DBX": {
    "state": "未進便宜區",
-   "heat": "",
+   "heat": "過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -896,7 +896,8 @@
   "MU|cross20": "2026-10-13",
   "SOXQ|cross50": "2026-10-13",
   "SOXL.L|cross50": "2026-10-13",
-  "ANTW|cross50": "2026-10-13"
+  "ANTW|cross50": "2026-10-13",
+  "00830.TW|confirm": "2026-10-14"
  },
  "market": {
   "US": 0,
@@ -905,7 +906,7 @@
  "groups": {
   "記憶體": 1,
   "半導體": 1,
-  "半導體/AI": 16
+  "半導體/AI": 18
  },
  "plan": {
   "sig": {
