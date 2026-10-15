@@ -23,7 +23,7 @@
    "sweet": false
   },
   "HACK": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "過熱",
    "trough": "",
    "armed": {
@@ -366,7 +366,7 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
    "sweet": false
   },
@@ -738,7 +738,7 @@
   },
   "PANW": {
    "state": "轉折初現",
-   "heat": "",
+   "heat": "過熱",
    "trough": "",
    "armed": {
     "20": false,
@@ -748,7 +748,7 @@
    "sweet": false
   },
   "CRWD": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
