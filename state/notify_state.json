@@ -368,7 +368,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "GOOG": {
    "state": "轉折確認",
@@ -492,7 +492,7 @@
    "sweet": false
   },
   "VWRA.L": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -628,7 +628,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "TQQQ": {
    "state": "轉折初現",
