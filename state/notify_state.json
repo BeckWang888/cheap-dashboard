@@ -23,22 +23,22 @@
    "sweet": false
   },
   "HACK": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "過熱",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
    "sweet": false
   },
   "CIBR": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "過熱",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -115,7 +115,7 @@
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -133,9 +133,9 @@
    "sweet": false
   },
   "TSLA": {
-   "state": "重點觀察",
+   "state": "轉折初現",
    "heat": "",
-   "trough": "形成中",
+   "trough": "",
    "armed": {
     "20": false,
     "50": true,
@@ -514,11 +514,11 @@
    "sweet": false
   },
   "NVDA": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -536,12 +536,12 @@
    "sweet": false
   },
   "LITE": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -603,7 +603,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -668,7 +668,7 @@
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -738,7 +738,7 @@
   },
   "PANW": {
    "state": "轉折初現",
-   "heat": "過熱",
+   "heat": "",
    "trough": "",
    "armed": {
     "20": false,
@@ -748,11 +748,11 @@
    "sweet": false
   },
   "CRWD": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -803,11 +803,11 @@
    "sweet": false
   },
   "BE": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -922,7 +922,7 @@
   "TW": 1
  },
  "groups": {
-  "半導體/AI": 22,
+  "半導體/AI": 23,
   "記憶體": 1,
   "半導體": 1,
   "美股": 1
