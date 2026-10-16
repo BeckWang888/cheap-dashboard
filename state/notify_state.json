@@ -108,14 +108,14 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "IBB": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -133,7 +133,7 @@
    "sweet": false
   },
   "TSLA": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -182,7 +182,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -376,7 +376,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -437,7 +437,7 @@
    "sweet": false
   },
   "MAGX": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -476,9 +476,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "VT": {
    "state": "觀察中",
@@ -509,9 +509,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "NVDA": {
    "state": "觀察中",
@@ -525,11 +525,11 @@
    "sweet": false
   },
   "META": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -565,7 +565,7 @@
    "sweet": false
   },
   "MAGS": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -658,13 +658,13 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
   },
   "VTI": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -932,7 +932,14 @@
   "SOXL|cross80": "2026-10-17",
   "SOXL|sweet": "2026-10-17",
   "INTC|cross80": "2026-10-17",
-  "INTC|sweet": "2026-10-17"
+  "INTC|sweet": "2026-10-17",
+  "SOXX|sweet": "2026-10-17",
+  "GGLL|cross50": "2026-10-17",
+  "GOOG|cross50": "2026-10-17",
+  "SOXQ|cross80": "2026-10-17",
+  "SOXQ|sweet": "2026-10-17",
+  "SOXL.L|cross80": "2026-10-17",
+  "SOXL.L|sweet": "2026-10-17"
  },
  "market": {
   "US": 0,
@@ -978,6 +985,41 @@
    ],
    [
     "INTC",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "SOXX",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "GGLL",
+    "cross50",
+    "跨上 50"
+   ],
+   [
+    "GOOG",
+    "cross50",
+    "跨上 50"
+   ],
+   [
+    "SOXQ",
+    "cross80",
+    "跨上 80"
+   ],
+   [
+    "SOXQ",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "SOXL.L",
+    "cross80",
+    "跨上 80"
+   ],
+   [
+    "SOXL.L",
     "sweet",
     "進入甜蜜點（分數 ≥ 80）"
    ]
