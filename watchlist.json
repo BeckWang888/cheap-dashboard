@@ -677,5 +677,15 @@
   "group": "",
   "theme": "全球",
   "hist_proxy": "VT"
+ },
+ {
+  "symbol": "00670L.TW",
+  "name": "富邦 NASDAQ 正2",
+  "market": "TW",
+  "type": "leveraged",
+  "group": "",
+  "theme": "美股大盤",
+  "underlying": "QQQ",
+  "x": 2
  }
 ]
