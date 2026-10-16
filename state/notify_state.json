@@ -56,7 +56,7 @@
    "sweet": false
   },
   "SMH": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -78,7 +78,7 @@
    "sweet": false
   },
   "VOO": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -100,7 +100,7 @@
    "sweet": false
   },
   "SOXX": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -133,7 +133,7 @@
    "sweet": false
   },
   "TSLA": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -144,18 +144,18 @@
    "sweet": false
   },
   "AMD": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
    "sweet": false
   },
   "SOXL": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -166,7 +166,7 @@
    "sweet": true
   },
   "USD": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -393,11 +393,11 @@
    "sweet": false
   },
   "AMDC": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -470,7 +470,7 @@
    "sweet": false
   },
   "SOXQ": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -503,7 +503,7 @@
    "sweet": false
   },
   "SOXL.L": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -525,7 +525,7 @@
    "sweet": false
   },
   "META": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -547,7 +547,7 @@
    "sweet": false
   },
   "AAOI": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -825,7 +825,7 @@
    "sweet": false
   },
   "COHR": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -946,7 +946,7 @@
   "TW": 1
  },
  "groups": {
-  "半導體/AI": 23,
+  "半導體/AI": 25,
   "記憶體": 1,
   "半導體": 1,
   "美股": 1
