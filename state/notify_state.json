@@ -35,7 +35,7 @@
   },
   "CIBR": {
    "state": "觀察中",
-   "heat": "",
+   "heat": "過熱",
    "trough": "",
    "armed": {
     "20": false,
@@ -72,7 +72,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -108,14 +108,14 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "IBB": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -133,22 +133,22 @@
    "sweet": false
   },
   "TSLA": {
-   "state": "轉折初現",
+   "state": "重點觀察",
    "heat": "",
-   "trough": "",
+   "trough": "形成中",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
   },
   "AMD": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -163,7 +163,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "USD": {
    "state": "觀察中",
@@ -182,7 +182,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -360,7 +360,7 @@
    "sweet": false
   },
   "AU9901.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -376,7 +376,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -393,11 +393,11 @@
    "sweet": false
   },
   "AMDC": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -437,11 +437,11 @@
    "sweet": false
   },
   "MAGX": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -478,7 +478,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "VT": {
    "state": "觀察中",
@@ -511,7 +511,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "NVDA": {
    "state": "觀察中",
@@ -525,11 +525,11 @@
    "sweet": false
   },
   "META": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -565,22 +565,22 @@
    "sweet": false
   },
   "MAGS": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
    "sweet": false
   },
   "AMZN": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -595,7 +595,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "TSM": {
    "state": "觀察中",
@@ -620,7 +620,7 @@
    "sweet": false
   },
   "00708L.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -636,7 +636,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -647,7 +647,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -658,7 +658,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -720,7 +720,7 @@
   },
   "DBX": {
    "state": "未進便宜區",
-   "heat": "",
+   "heat": "過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -863,7 +863,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -951,7 +951,7 @@
   "TW": 1
  },
  "groups": {
-  "半導體/AI": 25,
+  "半導體/AI": 23,
   "記憶體": 1,
   "半導體": 1,
   "美股": 1
