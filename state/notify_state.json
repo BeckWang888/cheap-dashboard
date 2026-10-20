@@ -497,7 +497,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -969,24 +969,8 @@
   "美股": 1
  },
  "digest": {
-  "pending": [
-   [
-    "AU9901.TW",
-    "cross80",
-    "跨上 80"
-   ],
-   [
-    "AU9901.TW",
-    "sweet",
-    "進入甜蜜點（分數 ≥ 80）"
-   ],
-   [
-    "00708L.TW",
-    "cross80",
-    "跨上 80"
-   ]
-  ],
-  "last": "2026-10-20"
+  "pending": [],
+  "last": "2026-10-21"
  },
  "plan": {
   "sig": {
