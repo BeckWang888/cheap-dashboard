@@ -687,5 +687,13 @@
   "theme": "美股大盤",
   "underlying": "QQQ",
   "x": 2
+ },
+ {
+  "symbol": "00713.TW",
+  "name": "元大台灣高息低波",
+  "market": "TW",
+  "type": "etf",
+  "group": "",
+  "theme": "高股息"
  }
 ]
