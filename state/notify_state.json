@@ -368,7 +368,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "GOOG": {
    "state": "觀察中",
@@ -481,7 +481,7 @@
    "sweet": false
   },
   "VT": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -628,7 +628,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "TQQQ": {
    "state": "觀察中",
@@ -675,7 +675,7 @@
    "sweet": false
   },
   "WLDU": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
