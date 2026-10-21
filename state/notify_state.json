@@ -133,7 +133,7 @@
    "sweet": false
   },
   "TSLA": {
-   "state": "強勢谷底",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "形成中",
    "armed": {
@@ -525,7 +525,7 @@
    "sweet": false
   },
   "META": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -748,7 +748,7 @@
    "sweet": false
   },
   "CRWD": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -781,7 +781,7 @@
    "sweet": false
   },
   "IBKR": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -818,7 +818,7 @@
    "heat": "",
    "trough": "形成中",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
