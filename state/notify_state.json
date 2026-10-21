@@ -368,7 +368,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "GOOG": {
    "state": "觀察中",
@@ -481,7 +481,7 @@
    "sweet": false
   },
   "VT": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -628,7 +628,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "TQQQ": {
    "state": "觀察中",
@@ -675,7 +675,7 @@
    "sweet": false
   },
   "WLDU": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -915,7 +915,7 @@
   "00708L.TW|cross20": "2026-10-07",
   "00708L.TW|cross50": "2026-10-07",
   "00708L.TW|cross80": "2026-10-20",
-  "00708L.TW|sweet": "2026-10-14",
+  "00708L.TW|sweet": "2026-10-22",
   "SOXX|cross20": "2026-10-09",
   "SOXX|confirm": "2026-10-09",
   "SOXL|cross20": "2026-10-09",
@@ -991,7 +991,13 @@
   "美股": 1
  },
  "digest": {
-  "pending": [],
+  "pending": [
+   [
+    "00708L.TW",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ]
+  ],
   "last": "2026-10-21"
  },
  "plan": {
