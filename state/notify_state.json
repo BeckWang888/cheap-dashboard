@@ -368,7 +368,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "GOOG": {
    "state": "觀察中",
@@ -628,7 +628,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "TQQQ": {
    "state": "觀察中",
@@ -991,14 +991,8 @@
   "美股": 1
  },
  "digest": {
-  "pending": [
-   [
-    "00708L.TW",
-    "sweet",
-    "進入甜蜜點（分數 ≥ 80）"
-   ]
-  ],
-  "last": "2026-10-21"
+  "pending": [],
+  "last": "2026-10-22"
  },
  "plan": {
   "sig": {
