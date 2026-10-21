@@ -695,5 +695,25 @@
   "type": "etf",
   "group": "",
   "theme": "高股息"
+ },
+ {
+  "symbol": "SSO",
+  "name": "ProShares 兩倍標普 500",
+  "market": "US",
+  "type": "leveraged",
+  "group": "",
+  "theme": "美股大盤",
+  "underlying": "SPY",
+  "x": 2
+ },
+ {
+  "symbol": "00647L.TW",
+  "name": "元大 S&P500 正2",
+  "market": "TW",
+  "type": "leveraged",
+  "group": "",
+  "theme": "美股大盤",
+  "underlying": "SPY",
+  "x": 2
  }
 ]
