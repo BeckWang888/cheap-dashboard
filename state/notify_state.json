@@ -492,12 +492,12 @@
    "sweet": false
   },
   "VWRA.L": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -995,29 +995,8 @@
   "美股": 1
  },
  "digest": {
-  "pending": [
-   [
-    "0052.TW",
-    "cross50",
-    "跨上 50"
-   ],
-   [
-    "GOOG",
-    "cross80",
-    "跨上 80"
-   ],
-   [
-    "GOOG",
-    "sweet",
-    "進入甜蜜點（分數 ≥ 80）"
-   ],
-   [
-    "GGLL",
-    "cross80",
-    "跨上 80"
-   ]
-  ],
-  "last": "2026-10-22"
+  "pending": [],
+  "last": "2026-10-23"
  },
  "plan": {
   "sig": {
