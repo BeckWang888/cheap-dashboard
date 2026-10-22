@@ -78,7 +78,7 @@
    "sweet": false
   },
   "VOO": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -379,7 +379,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "PLTR": {
    "state": "未進便宜區",
@@ -980,7 +980,8 @@
   "00892.TW|cross50": "2026-10-19",
   "AU9901.TW|cross80": "2026-10-20",
   "0052.TW|cross50": "2026-10-22",
-  "GOOG|cross80": "2026-10-23"
+  "GOOG|cross80": "2026-10-23",
+  "GOOG|sweet": "2026-10-23"
  },
  "market": {
   "US": 0,
@@ -1003,6 +1004,11 @@
     "GOOG",
     "cross80",
     "跨上 80"
+   ],
+   [
+    "GOOG",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
    ]
   ],
   "last": "2026-10-22"
