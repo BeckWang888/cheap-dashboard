@@ -27,7 +27,7 @@
    "heat": "過熱",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -183,7 +183,7 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
    "sweet": false
   },
@@ -742,7 +742,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -981,7 +981,8 @@
   "AU9901.TW|cross80": "2026-10-20",
   "0052.TW|cross50": "2026-10-22",
   "GOOG|cross80": "2026-10-23",
-  "GOOG|sweet": "2026-10-23"
+  "GOOG|sweet": "2026-10-23",
+  "GGLL|cross80": "2026-10-23"
  },
  "market": {
   "US": 0,
@@ -1009,6 +1010,11 @@
     "GOOG",
     "sweet",
     "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "GGLL",
+    "cross80",
+    "跨上 80"
    ]
   ],
   "last": "2026-10-22"
