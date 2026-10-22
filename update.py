@@ -263,7 +263,7 @@ def main():
                "thresholds": cfg.get("thresholds", [20, 50, 80]), "group_alert_min": cfg.get("group_alert_min", 3),
                "position_cap": cfg.get("position_cap", 0.10),
                "alloc_targets": cfg.get("alloc_targets"), "alloc_band": cfg.get("alloc_band", 5),
-               "alloc_notes": cfg.get("alloc_notes", {}),
+               "alloc_notes": cfg.get("alloc_notes", {}), "buy_triggers": cfg.get("buy_triggers", []),
                "groups": groups, "failed": failed, "items": results,
                "wr_lifts": wr_lifts, "wr_states": winrate.STATES}
     try:
