@@ -371,7 +371,7 @@
    "sweet": true
   },
   "GOOG": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -404,7 +404,7 @@
    "sweet": false
   },
   "MUU": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -426,7 +426,7 @@
    "sweet": true
   },
   "SNXX": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -448,7 +448,7 @@
    "sweet": false
   },
   "DRAM": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -459,7 +459,7 @@
    "sweet": false
   },
   "MU": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -481,7 +481,7 @@
    "sweet": false
   },
   "VT": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -514,11 +514,11 @@
    "sweet": false
   },
   "NVDA": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -587,7 +587,7 @@
    "sweet": false
   },
   "INTC": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -598,7 +598,7 @@
    "sweet": false
   },
   "TSM": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -609,7 +609,7 @@
    "sweet": false
   },
   "ANTW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -675,7 +675,7 @@
    "sweet": false
   },
   "WLDU": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -803,22 +803,22 @@
    "sweet": false
   },
   "BE": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
    "sweet": false
   },
   "VST": {
-   "state": "強勢谷底",
+   "state": "重點觀察",
    "heat": "",
    "trough": "形成中",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -833,10 +833,10 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "MSTR": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -985,7 +985,7 @@
   "TW": 1
  },
  "groups": {
-  "半導體/AI": 22,
+  "半導體/AI": 23,
   "記憶體": 1,
   "半導體": 1,
   "美股": 1
