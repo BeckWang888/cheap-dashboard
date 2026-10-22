@@ -132,7 +132,7 @@ config.json    ─▶│  ├ cheapdash/model.py    便宜度分數、訊號、�
 | 「新增追蹤 X」 | `watchlist.json` 加一筆；上市不到約 4 年的加 `hist_proxy`；槓桿型填 `underlying`、`x`。 |
 | 「改目標配置／建議文字」 | `config.json` 的 `alloc_targets`（七項加總 100）、`alloc_notes`（開頭標日期）。 |
 | 「改交屋資料」 | 資料加密，**請使用者提供密碼**（或請他在交屋分頁「編輯資料」自己改）。不要把密碼或明文寫進任何檔案。 |
-| 「改計畫」（例如槓桿部位的賣法、期限） | 同步改 `notes.json` 筆記、本檔第 6 節、`config.json` 的 `plan_alerts`（推播提醒的代碼、門檻、日期）與 `site/events.json` 的 PLAN 日期。 |
+| 「改計畫」（例如槓桿部位的賣法、期限） | 同步改 `notes.json` 筆記、本檔第 6 節、`config.json` 的 `buy_triggers`（網頁螢光紅提醒）與 `plan_alerts`（推播提醒的代碼、門檻、日期）與 `site/events.json` 的 PLAN 日期。 |
 | 官方公布新的 FOMC／CPI 日期 | 更新 `site/events.json`，推算的日期標 `"est": true`。 |
 | 改網頁功能 | 改 `site/`，用 375px 手機寬度實際看過（深色、淺色都看），再提交。 |
 

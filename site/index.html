@@ -292,6 +292,19 @@ th{color:var(--sub);font-weight:600;border-top:0}td:first-child,th:first-child{t
 .pd-act{margin-top:6px}.lots2{margin-top:8px;display:grid;gap:2px}
 @media(max-width:480px){.dn{max-width:100%;margin:0 auto}.wb{flex-basis:80px}}
 .foot{font-size:12px;color:var(--sub);margin-top:18px}
+/* ---- 計畫觸發提醒：條件到了，該檔框框螢光紅、緩慢閃動；頁首列出觸發了哪條規則 ---- */
+:root{--trg:#ff2d55}
+@keyframes trgOut{0%,100%{box-shadow:0 0 0 2px var(--trg),0 0 8px 1px rgba(255,45,85,.45)}50%{box-shadow:0 0 0 2px var(--trg),0 0 20px 5px rgba(255,45,85,.85)}}
+@keyframes trgIn{0%,100%{box-shadow:inset 0 0 0 2px var(--trg),inset 0 0 8px rgba(255,45,85,.35)}50%{box-shadow:inset 0 0 0 2px var(--trg),inset 0 0 22px rgba(255,45,85,.7)}}
+.tl.trg{animation:trgOut 1.8s ease-in-out infinite;border-color:var(--trg)!important;z-index:1}
+.row.trg{animation:trgIn 1.8s ease-in-out infinite}
+.list.lay-g2>.row.trg,.list.lay-g3>.row.trg{animation:trgOut 1.8s ease-in-out infinite}
+.trgb{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 12px;background:var(--panel);font-size:13px}
+.trgb.on{border-color:var(--trg);animation:trgOut 1.8s ease-in-out infinite}
+.trgb h4{margin:0 0 6px;font-size:14px}.trgb.on h4{color:var(--trg)}
+.trgi{display:flex;gap:8px;align-items:baseline;padding:4px 0;border-top:1px solid var(--line);cursor:pointer}.trgi:first-of-type{border-top:0}
+.trgi i{font-style:normal;flex:0 0 auto}.trgi.on b{color:var(--trg)}.trgi .dim{font-size:12px}
+@media (prefers-reduced-motion:reduce){.tl.trg,.row.trg,.trgb.on,.list.lay-g2>.row.trg,.list.lay-g3>.row.trg{animation:none}.tl.trg{box-shadow:0 0 0 2px var(--trg),0 0 14px 3px rgba(255,45,85,.7)!important}.row.trg{box-shadow:inset 0 0 0 2px var(--trg),inset 0 0 16px rgba(255,45,85,.5)!important}.trgb.on{box-shadow:0 0 0 2px var(--trg)!important}}  /* 手機若開了「減少動態效果」：不閃動，改成固定的紅色光暈，並蓋過甜蜜點的金框 */
 .srch{display:flex;gap:10px;align-items:center;margin:4px 0 10px}
 .srch input{flex:1;min-width:0;font:inherit;font-size:16px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
 .srch input:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
@@ -398,6 +411,7 @@ h1{background:linear-gradient(90deg,var(--ink) 30%,var(--n1) 75%,var(--n2));-web
   </div>
   <nav class="nav"><a href="#" data-view="cheap" aria-current="page">便宜度</a><a href="#holdings" data-view="holdings">持倉</a><a href="#notes" data-view="notes">建議操作</a><a href="#housing" data-view="housing">交屋</a><a href="#events" data-view="events">事件表</a><a href="#settings" data-view="settings">設定</a></nav>
   <div id="cheap">
+  <div id="trg"></div>
   <div id="alerts"></div>
   <details class="card" id="mkt" hidden><summary id="mkt-sum">市場溫度</summary><div id="mkt-body"></div></details>
   <div class="sum" id="sum"></div>
@@ -479,6 +493,7 @@ document.getElementById("fbar").addEventListener("click",function(e){if(e.target
 function rank(r){var k=stt(r)[1];return C(r).sweet?3:k==="strong"||k==="go"?2:k==="boss"?1:0}
 function isLev(r){return r.type==="leveraged"}
 function render(){
+ trgBanner();
  var items=D.items,cnt=function(f){return items.filter(f).length};
  // 上方統計可以點：只顯示那幾檔，再點一次（或按「顯示全部」）取消
  document.getElementById("sum").innerHTML=SUMF.map(function(f){var n=cnt(f[3]);
@@ -510,6 +525,19 @@ function render(){
 function sortVal(r){var w;return st.sort==="score"?C(r).score:st.sort==="chg"?(r.quote?r.quote.chg:null):st.sort==="wr"?((w=WR(r))?w.p:null):null}
 function wrTxt(r){var w=WR(r);return w?'<span class="wrt2'+(wrOk(w)?' ok':'')+'">勝率 '+w.p.toFixed(0)+'%'+(wrOk(w)?' ✓':'')+'</span>':'<span class="wrt2">勝率 —</span>'}
 function stCls(c,s){return c.sweet?" sweet":s[1]==="strong"?" strong":s[1]==="go"?" go":s[1]==="boss"?" boss":""}
+// ---- 計畫觸發條件（config.json 的 buy_triggers）：score＝便宜度（全部歷史）≥ min；dd＝即時價離歷史高點 ≤ max ----
+function trgDD(r){var c=r.v.full.current;if(!r._ath&&c.dd_ath!=null&&r.price)r._ath=r.price/(1+c.dd_ath);return r._ath&&r.price?r.price/r._ath-1:null}
+function trgEval(t,r){if(!r)return{on:false,now:"—"};
+ if(t.kind==="score"){var s=r.v.full.current.score;return{on:s!=null&&s>=t.min,now:s==null?"—":"便宜度 "+s.toFixed(0)+"（觸發 ≥ "+t.min+"）"}}
+ var d=trgDD(r);return{on:d!=null&&d<=t.max,now:d==null?"—":"離高點 "+(d*100).toFixed(1)+"%（觸發 ≤ "+(t.max*100).toFixed(0)+"%）"}}
+function trgOf(r){return(D.buy_triggers||[]).filter(function(t){return t.sym===r.symbol&&trgEval(t,r).on})}
+function trgCls(r){return trgOf(r).length?" trg":""}
+function trgBanner(){var T=D.buy_triggers||[],el=document.getElementById("trg");if(!T.length){el.innerHTML="";return}
+ var by={};D.items.forEach(function(r){by[r.symbol]=r});var n=0,h="";
+ T.forEach(function(t){var r=by[t.sym],e=trgEval(t,r);if(e.on)n++;
+  h+='<div class="trgi'+(e.on?' on':'')+'" data-q="'+esc(t.sym.replace(/\.TW$/,""))+'"><i>'+(e.on?'🔴':'⚪')+'</i><div><b>'+esc(t.label)+'</b> <span class="dim">'+esc(t.sym.replace(/\.TW$/,""))+'・'+esc(e.now)+'</span>'+(e.on?'<div>→ '+esc(t.text)+'</div>':'')+'</div></div>'});
+ el.innerHTML='<div class="trgb'+(n?' on':'')+'"><h4>'+(n?'🔴 計畫觸發提醒（'+n+' 條）':'計畫觸發條件（目前都還沒到）')+'</h4>'+h+'<div class="dim" style="font-size:11px;margin-top:4px">照你自己的計畫列出，不是投資建議；大跌當天不操作。點一下可在清單中找到該檔。</div></div>'}
+document.getElementById("trg").addEventListener("click",function(e){var x=e.target.closest("[data-q]");if(!x)return;var q=document.getElementById("q");q.value=x.dataset.q;q.dispatchEvent(new Event("input"));q.scrollIntoView({block:"center",behavior:"smooth"})});
 function scoreTxt(c){return c.score==null?'—':c.score.toFixed(0)}
 function lvColor(c){var l=c.score==null?null:lv(c.score);return l?l[2]:'--sub'}
 // 狀態標籤：只標值得注意的（甜蜜點、強勢谷底、候選進場、重點觀察、轉折初現）
@@ -518,7 +546,7 @@ function stTag(r,short){var c=C(r),s=stt(r);if(c.sweet)return'<span class="sw">�
 function pinBtn(r){return'<button class="pin" data-pin="'+esc(r.symbol)+'" aria-pressed="'+pinned(r.symbol)+'" title="'+(pinned(r.symbol)?'取消釘選':'釘選到最上面')+'" aria-label="釘選">'+(pinned(r.symbol)?'★':'☆')+'</button>'}
 // 精簡：一檔一行（代碼／名稱・狀態｜價格／漲跌｜分數／級距）
 function crow(r){var c=C(r),q=r.quote,x=heldOf(r),tag=stTag(r,true);
- return'<div class="row cr'+stCls(c,stt(r))+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
+ return'<div class="row cr'+stCls(c,stt(r))+trgCls(r)+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
   +'<div class="ci"><div class="c1">'+(canDrag()&&!pinned(r.symbol)?'<span class="dh" title="拖曳排序" aria-label="拖曳排序">☰</span>':'')+pinBtn(r)
   +'<b>'+esc(r.symbol.replace(".TW",""))+'</b>'+(x?'<span class="hlt">持有</span>':'')+(c.heat?'<span class="hot'+(c.heat==="嚴重過熱"?" vh":"")+'">'+c.heat+'</span>':'')+'</div>'
   +'<div class="c2">'+(st.sort==="wr"?wrTxt(r)+' ':'')+(tag?tag+' ':'')+'<span>'+esc(r.name)+'</span></div></div>'
@@ -526,7 +554,7 @@ function crow(r){var c=C(r),q=r.quote,x=heldOf(r),tag=stTag(r,true);
   +'<div class="cs" style="color:var('+lvColor(c)+')"><b>'+scoreTxt(c)+'</b><span>'+(c.score==null?'不足':lv(c.score)[1])+'</span></div></div>'}
 // 宮格：四宮格（g2，資訊較多）／九宮格（g3，一眼看完）；底色依便宜度級距
 function tile(r,big){var c=C(r),q=r.quote,x=heldOf(r),w=WR(r),p=c.score==null?50:(c.score+100)/2,tag=stTag(r,!big);
- return'<div class="tl'+stCls(c,stt(r))+'" tabindex="0" data-t="'+esc(r.symbol)+'" style="--lc:var('+lvColor(c)+')">'
+ return'<div class="tl'+stCls(c,stt(r))+trgCls(r)+'" tabindex="0" data-t="'+esc(r.symbol)+'" style="--lc:var('+lvColor(c)+')">'
   +'<div class="t1"><b>'+esc(r.symbol.replace(".TW",""))+'</b>'+(pinned(r.symbol)?'<span class="tp">★</span>':'')+(x?'<span class="hlt">持</span>':'')+'</div>'
   +'<div class="tn">'+esc(r.name)+'</div>'
   +'<div class="ts"><b>'+scoreTxt(c)+'</b><span>'+(c.score==null?'資料不足':lv(c.score)[1])+'</span></div>'
@@ -541,7 +569,7 @@ function fullRow(r){
   var dots="";c.sigs.forEach(function(v){dots+='<i class="dt'+(v?" on":"")+'"></i>'});
   dots+='<i class="dt bs'+(c.trough?" on":c.trough_forming?" half":"")+'" title="月線 MACD 谷底"></i>';
   var heat=c.heat?'<span class="hot'+(c.heat==="嚴重過熱"?" vh":"")+'">'+c.heat+'</span>':'';
-  h+='<div class="row'+(c.sweet?" sweet":s[1]==="strong"?" strong":s[1]==="go"?" go":s[1]==="boss"?" boss":"")+(st.open===r.symbol?" open":"")+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
+  h+='<div class="row'+(c.sweet?" sweet":s[1]==="strong"?" strong":s[1]==="go"?" go":s[1]==="boss"?" boss":"")+trgCls(r)+(st.open===r.symbol?" open":"")+'" tabindex="0" data-t="'+esc(r.symbol)+'">'
    +'<div class="id">'+(canDrag()&&!pinned(r.symbol)?'<span class="dh" title="拖曳排序" aria-label="拖曳排序">☰</span>':'')+pinBtn(r)+'<b>'+esc(r.symbol.replace(".TW",""))+'</b>'+heat+(r.intraday?'<span class="live">盤中</span>':'')+'<span class="nm">'+esc(r.name)+'</span>'
    +pxLine(r)+heldLine(r)
    +(L?'<div class="lv">'+L.x+' 倍・對應 '+esc(L.underlying)+'</div>':'')+(r.hist_proxy?'<div class="lv">上市前用 '+esc(r.hist_proxy.replace(".TW",""))+' 的走勢補歷史</div>':'')+(r.thin?'<div class="lv warn">資料不足，分數僅供參考</div>':'')
@@ -774,6 +802,7 @@ function rfScores(){
 try{var rfs=JSON.parse(localStorage.getItem("cd_rf")||"null");if(rfs&&Date.now()-rfs.t0<600000)setTimeout(function(){if(D&&D.generated===rfs.since)rfWait(rfs.since,rfs.t0);else localStorage.removeItem("cd_rf")},1500)}catch(e){}
 fetch("data.json?t="+Date.now()).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(j){
  D=j;document.getElementById("meta").textContent="更新時間 "+j.generated+"（台灣時間）・台股盤中與收盤後、美股盤中與收盤後自動更新";
+ D.items.forEach(trgDD);   // 先用排程價記下歷史高點，之後即時價才算得出離高點多少
  alerts();marketCard();setV(st.v);
  var lv=function(){liveFetch().then(function(m){rfMsg("即時股價："+m)},function(e){rfMsg("即時股價暫時抓不到（"+e.message+"），先顯示排程的價格。",true)})};
  if(window.Holdings&&Holdings.preload)Holdings.preload().then(function(){if(D)render();lv()},lv);else lv();
