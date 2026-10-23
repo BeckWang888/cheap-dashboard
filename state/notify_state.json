@@ -24,7 +24,7 @@
   },
   "HACK": {
    "state": "未進便宜區",
-   "heat": "過熱",
+   "heat": "嚴重過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -34,11 +34,11 @@
    "sweet": false
   },
   "CIBR": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "過熱",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -78,7 +78,7 @@
    "sweet": false
   },
   "VOO": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -183,9 +183,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00631L.TW": {
    "state": "觀察中",
@@ -377,9 +377,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "PLTR": {
    "state": "未進便宜區",
@@ -737,22 +737,22 @@
    "sweet": false
   },
   "PANW": {
-   "state": "觀察中",
-   "heat": "",
+   "state": "未進便宜區",
+   "heat": "過熱",
    "trough": "",
    "armed": {
-    "20": false,
-    "50": false,
+    "20": true,
+    "50": true,
     "80": true
    },
    "sweet": false
   },
   "CRWD": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -786,7 +786,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -808,7 +808,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -880,7 +880,7 @@
    "sweet": false
   },
   "SSO": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -891,7 +891,7 @@
    "sweet": false
   },
   "00647L.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -982,7 +982,8 @@
   "0052.TW|cross50": "2026-10-22",
   "GOOG|cross80": "2026-10-23",
   "GOOG|sweet": "2026-10-23",
-  "GGLL|cross80": "2026-10-23"
+  "GGLL|cross80": "2026-10-23",
+  "GGLL|sweet": "2026-10-24"
  },
  "market": {
   "US": 0,
@@ -995,7 +996,13 @@
   "美股": 1
  },
  "digest": {
-  "pending": [],
+  "pending": [
+   [
+    "GGLL",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ]
+  ],
   "last": "2026-10-23"
  },
  "plan": {
