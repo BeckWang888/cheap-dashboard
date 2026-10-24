@@ -24,7 +24,7 @@
   },
   "HACK": {
    "state": "未進便宜區",
-   "heat": "嚴重過熱",
+   "heat": "過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -34,11 +34,11 @@
    "sweet": false
   },
   "CIBR": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "過熱",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -78,7 +78,7 @@
    "sweet": false
   },
   "VOO": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -185,7 +185,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "00631L.TW": {
    "state": "觀察中",
@@ -379,7 +379,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "PLTR": {
    "state": "未進便宜區",
@@ -737,22 +737,22 @@
    "sweet": false
   },
   "PANW": {
-   "state": "未進便宜區",
-   "heat": "過熱",
+   "state": "觀察中",
+   "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
    "sweet": false
   },
   "CRWD": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -760,7 +760,7 @@
   },
   "V": {
    "state": "未進便宜區",
-   "heat": "",
+   "heat": "過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -808,7 +808,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -880,7 +880,7 @@
    "sweet": false
   },
   "SSO": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -891,7 +891,7 @@
    "sweet": false
   },
   "00647L.TW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
