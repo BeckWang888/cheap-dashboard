@@ -514,7 +514,7 @@
    "sweet": false
   },
   "NVDA": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -833,7 +833,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "MSTR": {
    "state": "觀察中",
@@ -990,7 +990,7 @@
   "TW": 1
  },
  "groups": {
-  "半導體/AI": 22,
+  "半導體/AI": 23,
   "記憶體": 1,
   "半導體": 1,
   "美股": 1
