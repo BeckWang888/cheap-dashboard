@@ -35,7 +35,7 @@
   },
   "CIBR": {
    "state": "未進便宜區",
-   "heat": "嚴重過熱",
+   "heat": "過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -108,7 +108,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "IBB": {
    "state": "未進便宜區",
@@ -133,7 +133,7 @@
    "sweet": false
   },
   "TSLA": {
-   "state": "強勢谷底",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "形成中",
    "armed": {
@@ -144,11 +144,11 @@
    "sweet": false
   },
   "AMD": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -163,7 +163,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "USD": {
    "state": "觀察中",
@@ -393,11 +393,11 @@
    "sweet": false
   },
   "AMDC": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -478,7 +478,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "VT": {
    "state": "觀察中",
@@ -511,7 +511,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "NVDA": {
    "state": "觀察中",
@@ -555,7 +555,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "SPCX": {
    "state": "",
@@ -595,7 +595,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "TSM": {
    "state": "觀察中",
@@ -658,7 +658,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -808,7 +808,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -836,7 +836,7 @@
    "sweet": true
   },
   "MSTR": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -880,7 +880,7 @@
    "sweet": false
   },
   "SSO": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -891,7 +891,7 @@
    "sweet": false
   },
   "00647L.TW": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -963,16 +963,16 @@
   "QQQ|cross50": "2026-10-17",
   "SOXX|cross80": "2026-10-17",
   "SOXL|cross80": "2026-10-17",
-  "SOXL|sweet": "2026-10-17",
+  "SOXL|sweet": "2026-10-27",
   "INTC|cross80": "2026-10-17",
-  "INTC|sweet": "2026-10-17",
-  "SOXX|sweet": "2026-10-17",
+  "INTC|sweet": "2026-10-27",
+  "SOXX|sweet": "2026-10-27",
   "GGLL|cross50": "2026-10-17",
   "GOOG|cross50": "2026-10-17",
   "SOXQ|cross80": "2026-10-17",
-  "SOXQ|sweet": "2026-10-17",
+  "SOXQ|sweet": "2026-10-27",
   "SOXL.L|cross80": "2026-10-17",
-  "SOXL.L|sweet": "2026-10-17",
+  "SOXL.L|sweet": "2026-10-27",
   "0050.TW|cross50": "2026-10-19",
   "00631L.TW|cross50": "2026-10-19",
   "00663L.TW|cross50": "2026-10-19",
@@ -990,13 +990,39 @@
   "TW": 1
  },
  "groups": {
-  "半導體/AI": 23,
+  "半導體/AI": 25,
   "記憶體": 1,
   "半導體": 1,
   "美股": 1
  },
  "digest": {
-  "pending": [],
+  "pending": [
+   [
+    "SOXX",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "SOXL",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "SOXQ",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "SOXL.L",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "INTC",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ]
+  ],
   "last": "2026-10-27"
  },
  "plan": {
