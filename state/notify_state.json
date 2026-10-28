@@ -360,7 +360,7 @@
    "sweet": false
   },
   "AU9901.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -620,7 +620,7 @@
    "sweet": false
   },
   "00708L.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -999,14 +999,8 @@
   "半導體": 1
  },
  "digest": {
-  "pending": [
-   [
-    "DRAM",
-    "cross50",
-    "跨上 50"
-   ]
-  ],
-  "last": "2026-10-28"
+  "pending": [],
+  "last": "2026-10-29"
  },
  "plan": {
   "sig": {
