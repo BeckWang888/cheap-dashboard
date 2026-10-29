@@ -24,7 +24,7 @@
   },
   "HACK": {
    "state": "未進便宜區",
-   "heat": "過熱",
+   "heat": "嚴重過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -360,7 +360,7 @@
    "sweet": false
   },
   "AU9901.TW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
