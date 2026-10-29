@@ -34,7 +34,7 @@
    "sweet": false
   },
   "CIBR": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "過熱",
    "trough": "",
    "armed": {
@@ -78,7 +78,7 @@
    "sweet": false
   },
   "VOO": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -481,7 +481,7 @@
    "sweet": false
   },
   "VT": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -598,7 +598,7 @@
    "sweet": false
   },
   "TSM": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -620,7 +620,7 @@
    "sweet": false
   },
   "00708L.TW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -675,7 +675,7 @@
    "sweet": false
   },
   "WLDU": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -760,7 +760,7 @@
   },
   "V": {
    "state": "未進便宜區",
-   "heat": "",
+   "heat": "過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -996,7 +996,7 @@
   "TW": 1
  },
  "groups": {
-  "半導體/AI": 21,
+  "半導體/AI": 20,
   "記憶體": 1,
   "半導體": 1,
   "美股": 1
