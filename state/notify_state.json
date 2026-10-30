@@ -23,7 +23,7 @@
    "sweet": false
   },
   "HACK": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "過熱",
    "trough": "",
    "armed": {
@@ -814,9 +814,9 @@
    "sweet": false
   },
   "VST": {
-   "state": "觀察中",
+   "state": "重點觀察",
    "heat": "",
-   "trough": "",
+   "trough": "形成中",
    "armed": {
     "20": false,
     "50": false,
