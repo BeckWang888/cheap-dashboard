@@ -23,7 +23,7 @@
    "sweet": false
   },
   "HACK": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "過熱",
    "trough": "",
    "armed": {
@@ -122,7 +122,7 @@
    "sweet": false
   },
   "SMCI": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -135,7 +135,7 @@
   "TSLA": {
    "state": "強勢谷底",
    "heat": "",
-   "trough": "形成中",
+   "trough": "已確認",
    "armed": {
     "20": true,
     "50": true,
@@ -478,7 +478,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "VT": {
    "state": "觀察中",
@@ -816,13 +816,13 @@
   "VST": {
    "state": "重點觀察",
    "heat": "",
-   "trough": "形成中",
+   "trough": "已確認",
    "armed": {
     "20": false,
     "50": false,
     "80": true
    },
-   "sweet": false
+   "sweet": true
   },
   "COHR": {
    "state": "觀察中",
@@ -995,7 +995,8 @@
   "009801.TW|cross50": "2026-10-30",
   "00757.TW|cross50": "2026-10-30",
   "MAGX|cross50": "2026-10-31",
-  "VT|cross50": "2026-10-31"
+  "VT|cross50": "2026-10-31",
+  "TSLA|trough已確認": "2026-10-31"
  },
  "market": {
   "US": 0,
@@ -1108,6 +1109,11 @@
     "INTC",
     "cross80",
     "跨上 80"
+   ],
+   [
+    "TSLA",
+    "trough已確認",
+    "月線 MACD 谷底（已確認，強勢谷底・站上年線）"
    ]
   ],
   "last": "2026-10-30"
