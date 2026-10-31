@@ -23,7 +23,18 @@
    "sweet": false
   },
   "HACK": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
+   "heat": "嚴重過熱",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "CIBR": {
+   "state": "未進便宜區",
    "heat": "過熱",
    "trough": "",
    "armed": {
@@ -33,19 +44,8 @@
    },
    "sweet": false
   },
-  "CIBR": {
-   "state": "轉折初現",
-   "heat": "",
-   "trough": "",
-   "armed": {
-    "20": false,
-    "50": false,
-    "80": true
-   },
-   "sweet": false
-  },
   "SNDK": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -56,34 +56,34 @@
    "sweet": false
   },
   "SMH": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
   },
   "QQQ": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
   },
   "VOO": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -100,15 +100,15 @@
    "sweet": false
   },
   "SOXX": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "IBB": {
    "state": "未進便宜區",
@@ -135,7 +135,7 @@
   "TSLA": {
    "state": "強勢谷底",
    "heat": "",
-   "trough": "已確認",
+   "trough": "形成中",
    "armed": {
     "20": true,
     "50": true,
@@ -144,34 +144,34 @@
    "sweet": false
   },
   "AMD": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
    "sweet": false
   },
   "SOXL": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "USD": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -393,22 +393,22 @@
    "sweet": false
   },
   "AMDC": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
    "sweet": false
   },
   "MUU": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -426,7 +426,7 @@
    "sweet": false
   },
   "SNXX": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -453,12 +453,34 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
   },
   "MU": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": true,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "SOXQ": {
+   "state": "轉折初現",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": false,
+    "50": false,
+    "80": true
+   },
+   "sweet": false
+  },
+  "VT": {
    "state": "觀察中",
    "heat": "",
    "trough": "",
@@ -469,57 +491,35 @@
    },
    "sweet": false
   },
-  "SOXQ": {
-   "state": "觀察中",
-   "heat": "",
-   "trough": "",
-   "armed": {
-    "20": false,
-    "50": false,
-    "80": false
-   },
-   "sweet": false
-  },
-  "VT": {
-   "state": "觀察中",
-   "heat": "",
-   "trough": "",
-   "armed": {
-    "20": false,
-    "50": false,
-    "80": true
-   },
-   "sweet": false
-  },
   "VWRA.L": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
   },
   "SOXL.L": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "NVDA": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -536,18 +536,18 @@
    "sweet": false
   },
   "LITE": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
-    "50": false,
+    "20": true,
+    "50": true,
     "80": true
    },
    "sweet": false
   },
   "AAOI": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -587,18 +587,7 @@
    "sweet": false
   },
   "INTC": {
-   "state": "觀察中",
-   "heat": "",
-   "trough": "",
-   "armed": {
-    "20": false,
-    "50": false,
-    "80": false
-   },
-   "sweet": true
-  },
-  "TSM": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -608,8 +597,19 @@
    },
    "sweet": false
   },
+  "TSM": {
+   "state": "未進便宜區",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": false,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
   "ANTW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -631,45 +631,45 @@
    "sweet": true
   },
   "TQQQ": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
   },
   "QLD": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
   },
   "QQQI": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
   },
   "VTI": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
-    "50": false,
+    "20": true,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -680,7 +680,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -708,12 +708,12 @@
    "sweet": false
   },
   "RBLX": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
-    "50": false,
+    "20": true,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -737,7 +737,7 @@
    "sweet": false
   },
   "PANW": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -781,7 +781,7 @@
    "sweet": false
   },
   "IBKR": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -793,7 +793,7 @@
   },
   "LLY": {
    "state": "未進便宜區",
-   "heat": "過熱",
+   "heat": "",
    "trough": "",
    "armed": {
     "20": true,
@@ -803,7 +803,7 @@
    "sweet": false
   },
   "BE": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -816,32 +816,32 @@
   "VST": {
    "state": "重點觀察",
    "heat": "",
-   "trough": "已確認",
+   "trough": "形成中",
    "armed": {
     "20": false,
     "50": false,
     "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "COHR": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "MSTR": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -858,12 +858,12 @@
    "sweet": false
   },
   "00670L.TW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -880,30 +880,30 @@
    "sweet": false
   },
   "SSO": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
-    "50": false,
+    "20": true,
+    "50": true,
     "80": true
    },
    "sweet": false
   },
   "00647L.TW": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
-    "50": false,
+    "20": true,
+    "50": true,
     "80": true
    },
    "sweet": false
   }
  },
  "sent": {
-  "TSLA|trough形成中": "2026-10-15",
+  "TSLA|trough形成中": "2026-10-31",
   "GGLL|confirm": "2026-10-17",
   "TSLA|cross50": "2026-10-17",
   "台股市場|market": "2026-10-03",
@@ -1003,13 +1003,19 @@
   "TW": 1
  },
  "groups": {
-  "半導體/AI": 26,
+  "半導體/AI": 20,
   "記憶體": 1,
   "半導體": 1,
   "美股": 1
  },
  "digest": {
-  "pending": [],
+  "pending": [
+   [
+    "TSLA",
+    "trough形成中",
+    "月線 MACD 谷底（形成中，強勢谷底・站上年線）"
+   ]
+  ],
   "last": "2026-10-31"
  },
  "plan": {
