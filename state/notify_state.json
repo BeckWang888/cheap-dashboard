@@ -415,7 +415,7 @@
    "sweet": false
   },
   "SKUU": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -492,12 +492,12 @@
    "sweet": false
   },
   "VWRA.L": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -1009,14 +1009,8 @@
   "美股": 1
  },
  "digest": {
-  "pending": [
-   [
-    "TSLA",
-    "trough形成中",
-    "月線 MACD 谷底（形成中，強勢谷底・站上年線）"
-   ]
-  ],
-  "last": "2026-10-31"
+  "pending": [],
+  "last": "2026-11-02"
  },
  "plan": {
   "sig": {
