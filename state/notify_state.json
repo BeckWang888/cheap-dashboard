@@ -24,17 +24,17 @@
   },
   "HACK": {
    "state": "轉折初現",
-   "heat": "",
+   "heat": "過熱",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
   },
   "CIBR": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -53,7 +53,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "SMH": {
    "state": "觀察中",
@@ -122,7 +122,7 @@
    "sweet": false
   },
   "SMCI": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -260,9 +260,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00941.TW": {
    "state": "轉折初現",
@@ -325,7 +325,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -1002,7 +1002,10 @@
   "SNXX|cross80": "2026-11-03",
   "SNXX|sweet": "2026-11-03",
   "ANTW|cross80": "2026-11-03",
-  "ANTW|sweet": "2026-11-03"
+  "ANTW|sweet": "2026-11-03",
+  "00830.TW|cross80": "2026-11-03",
+  "00830.TW|sweet": "2026-11-03",
+  "009800.TW|cross50": "2026-11-03"
  },
  "market": {
   "US": 0,
@@ -1015,7 +1018,23 @@
   "美股": 1
  },
  "digest": {
-  "pending": [],
+  "pending": [
+   [
+    "00830.TW",
+    "cross80",
+    "跨上 80"
+   ],
+   [
+    "00830.TW",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "009800.TW",
+    "cross50",
+    "跨上 50"
+   ]
+  ],
   "last": "2026-11-03"
  },
  "plan": {
