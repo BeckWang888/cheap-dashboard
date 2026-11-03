@@ -7,9 +7,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00929.TW": {
    "state": "觀察中",
@@ -95,9 +95,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "SOXX": {
    "state": "觀察中",
@@ -194,9 +194,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00663L.TW": {
    "state": "觀察中",
@@ -205,9 +205,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00685L.TW": {
    "state": "觀察中",
@@ -216,9 +216,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "0052.TW": {
    "state": "觀察中",
@@ -249,9 +249,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00830.TW": {
    "state": "觀察中",
@@ -265,7 +265,7 @@
    "sweet": true
   },
   "00941.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -869,11 +869,11 @@
    "sweet": false
   },
   "00713.TW": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -1005,7 +1005,17 @@
   "ANTW|sweet": "2026-11-03",
   "00830.TW|cross80": "2026-11-03",
   "00830.TW|sweet": "2026-11-03",
-  "009800.TW|cross50": "2026-11-03"
+  "009800.TW|cross50": "2026-11-03",
+  "0050.TW|cross80": "2026-11-03",
+  "0050.TW|sweet": "2026-11-03",
+  "00631L.TW|cross80": "2026-11-03",
+  "00631L.TW|sweet": "2026-11-03",
+  "00663L.TW|cross80": "2026-11-03",
+  "00663L.TW|sweet": "2026-11-03",
+  "00685L.TW|cross80": "2026-11-03",
+  "00685L.TW|sweet": "2026-11-03",
+  "00947.TW|cross80": "2026-11-03",
+  "00947.TW|sweet": "2026-11-03"
  },
  "market": {
   "US": 0,
@@ -1033,6 +1043,56 @@
     "009800.TW",
     "cross50",
     "跨上 50"
+   ],
+   [
+    "0050.TW",
+    "cross80",
+    "跨上 80"
+   ],
+   [
+    "0050.TW",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "00631L.TW",
+    "cross80",
+    "跨上 80"
+   ],
+   [
+    "00631L.TW",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "00663L.TW",
+    "cross80",
+    "跨上 80"
+   ],
+   [
+    "00663L.TW",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "00685L.TW",
+    "cross80",
+    "跨上 80"
+   ],
+   [
+    "00685L.TW",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "00947.TW",
+    "cross80",
+    "跨上 80"
+   ],
+   [
+    "00947.TW",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
    ]
   ],
   "last": "2026-11-03"
