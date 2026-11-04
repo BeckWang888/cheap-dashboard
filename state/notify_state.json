@@ -53,7 +53,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "SMH": {
    "state": "觀察中",
@@ -78,12 +78,12 @@
    "sweet": false
   },
   "VOO": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -409,7 +409,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -434,12 +434,12 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "MAGX": {
-   "state": "觀察中",
+   "state": "重點觀察",
    "heat": "",
-   "trough": "",
+   "trough": "形成中",
    "armed": {
     "20": false,
     "50": true,
@@ -464,7 +464,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -478,10 +478,10 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "VT": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -565,9 +565,9 @@
    "sweet": false
   },
   "MAGS": {
-   "state": "觀察中",
+   "state": "強勢谷底",
    "heat": "",
-   "trough": "",
+   "trough": "形成中",
    "armed": {
     "20": false,
     "50": true,
@@ -668,14 +668,14 @@
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
    "sweet": false
   },
   "WLDU": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -708,7 +708,7 @@
    "sweet": false
   },
   "RBLX": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -748,7 +748,7 @@
    "sweet": false
   },
   "CRWD": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -760,7 +760,7 @@
   },
   "V": {
    "state": "未進便宜區",
-   "heat": "過熱",
+   "heat": "嚴重過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -841,7 +841,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -884,18 +884,18 @@
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
    "sweet": false
   },
   "00647L.TW": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -1017,7 +1017,10 @@
   "00947.TW|cross80": "2026-11-03",
   "00947.TW|sweet": "2026-11-03",
   "00892.TW|cross80": "2026-11-04",
-  "00892.TW|sweet": "2026-11-04"
+  "00892.TW|sweet": "2026-11-04",
+  "MUU|cross50": "2026-11-05",
+  "MAGX|trough形成中": "2026-11-05",
+  "MU|cross50": "2026-11-05"
  },
  "market": {
   "US": 0,
@@ -1040,6 +1043,21 @@
     "00892.TW",
     "sweet",
     "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "MUU",
+    "cross50",
+    "跨上 50"
+   ],
+   [
+    "MAGX",
+    "trough形成中",
+    "月線 MACD 谷底（形成中，強勢谷底・站上年線）"
+   ],
+   [
+    "MU",
+    "cross50",
+    "跨上 50"
    ]
   ],
   "last": "2026-11-04"
