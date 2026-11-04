@@ -366,7 +366,7 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
    "sweet": false
   },
@@ -626,7 +626,7 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
    "sweet": false
   },
