@@ -18,9 +18,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "HACK": {
    "state": "轉折初現",
@@ -227,9 +227,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00892.TW": {
    "state": "觀察中",
@@ -874,7 +874,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -1022,7 +1022,9 @@
   "MAGX|trough形成中": "2026-11-05",
   "MU|cross50": "2026-11-05",
   "009816.TW|cross80": "2026-11-05",
-  "009816.TW|sweet": "2026-11-05"
+  "009816.TW|sweet": "2026-11-05",
+  "0052.TW|cross80": "2026-11-05",
+  "0052.TW|sweet": "2026-11-05"
  },
  "market": {
   "US": 0,
@@ -1063,6 +1065,16 @@
    ],
    [
     "009816.TW",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "0052.TW",
+    "cross80",
+    "跨上 80"
+   ],
+   [
+    "0052.TW",
     "sweet",
     "進入甜蜜點（分數 ≥ 80）"
    ]
