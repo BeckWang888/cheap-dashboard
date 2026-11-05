@@ -53,7 +53,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "SMH": {
    "state": "觀察中",
@@ -83,7 +83,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -304,9 +304,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00662.TW": {
    "state": "觀察中",
@@ -409,7 +409,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -434,7 +434,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "MAGX": {
    "state": "觀察中",
@@ -442,7 +442,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -464,7 +464,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -478,15 +478,15 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "VT": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -519,7 +519,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -570,15 +570,15 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
   },
   "AMZN": {
-   "state": "未進便宜區",
+   "state": "強勢谷底",
    "heat": "",
-   "trough": "",
+   "trough": "形成中",
    "armed": {
     "20": true,
     "50": true,
@@ -664,23 +664,23 @@
    "sweet": false
   },
   "VTI": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
    "sweet": false
   },
   "WLDU": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -708,7 +708,7 @@
    "sweet": false
   },
   "RBLX": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -748,7 +748,7 @@
    "sweet": false
   },
   "CRWD": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -760,7 +760,7 @@
   },
   "V": {
    "state": "未進便宜區",
-   "heat": "過熱",
+   "heat": "嚴重過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -803,7 +803,7 @@
    "sweet": false
   },
   "BE": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -820,7 +820,7 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
    "sweet": true
   },
@@ -869,6 +869,17 @@
    "sweet": false
   },
   "00713.TW": {
+   "state": "轉折初現",
+   "heat": "",
+   "trough": "",
+   "armed": {
+    "20": false,
+    "50": true,
+    "80": true
+   },
+   "sweet": false
+  },
+  "SSO": {
    "state": "未進便宜區",
    "heat": "",
    "trough": "",
@@ -879,23 +890,12 @@
    },
    "sweet": false
   },
-  "SSO": {
-   "state": "觀察中",
-   "heat": "",
-   "trough": "",
-   "armed": {
-    "20": false,
-    "50": true,
-    "80": true
-   },
-   "sweet": false
-  },
   "00647L.TW": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -1020,7 +1020,9 @@
   "00892.TW|sweet": "2026-11-04",
   "MUU|cross50": "2026-11-05",
   "MAGX|trough形成中": "2026-11-05",
-  "MU|cross50": "2026-11-05"
+  "MU|cross50": "2026-11-05",
+  "009816.TW|cross80": "2026-11-05",
+  "009816.TW|sweet": "2026-11-05"
  },
  "market": {
   "US": 0,
@@ -1051,6 +1053,16 @@
    ],
    [
     "00941.TW",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "009816.TW",
+    "cross80",
+    "跨上 80"
+   ],
+   [
+    "009816.TW",
     "sweet",
     "進入甜蜜點（分數 ≥ 80）"
    ]
