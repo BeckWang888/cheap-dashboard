@@ -454,9 +454,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "MU": {
    "state": "觀察中",
@@ -1029,7 +1029,9 @@
   "USD|cross80": "2026-11-05",
   "USD|sweet": "2026-11-05",
   "PLTR|cross50": "2026-11-05",
-  "AMDC|cross50": "2026-11-05"
+  "AMDC|cross50": "2026-11-05",
+  "DRAM|cross80": "2026-11-06",
+  "DRAM|sweet": "2026-11-06"
  },
  "market": {
   "US": 0,
@@ -1112,6 +1114,16 @@
     "TSLA",
     "cross50",
     "跨上 50"
+   ],
+   [
+    "DRAM",
+    "cross80",
+    "跨上 80"
+   ],
+   [
+    "DRAM",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
    ]
   ],
   "last": "2026-11-05"
