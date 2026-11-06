@@ -743,9 +743,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "CRWD": {
    "state": "觀察中",
