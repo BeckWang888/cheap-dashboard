@@ -317,7 +317,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "009800.TW": {
    "state": "觀察中",
@@ -877,7 +877,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "SSO": {
    "state": "觀察中",
