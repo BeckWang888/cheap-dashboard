@@ -456,7 +456,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "MU": {
    "state": "觀察中",
@@ -617,7 +617,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00708L.TW": {
    "state": "觀察中",
@@ -708,7 +708,7 @@
    "sweet": false
   },
   "RBLX": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -745,7 +745,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "CRWD": {
    "state": "觀察中",
