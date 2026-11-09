@@ -486,7 +486,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -511,7 +511,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "NVDA": {
    "state": "觀察中",
@@ -680,7 +680,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -719,11 +719,11 @@
    "sweet": false
   },
   "DBX": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
@@ -753,7 +753,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -885,7 +885,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -896,7 +896,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -1047,7 +1047,7 @@
  },
  "digest": {
   "pending": [],
-  "last": "2026-11-09"
+  "last": "2026-11-10"
  },
  "plan": {
   "sig": {
@@ -1063,7 +1063,7 @@
    "MU|plan_sig": "2026-10-28",
    "SNDK|plan_sig": "2026-10-29",
    "SOXL.L|plan_rb": "2026-10-29",
-   "AMDC|plan_rb": "2026-10-30",
+   "AMDC|plan_rb": "2026-11-10",
    "SOXL|plan_rb": "2026-10-30",
    "USD|plan_rb": "2026-10-30",
    "GGLL|plan_rb": "2026-11-10"
