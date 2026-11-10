@@ -34,7 +34,7 @@
    "sweet": false
   },
   "CIBR": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -122,7 +122,7 @@
    "sweet": false
   },
   "SMCI": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -133,7 +133,7 @@
    "sweet": false
   },
   "TSLA": {
-   "state": "未進便宜區",
+   "state": "重點觀察",
    "heat": "",
    "trough": "已確認",
    "armed": {
@@ -141,7 +141,7 @@
     "50": true,
     "80": true
    },
-   "sweet": false
+   "sweet": true
   },
   "AMD": {
    "state": "未進便宜區",
@@ -437,7 +437,7 @@
    "sweet": true
   },
   "MAGX": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -565,7 +565,7 @@
    "sweet": false
   },
   "MAGS": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -587,7 +587,7 @@
    "sweet": false
   },
   "INTC": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -598,7 +598,7 @@
    "sweet": true
   },
   "TSM": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -609,7 +609,7 @@
    "sweet": false
   },
   "ANTW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -781,7 +781,7 @@
    "sweet": false
   },
   "IBKR": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
