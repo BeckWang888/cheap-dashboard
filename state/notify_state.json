@@ -34,7 +34,7 @@
    "sweet": false
   },
   "CIBR": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -133,7 +133,7 @@
    "sweet": false
   },
   "TSLA": {
-   "state": "重點觀察",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "已確認",
    "armed": {
@@ -141,7 +141,7 @@
     "50": true,
     "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "AMD": {
    "state": "未進便宜區",
@@ -825,7 +825,7 @@
    "sweet": true
   },
   "COHR": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
