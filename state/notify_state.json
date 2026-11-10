@@ -20,7 +20,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "HACK": {
    "state": "觀察中",
@@ -97,7 +97,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "SOXX": {
    "state": "觀察中",
@@ -196,7 +196,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "00663L.TW": {
    "state": "觀察中",
@@ -207,7 +207,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "00685L.TW": {
    "state": "觀察中",
@@ -218,7 +218,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "0052.TW": {
    "state": "觀察中",
