@@ -309,7 +309,7 @@
    "sweet": false
   },
   "00662.TW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -492,7 +492,7 @@
    "sweet": false
   },
   "VWRA.L": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -1128,7 +1128,7 @@
   "sent": {
    "MU|plan_sig": "2026-10-28",
    "SNDK|plan_sig": "2026-10-29",
-   "SOXL.L|plan_rb": "2026-10-29",
+   "SOXL.L|plan_rb": "2026-11-12",
    "AMDC|plan_rb": "2026-11-10",
    "SOXL|plan_rb": "2026-10-30",
    "USD|plan_rb": "2026-10-30",
