@@ -265,7 +265,7 @@
    "sweet": false
   },
   "00941.TW": {
-   "state": "轉折初現",
+   "state": "轉折確認",
    "heat": "",
    "trough": "",
    "armed": {
@@ -303,7 +303,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -366,9 +366,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "GOOG": {
    "state": "轉折初現",
@@ -628,7 +628,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "TQQQ": {
    "state": "觀察中",
@@ -907,7 +907,7 @@
   "GGLL|confirm": "2026-10-17",
   "TSLA|cross50": "2026-11-06",
   "台股市場|market": "2026-10-03",
-  "AU9901.TW|sweet": "2026-10-20",
+  "AU9901.TW|sweet": "2026-11-12",
   "GOOG|confirm": "2026-10-15",
   "SKUU|confirm": "2026-10-05",
   "IBB|cross20": "2026-10-07",
@@ -942,7 +942,7 @@
   "SMCI|cross20": "2026-10-12",
   "MSTR|cross20": "2026-10-13",
   "00830.TW|cross20": "2026-10-13",
-  "00941.TW|confirm": "2026-10-13",
+  "00941.TW|confirm": "2026-11-12",
   "00990A.TW|confirm": "2026-10-13",
   "SOXX|cross50": "2026-11-06",
   "SOXL|cross50": "2026-11-06",
@@ -978,7 +978,7 @@
   "00663L.TW|cross50": "2026-10-30",
   "00685L.TW|cross50": "2026-10-30",
   "00892.TW|cross50": "2026-10-30",
-  "AU9901.TW|cross80": "2026-10-20",
+  "AU9901.TW|cross80": "2026-11-12",
   "0052.TW|cross50": "2026-10-30",
   "GOOG|cross80": "2026-10-23",
   "GOOG|sweet": "2026-10-30",
@@ -1076,6 +1076,21 @@
     "MU",
     "cross50",
     "跨上 50"
+   ],
+   [
+    "00941.TW",
+    "confirm",
+    "轉折確認"
+   ],
+   [
+    "AU9901.TW",
+    "cross80",
+    "跨上 80"
+   ],
+   [
+    "AU9901.TW",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
    ]
   ],
   "last": "2026-11-12"
