@@ -100,7 +100,7 @@
    "sweet": false
   },
   "SOXX": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -122,7 +122,7 @@
    "sweet": false
   },
   "SMCI": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -155,7 +155,7 @@
    "sweet": false
   },
   "SOXL": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -177,7 +177,7 @@
    "sweet": false
   },
   "GGLL": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -185,7 +185,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00631L.TW": {
    "state": "轉折初現",
@@ -371,7 +371,7 @@
    "sweet": true
   },
   "GOOG": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -379,7 +379,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "PLTR": {
    "state": "轉折初現",
@@ -415,7 +415,7 @@
    "sweet": false
   },
   "SKUU": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -470,7 +470,7 @@
    "sweet": false
   },
   "SOXQ": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -481,7 +481,7 @@
    "sweet": false
   },
   "VT": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -492,7 +492,7 @@
    "sweet": false
   },
   "VWRA.L": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -503,7 +503,7 @@
    "sweet": false
   },
   "SOXL.L": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -555,7 +555,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "SPCX": {
    "state": "",
@@ -598,7 +598,7 @@
    "sweet": true
   },
   "TSM": {
-   "state": "觀察中",
+   "state": "轉折確認",
    "heat": "",
    "trough": "",
    "armed": {
@@ -664,7 +664,7 @@
    "sweet": false
   },
   "VTI": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -675,7 +675,7 @@
    "sweet": false
   },
   "WLDU": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -697,7 +697,7 @@
    "sweet": false
   },
   "CRM": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -719,7 +719,7 @@
    "sweet": false
   },
   "DBX": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -781,7 +781,7 @@
    "sweet": false
   },
   "IBKR": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -807,7 +807,7 @@
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -981,9 +981,9 @@
   "AU9901.TW|cross80": "2026-11-12",
   "0052.TW|cross50": "2026-11-12",
   "GOOG|cross80": "2026-10-23",
-  "GOOG|sweet": "2026-10-30",
+  "GOOG|sweet": "2026-11-13",
   "GGLL|cross80": "2026-10-23",
-  "GGLL|sweet": "2026-10-24",
+  "GGLL|sweet": "2026-11-13",
   "00941.TW|cross80": "2026-11-05",
   "00941.TW|sweet": "2026-11-05",
   "00995A.TW|cross80": "2026-11-12",
@@ -1046,7 +1046,18 @@
   "美股": 1
  },
  "digest": {
-  "pending": [],
+  "pending": [
+   [
+    "GGLL",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "GOOG",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ]
+  ],
   "last": "2026-11-13"
  },
  "plan": {
