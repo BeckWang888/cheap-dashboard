@@ -415,7 +415,7 @@
    "sweet": false
   },
   "SKUU": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -423,7 +423,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "SNXX": {
    "state": "轉折初現",
@@ -1046,19 +1046,8 @@
   "美股": 1
  },
  "digest": {
-  "pending": [
-   [
-    "GGLL",
-    "sweet",
-    "進入甜蜜點（分數 ≥ 80）"
-   ],
-   [
-    "GOOG",
-    "sweet",
-    "進入甜蜜點（分數 ≥ 80）"
-   ]
-  ],
-  "last": "2026-11-13"
+  "pending": [],
+  "last": "2026-11-14"
  },
  "plan": {
   "sig": {
