@@ -188,7 +188,7 @@
    "sweet": false
   },
   "00631L.TW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -199,7 +199,7 @@
    "sweet": false
   },
   "00663L.TW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -221,7 +221,7 @@
    "sweet": false
   },
   "0052.TW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -265,7 +265,7 @@
    "sweet": false
   },
   "00941.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -423,7 +423,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "SNXX": {
    "state": "轉折初現",
