@@ -448,7 +448,7 @@
    "sweet": false
   },
   "DRAM": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -664,7 +664,7 @@
    "sweet": false
   },
   "VTI": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -825,7 +825,7 @@
    "sweet": true
   },
   "COHR": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
