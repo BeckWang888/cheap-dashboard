@@ -100,7 +100,7 @@
    "sweet": false
   },
   "SOXX": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -122,7 +122,7 @@
    "sweet": false
   },
   "SMCI": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -155,7 +155,7 @@
    "sweet": false
   },
   "SOXL": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -177,7 +177,7 @@
    "sweet": false
   },
   "GGLL": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -185,10 +185,10 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "00631L.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -199,7 +199,7 @@
    "sweet": false
   },
   "00663L.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -371,7 +371,7 @@
    "sweet": true
   },
   "GOOG": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -379,7 +379,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "PLTR": {
    "state": "轉折初現",
@@ -470,7 +470,7 @@
    "sweet": false
   },
   "SOXQ": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -481,7 +481,7 @@
    "sweet": false
   },
   "VT": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -503,7 +503,7 @@
    "sweet": false
   },
   "SOXL.L": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -555,7 +555,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "SPCX": {
    "state": "",
@@ -598,7 +598,7 @@
    "sweet": true
   },
   "TSM": {
-   "state": "轉折確認",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -664,7 +664,7 @@
    "sweet": false
   },
   "VTI": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -675,7 +675,7 @@
    "sweet": false
   },
   "WLDU": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -697,7 +697,7 @@
    "sweet": false
   },
   "CRM": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -719,7 +719,7 @@
    "sweet": false
   },
   "DBX": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -781,7 +781,7 @@
    "sweet": false
   },
   "IBKR": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
