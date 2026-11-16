@@ -23,7 +23,7 @@
    "sweet": true
   },
   "HACK": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -34,7 +34,7 @@
    "sweet": false
   },
   "CIBR": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -309,7 +309,7 @@
    "sweet": false
   },
   "00662.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -737,7 +737,7 @@
    "sweet": false
   },
   "PANW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -748,7 +748,7 @@
    "sweet": false
   },
   "CRWD": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -1046,49 +1046,8 @@
   "美股": 1
  },
  "digest": {
-  "pending": [
-   [
-    "SOXX",
-    "cross80",
-    "跨上 80"
-   ],
-   [
-    "SOXL",
-    "cross80",
-    "跨上 80"
-   ],
-   [
-    "USD",
-    "cross80",
-    "跨上 80"
-   ],
-   [
-    "USD",
-    "sweet",
-    "進入甜蜜點（分數 ≥ 80）"
-   ],
-   [
-    "GGLL",
-    "cross80",
-    "跨上 80"
-   ],
-   [
-    "GOOG",
-    "cross80",
-    "跨上 80"
-   ],
-   [
-    "SOXQ",
-    "cross80",
-    "跨上 80"
-   ],
-   [
-    "SOXL.L",
-    "cross80",
-    "跨上 80"
-   ]
-  ],
-  "last": "2026-11-16"
+  "pending": [],
+  "last": "2026-11-17"
  },
  "plan": {
   "sig": {
