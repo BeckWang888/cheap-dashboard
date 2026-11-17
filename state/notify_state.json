@@ -133,15 +133,15 @@
    "sweet": true
   },
   "TSLA": {
-   "state": "未進便宜區",
+   "state": "重點觀察",
    "heat": "",
    "trough": "已確認",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
-   "sweet": false
+   "sweet": true
   },
   "AMD": {
    "state": "未進便宜區",
@@ -371,7 +371,7 @@
    "sweet": true
   },
   "GOOG": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -387,7 +387,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -576,9 +576,9 @@
    "sweet": false
   },
   "AMZN": {
-   "state": "強勢谷底",
+   "state": "未進便宜區",
    "heat": "",
-   "trough": "形成中",
+   "trough": "",
    "armed": {
     "20": true,
     "50": true,
@@ -686,7 +686,7 @@
    "sweet": false
   },
   "MSFT": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -703,9 +703,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "RBLX": {
    "state": "轉折初現",
@@ -786,7 +786,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -1025,10 +1025,10 @@
   "009816.TW|sweet": "2026-11-17",
   "0052.TW|cross80": "2026-11-17",
   "0052.TW|sweet": "2026-11-17",
-  "TSLA|sweet": "2026-11-05",
+  "TSLA|sweet": "2026-11-17",
   "USD|cross80": "2026-11-16",
   "USD|sweet": "2026-11-16",
-  "PLTR|cross50": "2026-11-05",
+  "PLTR|cross50": "2026-11-17",
   "AMDC|cross50": "2026-11-05",
   "DRAM|cross80": "2026-11-06",
   "DRAM|sweet": "2026-11-06",
@@ -1151,6 +1151,16 @@
     "0052.TW",
     "sweet",
     "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "TSLA",
+    "sweet",
+    "進入甜蜜點（月線谷底確認且分數 ≥ 20）"
+   ],
+   [
+    "PLTR",
+    "cross50",
+    "跨上 50"
    ]
   ],
   "last": "2026-11-17"
