@@ -51,9 +51,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "SMH": {
    "state": "觀察中",
@@ -432,9 +432,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "MAGX": {
    "state": "觀察中",
