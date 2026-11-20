@@ -28,7 +28,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -73,9 +73,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "VOO": {
    "state": "觀察中",
@@ -116,7 +116,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -138,7 +138,7 @@
    "trough": "已確認",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": true
@@ -423,7 +423,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "SNXX": {
    "state": "觀察中",
@@ -454,9 +454,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "MU": {
    "state": "觀察中",
@@ -576,18 +576,18 @@
    "sweet": false
   },
   "AMZN": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
    "sweet": false
   },
   "INTC": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -637,9 +637,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "QLD": {
    "state": "觀察中",
@@ -648,9 +648,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "QQQI": {
    "state": "觀察中",
@@ -659,9 +659,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "VTI": {
    "state": "觀察中",
@@ -670,9 +670,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "WLDU": {
    "state": "觀察中",
@@ -691,7 +691,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -708,7 +708,7 @@
    "sweet": true
   },
   "RBLX": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -737,7 +737,7 @@
    "sweet": false
   },
   "PANW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -764,7 +764,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -781,15 +781,15 @@
    "sweet": false
   },
   "IBKR": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "LLY": {
    "state": "未進便宜區",
@@ -809,9 +809,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "VST": {
    "state": "重點觀察",
@@ -831,9 +831,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "MSTR": {
    "state": "觀察中",
@@ -864,9 +864,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00713.TW": {
    "state": "觀察中",
@@ -886,9 +886,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00647L.TW": {
    "state": "觀察中",
@@ -897,15 +897,15 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   }
  },
  "sent": {
   "TSLA|trough形成中": "2026-10-31",
   "GGLL|confirm": "2026-10-17",
-  "TSLA|cross50": "2026-11-06",
+  "TSLA|cross50": "2026-11-21",
   "台股市場|market": "2026-10-03",
   "AU9901.TW|sweet": "2026-11-12",
   "GOOG|confirm": "2026-10-15",
@@ -1030,12 +1030,15 @@
   "USD|sweet": "2026-11-16",
   "PLTR|cross50": "2026-11-17",
   "AMDC|cross50": "2026-11-05",
-  "DRAM|cross80": "2026-11-06",
-  "DRAM|sweet": "2026-11-06",
+  "DRAM|cross80": "2026-11-21",
+  "DRAM|sweet": "2026-11-21",
   "00662.TW|cross80": "2026-11-20",
   "00662.TW|sweet": "2026-11-20",
   "VT|cross80": "2026-11-20",
-  "VT|sweet": "2026-11-20"
+  "VT|sweet": "2026-11-20",
+  "QQQ|cross80": "2026-11-21",
+  "QQQ|sweet": "2026-11-21",
+  "IBB|cross50": "2026-11-21"
  },
  "market": {
   "US": 0,
@@ -1096,6 +1099,36 @@
    ],
    [
     "ANTW",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "QQQ",
+    "cross80",
+    "跨上 80"
+   ],
+   [
+    "QQQ",
+    "sweet",
+    "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "IBB",
+    "cross50",
+    "跨上 50"
+   ],
+   [
+    "TSLA",
+    "cross50",
+    "跨上 50"
+   ],
+   [
+    "DRAM",
+    "cross80",
+    "跨上 80"
+   ],
+   [
+    "DRAM",
     "sweet",
     "進入甜蜜點（分數 ≥ 80）"
    ]
