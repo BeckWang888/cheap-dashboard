@@ -337,9 +337,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00757.TW": {
    "state": "觀察中",
@@ -348,9 +348,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "6940.TW": {
    "state": "",
@@ -500,7 +500,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "SOXL.L": {
    "state": "觀察中",
@@ -1038,7 +1038,11 @@
   "VT|sweet": "2026-11-20",
   "QQQ|cross80": "2026-11-21",
   "QQQ|sweet": "2026-11-21",
-  "IBB|cross50": "2026-11-21"
+  "IBB|cross50": "2026-11-21",
+  "009801.TW|cross80": "2026-11-23",
+  "009801.TW|sweet": "2026-11-23",
+  "00757.TW|cross80": "2026-11-23",
+  "00757.TW|sweet": "2026-11-23"
  },
  "market": {
   "US": 0,
@@ -1052,7 +1056,7 @@
  },
  "digest": {
   "pending": [],
-  "last": "2026-11-21"
+  "last": "2026-11-23"
  },
  "plan": {
   "sig": {
