@@ -7,9 +7,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "00929.TW": {
    "state": "觀察中",
@@ -18,9 +18,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "HACK": {
    "state": "轉折初現",
@@ -95,9 +95,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "SOXX": {
    "state": "觀察中",
@@ -194,9 +194,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "00663L.TW": {
    "state": "觀察中",
@@ -205,9 +205,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "00685L.TW": {
    "state": "觀察中",
@@ -216,9 +216,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "0052.TW": {
    "state": "觀察中",
@@ -227,9 +227,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "00892.TW": {
    "state": "觀察中",
@@ -238,9 +238,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "00947.TW": {
    "state": "觀察中",
@@ -251,7 +251,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "00830.TW": {
    "state": "觀察中",
@@ -262,7 +262,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "00941.TW": {
    "state": "觀察中",
@@ -271,9 +271,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "00990A.TW": {
    "state": "觀察中",
@@ -304,9 +304,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "00662.TW": {
    "state": "觀察中",
@@ -317,7 +317,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "009800.TW": {
    "state": "觀察中",
@@ -337,9 +337,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "00757.TW": {
    "state": "觀察中",
@@ -348,9 +348,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "6940.TW": {
    "state": "",
@@ -875,9 +875,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "SSO": {
    "state": "觀察中",
