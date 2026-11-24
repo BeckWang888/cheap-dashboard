@@ -23,7 +23,7 @@
    "sweet": false
   },
   "HACK": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -423,7 +423,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "SNXX": {
    "state": "觀察中",
@@ -576,7 +576,7 @@
    "sweet": false
   },
   "AMZN": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -720,7 +720,7 @@
   },
   "DBX": {
    "state": "未進便宜區",
-   "heat": "過熱",
+   "heat": "",
    "trough": "",
    "armed": {
     "20": true,
@@ -737,7 +737,7 @@
    "sweet": false
   },
   "PANW": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -1056,7 +1056,7 @@
  },
  "digest": {
   "pending": [],
-  "last": "2026-11-24"
+  "last": "2026-11-25"
  },
  "plan": {
   "sig": {
