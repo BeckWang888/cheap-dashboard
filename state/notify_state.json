@@ -23,7 +23,7 @@
    "sweet": false
   },
   "HACK": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -133,7 +133,7 @@
    "sweet": true
   },
   "TSLA": {
-   "state": "未進便宜區",
+   "state": "強勢谷底",
    "heat": "",
    "trough": "已確認",
    "armed": {
@@ -144,7 +144,7 @@
    "sweet": false
   },
   "AMD": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -185,7 +185,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "00631L.TW": {
    "state": "觀察中",
@@ -393,7 +393,7 @@
    "sweet": false
   },
   "AMDC": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -576,7 +576,7 @@
    "sweet": false
   },
   "AMZN": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -720,7 +720,7 @@
   },
   "DBX": {
    "state": "未進便宜區",
-   "heat": "",
+   "heat": "過熱",
    "trough": "",
    "armed": {
     "20": true,
@@ -737,7 +737,7 @@
    "sweet": false
   },
   "PANW": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -763,7 +763,7 @@
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
