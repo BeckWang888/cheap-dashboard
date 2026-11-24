@@ -379,7 +379,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "PLTR": {
    "state": "觀察中",
@@ -387,7 +387,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -454,9 +454,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "MU": {
    "state": "觀察中",
@@ -478,7 +478,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "VT": {
    "state": "觀察中",
@@ -487,9 +487,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "VWRA.L": {
    "state": "觀察中",
@@ -511,7 +511,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "NVDA": {
    "state": "觀察中",
@@ -520,9 +520,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "META": {
    "state": "觀察中",
@@ -531,9 +531,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "LITE": {
    "state": "觀察中",
@@ -576,7 +576,7 @@
    "sweet": false
   },
   "AMZN": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -604,9 +604,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "ANTW": {
    "state": "觀察中",
@@ -617,7 +617,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "00708L.TW": {
    "state": "觀察中",
@@ -637,9 +637,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "QLD": {
    "state": "觀察中",
@@ -648,9 +648,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "QQQI": {
    "state": "觀察中",
@@ -659,9 +659,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "VTI": {
    "state": "觀察中",
@@ -670,9 +670,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "WLDU": {
    "state": "觀察中",
@@ -681,9 +681,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "MSFT": {
    "state": "觀察中",
@@ -708,11 +708,11 @@
    "sweet": true
   },
   "RBLX": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
@@ -737,7 +737,7 @@
    "sweet": false
   },
   "PANW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -748,12 +748,12 @@
    "sweet": false
   },
   "CRWD": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -764,7 +764,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": false,
+    "50": true,
     "80": true
    },
    "sweet": false
@@ -787,9 +787,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "LLY": {
    "state": "未進便宜區",
@@ -809,9 +809,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "VST": {
    "state": "重點觀察",
@@ -831,9 +831,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "MSTR": {
    "state": "觀察中",
@@ -844,7 +844,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "009826.TW": {
    "state": "觀察中",
@@ -864,9 +864,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "00713.TW": {
    "state": "觀察中",
@@ -886,9 +886,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   },
   "00647L.TW": {
    "state": "觀察中",
@@ -897,9 +897,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": false
+    "80": true
    },
-   "sweet": true
+   "sweet": false
   }
  },
  "sent": {
