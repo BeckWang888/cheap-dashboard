@@ -1,7 +1,7 @@
 {
  "items": {
   "00927.TW": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -62,9 +62,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "QQQ": {
    "state": "觀察中",
@@ -108,7 +108,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "IBB": {
    "state": "未進便宜區",
@@ -130,7 +130,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "TSLA": {
    "state": "強勢谷底",
@@ -163,7 +163,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "USD": {
    "state": "觀察中",
@@ -172,9 +172,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "GGLL": {
    "state": "觀察中",
@@ -379,7 +379,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "PLTR": {
    "state": "觀察中",
@@ -478,7 +478,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "VT": {
    "state": "觀察中",
@@ -511,7 +511,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "NVDA": {
    "state": "觀察中",
@@ -576,7 +576,7 @@
    "sweet": false
   },
   "AMZN": {
-   "state": "未進便宜區",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -617,7 +617,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00708L.TW": {
    "state": "觀察中",
@@ -705,7 +705,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "RBLX": {
    "state": "未進便宜區",
@@ -759,18 +759,18 @@
    "sweet": false
   },
   "V": {
-   "state": "轉折初現",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
-    "20": false,
+    "20": true,
     "50": true,
     "80": true
    },
    "sweet": false
   },
   "XYZ": {
-   "state": "觀察中",
+   "state": "未進便宜區",
    "heat": "",
    "trough": "",
    "armed": {
@@ -844,7 +844,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "009826.TW": {
    "state": "觀察中",
