@@ -28,7 +28,7 @@
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -45,7 +45,7 @@
    "sweet": false
   },
   "SNDK": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -86,7 +86,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "0050.TW": {
    "state": "觀察中",
@@ -133,23 +133,23 @@
    "sweet": true
   },
   "TSLA": {
-   "state": "強勢谷底",
+   "state": "重點觀察",
    "heat": "",
    "trough": "已確認",
    "armed": {
-    "20": true,
+    "20": false,
     "50": true,
     "80": true
    },
-   "sweet": false
+   "sweet": true
   },
   "AMD": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -185,7 +185,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00631L.TW": {
    "state": "觀察中",
@@ -382,7 +382,7 @@
    "sweet": true
   },
   "PLTR": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -393,12 +393,12 @@
    "sweet": false
   },
   "AMDC": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -423,10 +423,10 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "SNXX": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -454,9 +454,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "MU": {
    "state": "觀察中",
@@ -487,9 +487,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "VWRA.L": {
    "state": "觀察中",
@@ -514,7 +514,7 @@
    "sweet": true
   },
   "NVDA": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -576,12 +576,12 @@
    "sweet": false
   },
   "AMZN": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
     "20": false,
-    "50": true,
+    "50": false,
     "80": true
    },
    "sweet": false
@@ -604,9 +604,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "ANTW": {
    "state": "觀察中",
@@ -681,9 +681,9 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "MSFT": {
    "state": "觀察中",
@@ -697,7 +697,7 @@
    "sweet": false
   },
   "CRM": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -770,7 +770,7 @@
    "sweet": false
   },
   "XYZ": {
-   "state": "未進便宜區",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -831,12 +831,12 @@
    "armed": {
     "20": false,
     "50": false,
-    "80": true
+    "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "MSTR": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -1029,7 +1029,7 @@
   "USD|cross80": "2026-11-24",
   "USD|sweet": "2026-11-24",
   "PLTR|cross50": "2026-11-24",
-  "AMDC|cross50": "2026-11-05",
+  "AMDC|cross50": "2026-11-26",
   "DRAM|cross80": "2026-11-21",
   "DRAM|sweet": "2026-11-21",
   "00662.TW|cross80": "2026-11-20",
@@ -1135,6 +1135,11 @@
     "009816.TW",
     "sweet",
     "進入甜蜜點（分數 ≥ 80）"
+   ],
+   [
+    "AMDC",
+    "cross50",
+    "跨上 50"
    ]
   ],
   "last": "2026-11-25"
