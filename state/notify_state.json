@@ -492,7 +492,7 @@
    "sweet": false
   },
   "VWRA.L": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -500,7 +500,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "SOXL.L": {
    "state": "觀察中",
