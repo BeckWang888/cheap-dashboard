@@ -251,7 +251,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "00830.TW": {
    "state": "觀察中",
@@ -492,7 +492,7 @@
    "sweet": false
   },
   "VWRA.L": {
-   "state": "觀察中",
+   "state": "轉折初現",
    "heat": "",
    "trough": "",
    "armed": {
@@ -877,7 +877,7 @@
     "50": false,
     "80": false
    },
-   "sweet": true
+   "sweet": false
   },
   "SSO": {
    "state": "轉折初現",
