@@ -1,7 +1,7 @@
 {
  "items": {
   "00927.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -221,7 +221,7 @@
    "sweet": false
   },
   "0052.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
@@ -251,7 +251,7 @@
     "50": false,
     "80": false
    },
-   "sweet": false
+   "sweet": true
   },
   "00830.TW": {
    "state": "觀察中",
@@ -287,7 +287,7 @@
    "sweet": true
   },
   "00995A.TW": {
-   "state": "轉折初現",
+   "state": "觀察中",
    "heat": "",
    "trough": "",
    "armed": {
